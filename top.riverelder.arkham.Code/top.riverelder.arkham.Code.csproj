@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8386F876-96BA-4FDC-9067-27CBE008582D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>top.riverelder.arkham.Code</RootNamespace>
+    <AssemblyName>top.riverelder.arkham.Code</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Bot\ArgumentValidater.cs" />
+    <Compile Include="Bot\Command.cs" />
+    <Compile Include="Bot\Dispatcher.cs" />
+    <Compile Include="Bot\Env.cs" />
+    <Compile Include="Bot\EnvValidator.cs" />
+    <Compile Include="Bot\ICmdExecutor.cs" />
+    <Compile Include="Bot\CommandNode.cs" />
+    <Compile Include="Bot\CommandDispatcher.cs" />
+    <Compile Include="Bot\CompiledCommand.cs" />
+    <Compile Include="Bot\ICommand.cs" />
+    <Compile Include="Bot\Params.cs" />
+    <Compile Include="Bot\ParamValidator\AnyParam.cs" />
+    <Compile Include="Bot\ParamValidator\DecParam.cs" />
+    <Compile Include="Bot\ParamValidator\DiceParam.cs" />
+    <Compile Include="Bot\ParamValidator\IParam.cs" />
+    <Compile Include="Bot\ParamValidator\IntParam.cs" />
+    <Compile Include="Bot\ParamValidator\LitParam.cs" />
+    <Compile Include="Bot\ParamValidator\OrParam.cs" />
+    <Compile Include="Bot\ParamValidator\RestParam.cs" />
+    <Compile Include="Commands\Command_Check.cs" />
+    <Compile Include="Commands\Command_CreateInv.cs" />
+    <Compile Include="Commands\Command_CreateScenario.cs" />
+    <Compile Include="Commands\Command_Display.cs" />
+    <Compile Include="Commands\Command_Fight.cs" />
+    <Compile Include="Commands\Command_Horse.cs" />
+    <Compile Include="Commands\Command_Item.cs" />
+    <Compile Include="Commands\Command_SaveScenario.cs" />
+    <Compile Include="Commands\Command_Help.cs" />
+    <Compile Include="Commands\Command_Global.cs" />
+    <Compile Include="Commands\Command_ReloadScenario.cs" />
+    <Compile Include="Commands\Command_Roll.cs" />
+    <Compile Include="Commands\Command_SanCheck.cs" />
+    <Compile Include="Commands\Command_SetPrefix.cs" />
+    <Compile Include="Commands\Command_Value.cs" />
+    <Compile Include="Commands\Command_Control.cs" />
+    <Compile Include="Event_CqAppEnable.cs" />
+    <Compile Include="Event_CqExit.cs" />
+    <Compile Include="Global.cs" />
+    <Compile Include="Bot\CmdEnv.cs" />
+    <Compile Include="ICQAppEnable.cs" />
+    <Compile Include="Model\FightEvent.cs" />
+    <Compile Include="Model\Horse.cs" />
+    <Compile Include="Model\Scenario.cs" />
+    <Compile Include="Utils\CheckResult.cs" />
+    <Compile Include="Utils\CheckUtil.cs" />
+    <Compile Include="Utils\Dice.cs" />
+    <Compile Include="Event_GroupMessage.cs" />
+    <Compile Include="Model\Inventory.cs" />
+    <Compile Include="Model\Investigator.cs" />
+    <Compile Include="Model\Item.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Model\FightTask.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="Model\Value.cs" />
+    <Compile Include="Model\ValueSet.cs" />
+    <Compile Include="Model\WeaponInfo.cs" />
+    <Compile Include="Utils\SaveUtil.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Native.Sdk\Native.Sdk.csproj">
+      <Project>{d7a958b3-79d9-49f8-8bb4-9619bab6ecba}</Project>
+      <Name>Native.Sdk</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Native.Tool\Native.Tool.csproj">
+      <Project>{0ca93eb9-4e25-46c6-94d2-0f97137a1606}</Project>
+      <Name>Native.Tool</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
