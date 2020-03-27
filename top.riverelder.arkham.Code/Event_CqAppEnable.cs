@@ -28,6 +28,7 @@ namespace top.riverelder.arkham.Code
             Global.Dispatcher.Register(new Command_CreateScenario());
             Global.Dispatcher.Register(new Command_Display());
             Global.Dispatcher.Register(new Command_Fight());
+            Global.Dispatcher.Register(new Command_Heal());
             Global.Dispatcher.Register(new Command_Help());
             Global.Dispatcher.Register(new Command_Horse());
             Global.Dispatcher.Register(new Command_Item());
@@ -44,11 +45,14 @@ namespace top.riverelder.arkham.Code
             Global.Dispatcher.AddAlias("拾取", "物品 拾取");
             Global.Dispatcher.AddAlias("销毁", "物品 销毁");
             Global.Dispatcher.AddAlias("攻击", "战斗 攻击");
+            Global.Dispatcher.AddAlias("射击", "战斗 射击");
             Global.Dispatcher.AddAlias("闪避", "战斗 闪避");
             Global.Dispatcher.AddAlias("增值", "数值 增加");
             Global.Dispatcher.AddAlias("设值", "数值 设置");
             Global.Dispatcher.AddAlias("别名", "数值 别名");
             Global.Dispatcher.AddAlias("sc", "SC");
+            Global.Dispatcher.AddAlias("医学", "治疗 医学");
+            Global.Dispatcher.AddAlias("急救", "治疗 急救");
 
         }
     }

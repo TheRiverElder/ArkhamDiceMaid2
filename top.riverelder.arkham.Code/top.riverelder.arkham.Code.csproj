@@ -86,6 +86,7 @@
     <Compile Include="Commands\Command_CreateScenario.cs" />
     <Compile Include="Commands\Command_Display.cs" />
     <Compile Include="Commands\Command_Fight.cs" />
+    <Compile Include="Commands\Command_Heal.cs" />
     <Compile Include="Commands\Command_Horse.cs" />
     <Compile Include="Commands\Command_Item.cs" />
     <Compile Include="Commands\Command_SaveScenario.cs" />
