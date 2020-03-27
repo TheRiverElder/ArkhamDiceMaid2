@@ -91,7 +91,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!inv.Values.TryGet("敏捷", out Value dex)) {
                 return $"未找到{inv.Name}的敏捷属性";
             }
-            Value dodge = new Value("闪避", dex.Val / 2);
+            Value dodge = new Value(dex.Val / 2);
 
             CheckResult result =dodge.Check();
             if (result.succeed) {
@@ -126,11 +126,12 @@ namespace top.riverelder.arkham.Code.Commands {
                     Capacity = 1,
                     Mulfunction = 100,
                     CurrentLoad = 1,
+                    Cost = 1,
                 };
             }
 
             if (!source.Values.TryGet(w.SkillName, out Value skill)) {
-                skill = new Value(w.SkillName, w.SkillValue);
+                skill = new Value(w.SkillValue);
             }
             CheckResult result = skill.Check();
 
@@ -173,13 +174,20 @@ namespace top.riverelder.arkham.Code.Commands {
                     Capacity = 1,
                     Mulfunction = 100,
                     CurrentLoad = 1,
+                    Cost = 0,
                 };
             }
             
+            if (w.CurrentLoad <= 0) {
+                return "弹药不足，请装弹";
+            }
+
             StringBuilder sb = new StringBuilder();
             string damage = Regex.Replace(w.Damage, @"DB", source.DamageBonus, RegexOptions.IgnoreCase);
             int r = Dice.Roll(damage);
-            sb.AppendLine($"造成伤害：{r}");
+            int cost = Math.Min(w.Cost, w.CurrentLoad);
+            w.CurrentLoad -= cost;
+            sb.AppendLine($"伤害{r}，弹药{cost}，剩余{w.CurrentLoad}/{w.Capacity}");
             if (r > 0) {
                 if (!target.Values.TryGet("体力", out Value th)) {
                     return sb.Append("而对方没有体力").ToString();
@@ -188,7 +196,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 sb.AppendLine($"{target.Name}的体力：{prev} - {r} => {th.Sub(r).Val}");
                 if (r >= th.Max / 2 && th.Val > 0) {
                     if (!target.Values.TryWidelyGet("意志", out Value san)) {
-                        san = new Value("意志", 50);
+                        san = new Value(50);
                     }
                     CheckResult cr = san.Check();
                     sb.AppendLine().Append($"失血过半，检定意志({san.Val})：");

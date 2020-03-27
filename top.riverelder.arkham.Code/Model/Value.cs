@@ -13,21 +13,15 @@ namespace top.riverelder.arkham.Code.Model {
     /// </summary>
     public class Value {
         private static Regex reg = new Regex(@"(\d+)(/(\d+))?");
-        public static Value Of(string name, string raw) {
+        public static Value Of(string raw) {
             Match match = reg.Match(raw);
             if (!match.Success) {
-                return new Value(name, 0, -1);
+                return new Value(0, -1);
             }
             int val = int.Parse(match.Groups[1].Value);
             int max = match.Groups[3].Success ? int.Parse(match.Groups[3].Value) : -1;
-            return new Value(name, val, max);
+            return new Value(val, max);
         }
-
-
-        /// <summary>
-        /// 数值的名字
-        /// </summary>
-        public string Name { get; set; }
 
 
         /// <summary>
@@ -53,19 +47,16 @@ namespace top.riverelder.arkham.Code.Model {
         public int ExtremeVal => Val / 5;
 
         #region 构造器
-        public Value(string name, int val, int max) {
-            Name = name;
+        public Value(int val, int max) {
             Val = val;
             Max = max;
         }
 
-        public Value(string name, int val) {
-            Name = name;
+        public Value(int val) {
             Val = val;
         }
 
         public Value() {
-            Name = "未命名";
         }
         #endregion
 
@@ -97,7 +88,7 @@ namespace top.riverelder.arkham.Code.Model {
 
         public override string ToString() => Max < 0 ? $"{Val}" : $"{Val}/{Max}";
 
-        public Value Copy() => new Value(Name, Val, Max);
+        public Value Copy() => new Value(Val, Max);
 
 
         #region 检定

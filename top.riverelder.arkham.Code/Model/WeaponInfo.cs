@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace top.riverelder.arkham.Code.Model
-{
+namespace top.riverelder.arkham.Code.Model {
     /// <summary>
     /// 武器属性
     /// </summary>
-    public class WeaponInfo
-    {
+    public class WeaponInfo {
+
 
         /// <summary>
         /// 对应技能名字
@@ -52,7 +51,12 @@ namespace top.riverelder.arkham.Code.Model
         /// </summary>
         public int CurrentLoad { get; set; } = 1;
 
-        public WeaponInfo(string skillName, int skillValue, string damage, bool impale, int maxCount, int capacity, int mulfunction, int currentLoad) {
+        /// <summary>
+        /// 弹药每轮消耗
+        /// </summary>
+        public int Cost { get; set; } = 1;
+
+        public WeaponInfo(string skillName, int skillValue, string damage, bool impale, int maxCount, int capacity, int mulfunction, int currentLoad, int cost) {
             SkillName = skillName;
             SkillValue = skillValue;
             Damage = damage;
@@ -61,10 +65,10 @@ namespace top.riverelder.arkham.Code.Model
             Capacity = capacity;
             Mulfunction = mulfunction;
             CurrentLoad = currentLoad;
+            Cost = cost;
         }
 
-        public WeaponInfo()
-        {
+        public WeaponInfo() {
         }
     }
 }

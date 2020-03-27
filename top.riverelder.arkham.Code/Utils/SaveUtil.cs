@@ -9,8 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 
-namespace top.riverelder.arkham.Code.Utils
-{
+namespace top.riverelder.arkham.Code.Utils {
     class SaveUtil {
         public static bool TryLoad(string scenarioName, out Scenario scenario) {
             string path = Path.Combine(Global.DataDir, scenarioName + ".json");
@@ -30,27 +29,22 @@ namespace top.riverelder.arkham.Code.Utils
         }
 
 
-        public static bool Save(Scenario scenario)
-        {
-            if (!Directory.Exists(Global.DataDir))
-            {
+        public static bool Save(Scenario scenario) {
+            if (!Directory.Exists(Global.DataDir)) {
                 Directory.CreateDirectory(Global.DataDir);
             }
-            
+
             string json = JsonConvert.SerializeObject(scenario, Formatting.Indented, options);
             File.WriteAllText(Path.Combine(Global.DataDir, scenario.Name + ".json"), json);
             return true;
         }
 
-        public static bool LoadGlobal()
-        {
-            if (!File.Exists(Global.ConfFile))
-            {
+        public static bool LoadGlobal() {
+            if (!File.Exists(Global.ConfFile)) {
                 return false;
             }
 
-            try
-            {
+            try {
                 IniObject global = IniObject.Load(Global.ConfFile, Encoding.UTF8);
 
                 IniSection conf = global["Config"];
@@ -60,63 +54,51 @@ namespace top.riverelder.arkham.Code.Utils
 
                 IniSection defaultValues = global["DefaultValues"];
                 Global.DefaultValues.Clear();
-                foreach (string key in defaultValues.Keys)
-                {
+                foreach (string key in defaultValues.Keys) {
                     string val = defaultValues[key].ToString();
-                    Value value = Value.Of(key, val);
-                    if (value != null)
-                    {
-                        Global.DefaultValues.Put(value);
+                    Value value = Value.Of(val);
+                    if (value != null) {
+                        Global.DefaultValues.Put(key, value);
                     }
                 }
 
                 IniSection aliases = global["Aliases"];
-                foreach (string key in aliases.Keys)
-                {
+                foreach (string key in aliases.Keys) {
                     Global.DefaultValues.Set(aliases[key].ToString(), key);
                 }
 
                 IniSection groups = global["Groups"];
                 Global.Groups.Clear();
-                foreach (string key in groups.Keys)
-                {
-                    if (long.TryParse(key, out long g))
-                    {
+                foreach (string key in groups.Keys) {
+                    if (long.TryParse(key, out long g)) {
                         Global.Groups[g] = groups[key].ToString();
                     }
                 }
-            }
-            catch
-            {
+            } catch {
                 return false;
             }
             return true;
         }
 
-        public static bool SaveGlobal()
-        {
-            IniSection conf = new IniSection("Config")
-            {
+        public static bool SaveGlobal() {
+            IniSection conf = new IniSection("Config") {
                 ["Prefix"] = new IniValue(Global.Prefix),
                 ["GreatSuccess"] = new IniValue(Global.GreatSuccess.ToString()),
                 ["GreatFailure"] = new IniValue(Global.GreatFailure.ToString())
             };
 
             IniSection defaultValues = new IniSection("DefaultValues");
-            foreach (string name in Global.DefaultValues.Names)
-            {
+            foreach (string name in Global.DefaultValues.Names) {
                 defaultValues[name] = new IniValue(Global.DefaultValues[name].ToString());
             }
 
             IniSection aliases = new IniSection("Aliases");
-            foreach (string name in Global.DefaultValues.aliases.Keys)
-            {
+            foreach (string name in Global.DefaultValues.aliases.Keys) {
                 aliases[name] = new IniValue(Global.DefaultValues.aliases[name]);
             }
 
             IniSection groups = new IniSection("Groups");
-            foreach (long g in Global.Groups.Keys)
-            {
+            foreach (long g in Global.Groups.Keys) {
                 groups[g.ToString()] = new IniValue(Global.Groups[g]);
             }
 

@@ -110,8 +110,8 @@ namespace top.riverelder.arkham.Code.Commands {
                 foreach (var e in profits) {
                     if (scenario.TryGetInvestigator(e.Key, out Investigator inv)) {
                         if (!inv.Values.TryWidelyGet("账户", out Value account)) {
-                            account = new Value("账户", 0);
-                            inv.Values.Put(account);
+                            account = new Value(0);
+                            inv.Values.Put("账户", account);
                         }
                         int prev = account.Val;
                         account.Add(e.Value);

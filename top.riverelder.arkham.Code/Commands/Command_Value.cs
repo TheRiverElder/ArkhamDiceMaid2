@@ -33,8 +33,8 @@ namespace top.riverelder.arkham.Code.Commands
             }
 
             if (!inv.Values.TryGet(name, out Value v)) {
-                v = new Value(name, 1);
-                inv.Values.Put(v);
+                v = new Value(1);
+                inv.Values.Put(name, v);
             }
 
             if (!Dice.TryParse(arg3, out Dice dice, out int length) || length == 0) {

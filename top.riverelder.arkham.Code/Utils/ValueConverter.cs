@@ -13,7 +13,7 @@ namespace top.riverelder.arkham.Code.Utils {
 
         public override Value ReadJson(JsonReader reader, Type objectType, Value existingValue, bool hasExistingValue, JsonSerializer serializer) {
             string s = reader.Value.ToString();
-            Value val = Value.Of("JV", s);
+            Value val = Value.Of(s);
             //Util.Log($"读取 {s} 解析得到 {val.ToString()}");
             return val;
         }

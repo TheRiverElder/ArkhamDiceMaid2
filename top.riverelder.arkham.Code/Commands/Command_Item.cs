@@ -15,12 +15,12 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public string Name => "物品";
 
-        public string Usage => "物品 <创造|丢弃|拾取|销毁|编辑> <物品名> [重命名]";
+        public string Usage => "物品 <创造|丢弃|拾取|销毁|编辑|装弹> <物品名> [重命名|弹药数]";
 
         public ArgumentValidater Validater { get; } = ArgumentValidater.Empty
             .SetListArgCountMin(2)
             .SetListArgCountMax(3)
-            .AddListArg("创造|丢弃|拾取|销毁|编辑")
+            .AddListArg("创造|丢弃|拾取|销毁|编辑|装弹")
             .AddListArg(ArgumentValidater.Any)
             .AddListArg(ArgumentValidater.Any)
             .AddDictArg("技能名", ArgumentValidater.Any, false)
@@ -30,7 +30,8 @@ namespace top.riverelder.arkham.Code.Commands {
             .AddDictArg("次数", ArgumentValidater.Number, false)
             .AddDictArg("弹匣", ArgumentValidater.Number, false)
             .AddDictArg("故障", ArgumentValidater.Number, false)
-            .AddDictArg("弹药", ArgumentValidater.Number, false);
+            .AddDictArg("弹药", ArgumentValidater.Number, false)
+            .AddDictArg("消耗", ArgumentValidater.Number, false);
 
         public string Execute(string[] listArgs, IDictionary<string, string> dictArgs, string originalString, CmdEnv env) {
             string opt = listArgs[0];
@@ -81,6 +82,7 @@ namespace top.riverelder.arkham.Code.Commands {
                         ret = $"{inv.Name}销毁了{name}";
                     } break;
                 case "编辑": ret = EditItem(inv, name, newName, dict); break;
+                case "装弹": ret = LoadBullets(inv, name, newName); break;
             }
             SaveUtil.Save(scenario);
             return ret;
@@ -96,6 +98,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (rd.TryGetValue("弹匣", out string c)) dict["弹匣"] = int.Parse(c);
             if (rd.TryGetValue("故障", out string m)) dict["故障"] = int.Parse(m);
             if (rd.TryGetValue("弹药", out string cl)) dict["弹药"] = int.Parse(cl);
+            if (rd.TryGetValue("消耗", out string co)) dict["消耗"] = int.Parse(co);
             return dict;
         }
 
@@ -113,7 +116,8 @@ namespace top.riverelder.arkham.Code.Commands {
                     dict.TryGetValue("次数", out object mc) ? (int)mc : 1,
                     dict.TryGetValue("弹匣", out object c) ? (int)c : 1,
                     dict.TryGetValue("故障", out object m) ? (int)m : 100,
-                    dict.TryGetValue("弹药", out object cl) ? (int)cl : 0
+                    dict.TryGetValue("弹药", out object cl) ? (int)cl : 0,
+                    dict.TryGetValue("消耗", out object co) ? (int)co : 0
                 );
             }
             inv.Inventory.Put(item);
@@ -137,6 +141,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 if (dict.TryGetValue("弹匣", out object c)) w.Capacity = (int)c;
                 if (dict.TryGetValue("故障", out object m)) w.Mulfunction = (int)m;
                 if (dict.TryGetValue("弹药", out object cl)) w.CurrentLoad = (int)cl;
+                if (dict.TryGetValue("消耗", out object co)) w.Cost = (int)co;
             }
             if (!string.Equals(name, newName)) {
                 inv.Inventory.Remove(name);
@@ -145,6 +150,27 @@ namespace top.riverelder.arkham.Code.Commands {
                 return $"{inv.Name}重命名了物品：{name}=>{newName}";
             }
             return $"{inv.Name}编辑了物品：{name}";
+        }
+
+        string LoadBullets(Investigator inv, string name, string countStr) {
+            if (!inv.Inventory.TryGet(name, out Item item)) {
+                return $"{inv.Name}的物品栏中不存在{name}";
+            }
+            if (!item.IsWeapon) {
+                return $"{item.Name}不是武器";
+            }
+            if (!Dice.TryParse(countStr, out Dice dice, out int length) || length == 0) {
+                return "弹药量不是数字或者骰子表达式：" + countStr;
+            }
+            WeaponInfo w = item.Weapon;
+            int left = w.Capacity - w.CurrentLoad;
+            if (left > 0) {
+                return "弹匣已经装满，无需装弹";
+            }
+            int loaded = Math.Min(left, dice.Roll());
+            w.CurrentLoad += loaded;
+            return new StringBuilder().AppendLine($"{inv.Name}为{name}装弹{loaded}")
+                .Append($"弹药：{w.CurrentLoad}/{w.Capacity}").ToString();
         }
     }
 }

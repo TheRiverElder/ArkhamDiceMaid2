@@ -31,8 +31,8 @@ namespace top.riverelder.arkham.Code.Commands
             inv.Values.Fill(Global.DefaultValues);
 
             foreach (string key in dictArgs.Keys) {
-                Value value = Value.Of(key, dictArgs[key]);
-                inv.Values.Put(value);
+                Value value = Value.Of(dictArgs[key]);
+                inv.Values.Put(key, value);
             }
             inv.Calc(out string err);
 
@@ -46,7 +46,7 @@ namespace top.riverelder.arkham.Code.Commands
                     builder.AppendLine();
                 }
                 Value v = inv.Values[keys[i]];
-                builder.AppendFormat(" {0}:{1}; ", v.Name, v.Val);
+                builder.AppendFormat(" {0}:{1}; ", keys[i], v.Val);
             }
             env.Scenario.PutInvestigator(inv);
             env.Scenario.Control(env.User, inv.Name);

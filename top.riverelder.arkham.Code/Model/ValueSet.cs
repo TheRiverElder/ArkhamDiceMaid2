@@ -71,7 +71,7 @@ namespace top.riverelder.arkham.Code.Model
             }
             if (Global.DefaultValues.TryGet(name, out Value v)) {
                 val = v.Copy();
-                Put(val);
+                Put(name, val);
                 return true;
             }
             return false;
@@ -90,13 +90,9 @@ namespace top.riverelder.arkham.Code.Model
         /// 设置值
         /// </summary>
         /// <param name="val">值</param>
-        public void Put(Value val, params string[] als)
+        public void Put(string name, Value val)
         {
-            values[val.Name] = val;
-            foreach (string alias in als)
-            {
-                aliases[alias] = val.Name;
-            }
+            values[name] = val;
         }
 
         /// <summary>
