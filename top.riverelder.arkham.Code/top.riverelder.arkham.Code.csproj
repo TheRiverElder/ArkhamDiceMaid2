@@ -119,6 +119,7 @@
     <Compile Include="Model\ValueSet.cs" />
     <Compile Include="Model\WeaponInfo.cs" />
     <Compile Include="Utils\SaveUtil.cs" />
+    <Compile Include="Utils\ValueConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Native.Sdk\Native.Sdk.csproj">

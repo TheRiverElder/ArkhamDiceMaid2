@@ -13,9 +13,14 @@ namespace top.riverelder.arkham.Code.Model
     {
 
         /// <summary>
-        /// 对应技能
+        /// 对应技能名字
         /// </summary>
-        public Value Skill { get; set; } = new Value("肉搏", 20);
+        public string SkillName { get; set; } = "肉搏";
+
+        /// <summary>
+        /// 对应技能数值
+        /// </summary>
+        public int SkillValue { get; set; } = 25;
 
         /// <summary>
         /// 造成伤害的骰子表达式
@@ -47,9 +52,9 @@ namespace top.riverelder.arkham.Code.Model
         /// </summary>
         public int CurrentLoad { get; set; } = 1;
 
-        public WeaponInfo(Value skill, string damage, bool impale, int maxCount, int capacity, int mulfunction, int currentLoad)
-        {
-            Skill = skill;
+        public WeaponInfo(string skillName, int skillValue, string damage, bool impale, int maxCount, int capacity, int mulfunction, int currentLoad) {
+            SkillName = skillName;
+            SkillValue = skillValue;
             Damage = damage;
             Impale = impale;
             MaxCount = maxCount;

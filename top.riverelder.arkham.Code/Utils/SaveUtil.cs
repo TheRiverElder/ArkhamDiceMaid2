@@ -11,20 +11,22 @@ using top.riverelder.arkham.Code.Model;
 
 namespace top.riverelder.arkham.Code.Utils
 {
-    class SaveUtil
-    {
-        public static bool TryLoad(string scenarioName, out Scenario scenario)
-        {
+    class SaveUtil {
+        public static bool TryLoad(string scenarioName, out Scenario scenario) {
             string path = Path.Combine(Global.DataDir, scenarioName + ".json");
-            if (!File.Exists(path))
-            {
+            if (!File.Exists(path)) {
                 scenario = null;
                 return false;
             }
 
             string json = File.ReadAllText(path);
-            scenario = JsonConvert.DeserializeObject<Scenario>(json);
+            scenario = JsonConvert.DeserializeObject<Scenario>(json, options);
             return true;
+        }
+
+        private static readonly JsonSerializerSettings options = new JsonSerializerSettings();
+        static SaveUtil() {
+            options.Converters.Add(new ValueConverter());
         }
 
 
@@ -35,7 +37,7 @@ namespace top.riverelder.arkham.Code.Utils
                 Directory.CreateDirectory(Global.DataDir);
             }
             
-            string json = JsonConvert.SerializeObject(scenario, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(scenario, Formatting.Indented, options);
             File.WriteAllText(Path.Combine(Global.DataDir, scenario.Name + ".json"), json);
             return true;
         }

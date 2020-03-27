@@ -40,7 +40,8 @@ namespace top.riverelder.arkham.Code.Commands
                             {
                                 WeaponInfo w = it.Weapon;
                                 b
-                                    .Append("技能：").AppendLine(w.Skill.Name + w.Skill.ToString())
+                                    .Append("技能名：").AppendLine(w.SkillName)
+                                    .Append("技能值：").AppendLine(w.SkillValue.ToString())
                                     .Append("伤害：").AppendLine(w.Damage)
                                     .Append("贯穿：").AppendLine(w.Impale ? "是" : "否")
                                     .Append("次数：").AppendLine(w.MaxCount.ToString())

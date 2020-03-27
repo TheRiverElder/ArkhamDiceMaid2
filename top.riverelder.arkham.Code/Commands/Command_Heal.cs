@@ -40,13 +40,14 @@ namespace top.riverelder.arkham.Code.Commands {
                 return $"未找到{inv.Name}的{skillName}";
             }
             StringBuilder sb = new StringBuilder();
-            sb.Append($"{inv.Name}检定{skill.Name}({skill.Val})：");
+            sb.Append($"{inv.Name}检定{skillName}({skill.Val})：");
             int prev = health.Val;
             CheckResult cr = skill.Check();
             sb.Append(cr.TypeString);
             if (cr.succeed) {
                 int r = Dice.Roll(dice);
                 sb.AppendLine().Append($"{target.Name}的体力：{prev} + {r} => {health.Add(r)}");
+                SaveUtil.Save(scenario);
             }
             return sb.ToString();
         }

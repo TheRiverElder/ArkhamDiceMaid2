@@ -118,7 +118,8 @@ namespace top.riverelder.arkham.Code.Commands {
                 w = item.Weapon;
             } else {
                 w = new WeaponInfo {
-                    Skill = new Value("斗殴", 25),
+                    SkillName = "斗殴",
+                    SkillValue = 25,
                     Damage = "1D3+DB",
                     Impale = false,
                     MaxCount = 1,
@@ -128,8 +129,8 @@ namespace top.riverelder.arkham.Code.Commands {
                 };
             }
 
-            if (!source.Values.TryGet(w.Skill.Name, out Value skill)) {
-                skill = w.Skill;
+            if (!source.Values.TryGet(w.SkillName, out Value skill)) {
+                skill = new Value(w.SkillName, w.SkillValue);
             }
             CheckResult result = skill.Check();
 
@@ -164,7 +165,8 @@ namespace top.riverelder.arkham.Code.Commands {
                 w = item.Weapon;
             } else {
                 w = new WeaponInfo {
-                    Skill = new Value("斗殴", 25),
+                    SkillName = "斗殴",
+                    SkillValue = 25,
                     Damage = "1D3+DB",
                     Impale = false,
                     MaxCount = 1,

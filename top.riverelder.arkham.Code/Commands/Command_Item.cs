@@ -23,7 +23,8 @@ namespace top.riverelder.arkham.Code.Commands {
             .AddListArg("创造|丢弃|拾取|销毁|编辑")
             .AddListArg(ArgumentValidater.Any)
             .AddListArg(ArgumentValidater.Any)
-            .AddDictArg("技能", @"\D+\d+", false)
+            .AddDictArg("技能名", ArgumentValidater.Any, false)
+            .AddDictArg("技能值", @"\d+", false)
             .AddDictArg("伤害", ArgumentValidater.Any, false)
             .AddDictArg("穿刺", "是|否", false)
             .AddDictArg("次数", ArgumentValidater.Number, false)
@@ -87,10 +88,8 @@ namespace top.riverelder.arkham.Code.Commands {
 
         Dictionary<string, object> ParseWeapon(IDictionary<string, string> rd) {
             Dictionary<string, object> dict = new Dictionary<string, object>();
-            if (rd.TryGetValue("技能", out string s)) {
-                Match match = Regex.Match(s, SkillRegExp);
-                dict["技能"] = Value.Of(match.Groups[1].Value, match.Groups[2].Value);
-            }
+            if (rd.TryGetValue("技能名", out string sn)) dict["技能名"] = sn;
+            if (rd.TryGetValue("技能值", out string sv)) dict["技能值"] = int.Parse(sv);
             if (rd.TryGetValue("伤害", out string d)) dict["伤害"] = d;
             if (rd.TryGetValue("穿刺", out string i)) dict["穿刺"] = "是".Equals(i);
             if (rd.TryGetValue("次数", out string mc)) dict["次数"] = int.Parse(mc);
@@ -107,7 +106,8 @@ namespace top.riverelder.arkham.Code.Commands {
             Item item = new Item(name);
             if (dict.Count > 0) {
                 item.Weapon = new WeaponInfo(
-                    dict.TryGetValue("技能", out object s) ? (Value)s : new Value("肉搏", 25),
+                    dict.TryGetValue("技能名", out object sn) ? (string)sn : "肉搏",
+                    dict.TryGetValue("技能值", out object sv) ? (int)sv : 25,
                     dict.TryGetValue("伤害", out object d) ? (string)d : "1d1",
                     dict.TryGetValue("穿刺", out object i) ? (bool)i : false,
                     dict.TryGetValue("次数", out object mc) ? (int)mc : 1,
@@ -129,7 +129,8 @@ namespace top.riverelder.arkham.Code.Commands {
                     item.Weapon = new WeaponInfo();
                 }
                 WeaponInfo w = item.Weapon;
-                if (dict.TryGetValue("技能", out object s)) w.Skill = (Value)s;
+                if (dict.TryGetValue("技能名", out object sn)) w.SkillName = (string)sn;
+                if (dict.TryGetValue("技能值", out object sv)) w.SkillValue = (int)sv;
                 if (dict.TryGetValue("伤害", out object d)) w.Damage = (string)d;
                 if (dict.TryGetValue("穿刺", out object i)) w.Impale = (bool)i;
                 if (dict.TryGetValue("次数", out object mc)) w.MaxCount = (int)mc;

@@ -71,8 +71,8 @@ namespace top.riverelder.arkham.Code.Model {
                 return false;
             }
             WeaponInfo wi = item.Weapon;
-            if (!Values.TryGet(wi.Skill.Name, out Value skill)) {
-                skill = wi.Skill;
+            if (!Values.TryGet(wi.SkillName, out Value skill)) {
+                skill = new Value(wi.SkillName, wi.SkillValue);
             }
             CheckResult result = skill.Check();
             err = null;

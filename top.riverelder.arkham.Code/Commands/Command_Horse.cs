@@ -172,7 +172,8 @@ namespace top.riverelder.arkham.Code.Commands {
                 w = item.Weapon;
             } else {
                 w = new WeaponInfo {
-                    Skill = new Value("斗殴", 25),
+                    SkillName = "斗殴",
+                    SkillValue = 25,
                     Damage = "1D3+DB",
                     Impale = false,
                     MaxCount = 1,
