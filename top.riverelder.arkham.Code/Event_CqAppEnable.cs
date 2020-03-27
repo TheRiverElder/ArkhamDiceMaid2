@@ -48,6 +48,7 @@ namespace top.riverelder.arkham.Code
             Global.Dispatcher.AddAlias("增值", "数值 增加");
             Global.Dispatcher.AddAlias("设值", "数值 设置");
             Global.Dispatcher.AddAlias("别名", "数值 别名");
+            Global.Dispatcher.AddAlias("sc", "SC");
 
         }
     }

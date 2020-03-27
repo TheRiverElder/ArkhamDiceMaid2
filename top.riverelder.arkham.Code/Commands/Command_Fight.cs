@@ -12,12 +12,12 @@ namespace top.riverelder.arkham.Code.Commands {
     class Command_Fight : ICommand {
         public string Name => "战斗";
 
-        public string Usage => "战斗 <攻击|闪避|跳过|放弃> [目标] [武器名]";
+        public string Usage => "战斗 <攻击|闪避|跳过|放弃|射击> [目标] [武器名]";
 
         public ArgumentValidater Validater { get; } = ArgumentValidater.Empty
             .SetListArgCountMin(1)
             .SetListArgCountMax(3)
-            .AddListArg("攻击|闪避|跳过|放弃")
+            .AddListArg("攻击|闪避|跳过|放弃|射击")
             .AddListArg(ArgumentValidater.Any)
             .AddListArg(ArgumentValidater.Any);
 
@@ -39,6 +39,16 @@ namespace top.riverelder.arkham.Code.Commands {
                         }
                         ret = CommitFight(env, inv, targetName, weaponName);
                     } break;
+                case "射击": {
+                        if (string.IsNullOrEmpty(targetName)) {
+                            return "请指定瞄准目标";
+                        }
+                        if (string.IsNullOrEmpty(weaponName)) {
+                            return "请指定火器名称";
+                        }
+                        ret = AttackWithFirearm(env, inv, targetName, weaponName);
+                    }
+                    break;
                 case "闪避": ret = DodgeFight(env, inv); break;
                 case "跳过": ret = SkipFight(env, inv); break;
                 case "放弃": ret = GiveUpFight(env, inv); break;
@@ -132,6 +142,15 @@ namespace top.riverelder.arkham.Code.Commands {
             return $"{source.Name}使用{wName}对{targetName}发起了攻击";
         }
 
+        string AttackWithFirearm(CmdEnv env, Investigator source, string targetName, string weaponName) {
+
+            if (!env.Scenario.TryGetInvestigator(targetName, out Investigator target)) {
+                return $"未找到目标：{targetName}";
+            }
+
+            return CalculateDamage(env, source, target, weaponName);
+        }
+
         string CalculateDamage(CmdEnv env, Investigator source, Investigator target, string weaponName) {
 
             WeaponInfo w;
@@ -164,7 +183,20 @@ namespace top.riverelder.arkham.Code.Commands {
                     return sb.Append("而对方没有体力").ToString();
                 }
                 int prev = th.Val;
-                sb.Append($"{target.Name}的体力：{prev} - {r} => {th.Sub(r).Val}");
+                sb.AppendLine($"{target.Name}的体力：{prev} - {r} => {th.Sub(r).Val}");
+                if (r >= th.Max / 2 && th.Val > 0) {
+                    if (!target.Values.TryWidelyGet("意志", out Value san)) {
+                        san = new Value("意志", 50);
+                    }
+                    CheckResult cr = san.Check();
+                    sb.AppendLine().Append($"失血过半，检定意志({san.Val})：");
+                    sb.Append($"结果：{cr.result}");
+                    if (cr.succeed) {
+                        sb.Append($"成功挺住");
+                    } else {
+                        sb.Append($"{target.Name}昏厥");
+                    }
+                }
             }
             return sb.ToString();
         }
