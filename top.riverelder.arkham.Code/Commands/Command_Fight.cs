@@ -83,8 +83,8 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             Value dodge = new Value("闪避", dex.Val / 2);
 
-            CheckResult result = CheckUtil.Check(dodge.Val);
-            if (result.Succeed) {
+            CheckResult result =dodge.Check();
+            if (result.succeed) {
                 return $"{inv.Name}躲开了{source.Name}的攻击";
             } else {
                 return $"{inv.Name}闪避失败\n" + CalculateDamage(env, source, inv, fight.WeaponName);
@@ -121,9 +121,9 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!source.Values.TryGet(w.Skill.Name, out Value skill)) {
                 skill = w.Skill;
             }
-            CheckResult result = CheckUtil.Check(skill.Val);
+            CheckResult result = skill.Check();
 
-            if (result.Failed) {
+            if (!result.succeed) {
                 return $"{source.Name}对{target.Name}的攻击失败";
             }
 

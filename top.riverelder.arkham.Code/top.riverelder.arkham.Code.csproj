@@ -106,7 +106,6 @@
     <Compile Include="Model\Horse.cs" />
     <Compile Include="Model\Scenario.cs" />
     <Compile Include="Utils\CheckResult.cs" />
-    <Compile Include="Utils\CheckUtil.cs" />
     <Compile Include="Utils\Dice.cs" />
     <Compile Include="Event_GroupMessage.cs" />
     <Compile Include="Model\Inventory.cs" />

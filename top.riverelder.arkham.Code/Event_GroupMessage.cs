@@ -10,15 +10,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Bot;
 
-namespace top.riverelder.arkham.Code
-{
-    public class Event_GroupMessage : IGroupMessage
-    {
-        public void GroupMessage(object sender, CQGroupMessageEventArgs e)
-        {
+namespace top.riverelder.arkham.Code {
+
+    public class Event_GroupMessage : IGroupMessage {
+
+        public void GroupMessage(object sender, CQGroupMessageEventArgs e) {
             string msg = e.Message.Text;
-            if (msg.StartsWith(Global.Prefix))
-            {
+            if (msg.StartsWith(Global.Prefix)) {
                 string raw = msg.Substring(Global.Prefix.Length);
                 string[] cmds = Regex.Split(raw, "([\n;；])" + Global.Prefix);
                 StringBuilder sb = new StringBuilder().Append(CQApi.CQCode_At(e.FromQQ));

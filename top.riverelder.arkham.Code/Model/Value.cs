@@ -5,20 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using top.riverelder.arkham.Code.Utils;
 
-namespace top.riverelder.arkham.Code.Model
-{
+namespace top.riverelder.arkham.Code.Model {
     /// <summary>
     /// 封装一个值
     /// </summary>
-    public class Value
-    {
+    public class Value {
         private static Regex reg = new Regex(@"(\d+)(/(\d+))?");
-        public static Value Of(string name, string raw)
-        {
+        public static Value Of(string name, string raw) {
             Match match = reg.Match(raw);
-            if (!match.Success)
-            {
+            if (!match.Success) {
                 return new Value(name, 0, -1);
             }
             int val = int.Parse(match.Groups[1].Value);
@@ -55,24 +52,24 @@ namespace top.riverelder.arkham.Code.Model
         [JsonIgnore]
         public int ExtremeVal => Val / 5;
 
-        public Value(string name, int val, int max)
-        {
+        #region 构造器
+        public Value(string name, int val, int max) {
             Name = name;
             Val = val;
             Max = max;
         }
 
-        public Value(string name, int val)
-        {
+        public Value(string name, int val) {
             Name = name;
             Val = val;
         }
 
-        public Value()
-        {
+        public Value() {
             Name = "未命名";
         }
+        #endregion
 
+        #region 数值变化
         /// <summary>
         /// 设置新值，这个设置受到根据其最大值的限制，除非Max为负数
         /// </summary>
@@ -96,9 +93,43 @@ namespace top.riverelder.arkham.Code.Model
             Set(Val - delta);
             return this;
         }
+        #endregion
 
         public override string ToString() => Max < 0 ? $"{Val}" : $"{Val}/{Max}";
 
         public Value Copy() => new Value(Name, Val, Max);
+
+
+        #region 检定
+        public static readonly string DefaultDice = "1d100";
+
+        /// <summary>
+        /// 以默认的骰子与默认的普通难度进行检定
+        /// </summary>
+        /// <returns>检定结果</returns>
+        public CheckResult Check() {
+            return Check(DefaultDice, CheckResult.NormalSuccess);
+        }
+
+        /// <summary>
+        /// 以默认的骰子进行检定
+        /// </summary>
+        /// <param name="level">难度等级</param>
+        /// <returns>检定结果</returns>
+        public CheckResult Check(int level) {
+            return Check(DefaultDice, level);
+        }
+
+        /// <summary>
+        /// 使用指定的骰子进行检定
+        /// </summary>
+        /// <param name="diceExp">指定的骰子表达式</param>
+        /// <param name="level">难度等级</param>
+        /// <returns>检定结果</returns>
+        public CheckResult Check(string diceExp, int level) {
+            int result = Dice.Roll(diceExp);
+            return new CheckResult(diceExp, this, result, level);
+        }
+        #endregion
     }
 }

@@ -26,7 +26,6 @@ namespace top.riverelder.arkham.Code.Bot
             this.listArgs = listArgs;
             this.dictArgs = dictArgs;
             this.originalString = originalString;
-            this.senderToken = senderToken;
         }
     }
 }

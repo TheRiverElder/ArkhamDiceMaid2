@@ -74,7 +74,7 @@ namespace top.riverelder.arkham.Code.Model {
             if (!Values.TryGet(wi.Skill.Name, out Value skill)) {
                 skill = wi.Skill;
             }
-            CheckResult result = CheckUtil.Check(skill.Val);
+            CheckResult result = skill.Check();
             err = null;
             return true;
         }

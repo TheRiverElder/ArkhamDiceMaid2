@@ -41,10 +41,10 @@ namespace top.riverelder.arkham.Code.Commands
             {
                 return "未找到属性：理智";
             }
-            CheckResult result = CheckUtil.Check(value.Val);
+            CheckResult result = value.Check();
 
             bool isDice = false;
-            string s = result.Succeed ? listArgs[0] : listArgs[1];
+            string s = result.succeed ? listArgs[0] : listArgs[1];
             if (!int.TryParse(s, out int v))
             {
                 isDice = true;
@@ -53,7 +53,7 @@ namespace top.riverelder.arkham.Code.Commands
             value.Sub(v);
 
             StringBuilder builder = new StringBuilder();
-            string typeStr = result.Succeed ? "成功" : "失败";
+            string typeStr = result.succeed ? "成功" : "失败";
             builder.AppendLine($"{inv.Name}的San={value.Val}，检定结果：");
             builder.AppendLine($"{result.dice} = {result.result}, 判定为 {typeStr}");
             if (v > 0)
