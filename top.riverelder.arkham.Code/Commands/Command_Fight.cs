@@ -193,7 +193,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     return sb.Append("而对方没有体力").ToString();
                 }
                 int prev = th.Val;
-                sb.AppendLine($"{target.Name}的体力：{prev} - {r} => {th.Sub(r).Val}");
+                sb.Append($"{target.Name}的体力：{prev} - {r} => {th.Sub(r).Val}");
                 if (r >= th.Max / 2 && th.Val > 0) {
                     if (!target.Values.TryWidelyGet("意志", out Value san)) {
                         san = new Value(50);
