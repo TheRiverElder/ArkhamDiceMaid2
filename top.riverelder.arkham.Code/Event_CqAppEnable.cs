@@ -53,6 +53,7 @@ namespace top.riverelder.arkham.Code
             Global.Dispatcher.AddAlias("sc", "SC");
             Global.Dispatcher.AddAlias("医学", "治疗 医学");
             Global.Dispatcher.AddAlias("急救", "治疗 急救");
+            Global.Dispatcher.AddAlias("装弹", "物品 装弹");
 
         }
     }
