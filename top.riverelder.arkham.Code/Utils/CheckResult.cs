@@ -12,6 +12,7 @@ namespace top.riverelder.arkham.Code.Utils {
             [Unkonwn] = "未知",
             [GreatSuccess] = "极难成功",
             [ExtremeSuccess] = "困难成功",
+            [HardSuccess] = "困难成功",
             [NormalSuccess] = "成功",
             [Failure] = "失败",
             [GreatFailure] = "大失败",

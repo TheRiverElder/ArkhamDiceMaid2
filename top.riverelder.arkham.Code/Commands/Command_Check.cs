@@ -60,7 +60,7 @@ namespace top.riverelder.arkham.Code.Commands {
             }
 
             CheckResult result = null;
-
+            string rrText = "";
             if ("奖励" == hardness || "惩罚" == hardness) {
                 result = value.Check(CheckResult.NormalSuccess);
                 CheckResult result2 = value.Check(CheckResult.NormalSuccess);
@@ -68,10 +68,10 @@ namespace top.riverelder.arkham.Code.Commands {
                 CheckResult larger = result.result >= result2.result ? result : result2;
                 if ("奖励" == hardness) {
                     result = smaller;
-                    builder.AppendLine($"奖励取小：{smaller.result} <= {larger.result}");
+                    rrText = $"{smaller.result} <= {larger.result}";
                 } else {
                     result = larger;
-                    builder.AppendLine($"惩罚取大：{larger.result} >= {smaller.result}");
+                    rrText = $"{larger.result} >= {smaller.result}";
                 }
             } else {
                 switch (hardness) {
@@ -80,10 +80,11 @@ namespace top.riverelder.arkham.Code.Commands {
                     case "极难": result = value.Check(CheckResult.ExtremeSuccess); break;
                     default : result = value.Check(CheckResult.NormalSuccess); break;
                 }
+                rrText = string.Empty + result.result;
             }
 
             builder.AppendLine($"{inv.Name}检定{hardness}{valueName}({result.target}/{result.value})：");
-            builder.Append($"{result.dice} = {result.result}, 判定为 {result.ActualTypeString}");
+            builder.Append($"{result.dice} = {rrText}, 判定为 {result.ActualTypeString}");
 
             return builder.ToString();
         }
