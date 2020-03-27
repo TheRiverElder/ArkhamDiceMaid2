@@ -20,15 +20,18 @@ namespace top.riverelder.arkham.Code {
                 string raw = msg.Substring(Global.Prefix.Length);
                 string[] cmds = Regex.Split(raw, "([\n;；])" + Global.Prefix);
                 StringBuilder sb = new StringBuilder().Append(CQApi.CQCode_At(e.FromQQ));
+                bool flag = false;
                 foreach (string c in cmds) {
+                    e.CQLog.InfoReceive("DiceCommand", c);
                     if (Global.Dispatcher.Compile(c, out CompiledCommand cc, out string err)) {
                         CmdEnv env = new CmdEnv(e.FromQQ.Id, e.FromGroup.Id, Global.Groups.TryGetValue(e.FromGroup.Id, out string name) ? name : string.Empty);
                         sb.AppendLine().Append(cc.Execute(env));
+                        flag = true;
                     }
-                    e.CQLog.InfoReceive("Command", c);
                 }
-                e.CQApi.SendGroupMessage(e.FromGroup, sb.ToString());
-
+                if (flag) {
+                    e.CQApi.SendGroupMessage(e.FromGroup, sb.ToString());
+                }
             }
         }
     }
