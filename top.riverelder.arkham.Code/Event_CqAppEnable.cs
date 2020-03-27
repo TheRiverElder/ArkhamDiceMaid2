@@ -38,7 +38,17 @@ namespace top.riverelder.arkham.Code
             Global.Dispatcher.Register(new Command_SaveScenario());
             Global.Dispatcher.Register(new Command_SetPrefix());
             Global.Dispatcher.Register(new Command_Value());
-            
+
+            Global.Dispatcher.AddAlias("造物", "物品 创造");
+            Global.Dispatcher.AddAlias("丢弃", "物品 丢弃");
+            Global.Dispatcher.AddAlias("拾取", "物品 拾取");
+            Global.Dispatcher.AddAlias("销毁", "物品 销毁");
+            Global.Dispatcher.AddAlias("攻击", "战斗 攻击");
+            Global.Dispatcher.AddAlias("闪避", "战斗 闪避");
+            Global.Dispatcher.AddAlias("增值", "数值 增加");
+            Global.Dispatcher.AddAlias("设值", "数值 设置");
+            Global.Dispatcher.AddAlias("别名", "数值 别名");
+
         }
     }
 }

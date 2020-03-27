@@ -11,7 +11,7 @@ namespace top.riverelder.arkham.Code.Commands {
         public ArgumentValidater Validater { get; } = ArgumentValidater.Empty
             .SetListArgCountMax(1);
 
-        public string Usage => "帮助";
+        public string Usage => "帮助 [命令名称]";
 
         public string Execute(string[] listArgs, IDictionary<string, string> dictArgs, string originalString, CmdEnv env) {
 
