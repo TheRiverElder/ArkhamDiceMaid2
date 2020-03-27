@@ -164,7 +164,7 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             WeaponInfo w = item.Weapon;
             int left = w.Capacity - w.CurrentLoad;
-            if (left > 0) {
+            if (left <= 0) {
                 return "弹匣已经装满，无需装弹";
             }
             int loaded = Math.Min(left, dice.Roll());
