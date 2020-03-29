@@ -10,8 +10,8 @@ namespace top.riverelder.arkham.Code.Utils {
     public class CheckResult {
         private static Dictionary<int, string> typeStrings = new Dictionary<int, string> {
             [Unkonwn] = "未知",
-            [GreatSuccess] = "极难成功",
-            [ExtremeSuccess] = "困难成功",
+            [GreatSuccess] = "大成功",
+            [ExtremeSuccess] = "极难成功",
             [HardSuccess] = "困难成功",
             [NormalSuccess] = "成功",
             [Failure] = "失败",
