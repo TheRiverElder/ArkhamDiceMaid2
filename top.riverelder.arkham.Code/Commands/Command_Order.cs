@@ -24,9 +24,9 @@ namespace top.riverelder.arkham.Code.Commands {
             IDictionary<string, int> map = new Dictionary<string, int>();
 
             foreach (string name in invNames) {
-                Match m = Regex.Match(name, @"^(.+)\s*([+-]\d+)?$");
-                string invName = m.Groups[1].Value;
-                int fix = m.Groups[2].Success ? int.Parse(m.Groups[2].Value) : 0;
+                Match m = Regex.Match(name, @"[+-]\d+$");
+                int fix = m.Success ? int.Parse(m.Value) : 0;
+                string invName = name.Substring(name.Length - m.Value.Length);
                 if (scenario.TryGetInvestigator(invName, out Investigator inv)) {
                     if (inv.Values.TryGet(valueName, out Value value)) {
                         map[invName] = value.Val + fix;
