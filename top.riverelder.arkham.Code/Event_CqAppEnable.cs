@@ -4,7 +4,6 @@ using Native.Sdk.Cqp.Interface;
 using System.IO;
 using top.riverelder.arkham.Code;
 using top.riverelder.arkham.Code.Bot;
-using top.riverelder.arkham.Code.Bot.ParamValidator;
 using top.riverelder.arkham.Code.Commands;
 using top.riverelder.arkham.Code.Utils;
 
@@ -32,6 +31,7 @@ namespace top.riverelder.arkham.Code
             Global.Dispatcher.Register(new Command_Help());
             Global.Dispatcher.Register(new Command_Horse());
             Global.Dispatcher.Register(new Command_Item());
+            Global.Dispatcher.Register(new Command_Order());
             Global.Dispatcher.Register(new Command_Global());
             Global.Dispatcher.Register(new Command_ReloadScenario());
             Global.Dispatcher.Register(new Command_Roll());
@@ -54,6 +54,7 @@ namespace top.riverelder.arkham.Code
             Global.Dispatcher.AddAlias("医学", "治疗 医学");
             Global.Dispatcher.AddAlias("急救", "治疗 急救");
             Global.Dispatcher.AddAlias("装弹", "物品 装弹");
+            Global.Dispatcher.AddAlias("战列", "排序 敏捷");
 
         }
     }

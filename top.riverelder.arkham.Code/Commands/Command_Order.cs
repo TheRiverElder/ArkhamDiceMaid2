@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using top.riverelder.arkham.Code.Bot;
+using top.riverelder.arkham.Code.Model;
+
+namespace top.riverelder.arkham.Code.Commands {
+    class Command_Order : ICommand {
+
+        public string Name => "排序";
+
+        public string Usage => "排序 <数值名> {调查员名}";
+
+        public ArgumentValidater Validater => ArgumentValidater.Empty
+            .SetListArgCountMin(3)
+            .SetListArgCountMax(ArgumentValidater.Unlimited);
+
+        public static string OrderByValue(Scenario scenario, string[] invNames, string valueName) {
+            IList<string> notFoundNames = new List<string>();
+            IList<string> notFoundValues = new List<string>();
+            IDictionary<string, int> map = new Dictionary<string, int>();
+
+            foreach (string name in invNames) {
+                Match m = Regex.Match(name, @"^(.+)\s*([+-]\d+)?$");
+                string invName = m.Groups[1].Value;
+                int fix = m.Groups[2].Success ? int.Parse(m.Groups[2].Value) : 0;
+                if (scenario.TryGetInvestigator(invName, out Investigator inv)) {
+                    if (inv.Values.TryGet(valueName, out Value value)) {
+                        map[invName] = value.Val + fix;
+                    } else {
+                        notFoundValues.Add(invName);
+                    }
+                } else {
+                    notFoundNames.Add(invName);
+                }
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            if (map.Count > 0) {
+                List<string> list = new List<string>(map.Keys);
+                list.Sort((a, b) => map[a] - map[b]);
+                
+                sb.Append(string.Join(" > ", list.ToArray()));
+            }
+            if (notFoundNames.Count > 0) {
+                sb.AppendLine().Append("未找到调查员：").Append(string.Join("、", notFoundNames));
+            }
+            if (notFoundValues.Count > 0) {
+                sb.AppendLine().Append($"未找到带{valueName}调查员：").Append(string.Join("、", notFoundValues));
+            }
+            return sb.ToString();
+        }
+
+        public string Execute(string[] listArgs, IDictionary<string, string> dictArgs, string originalString, CmdEnv env) {
+            if (!env.ScenarioExist) {
+                return "该羣还未开团";
+            }
+
+            string valueName = listArgs[0];
+            string[] invNames = new string[listArgs.Length - 1];
+            Array.Copy(listArgs, 1, invNames, 0, invNames.Length);
+            return OrderByValue(env.Scenario, invNames, valueName);
+        }
+    }
+}

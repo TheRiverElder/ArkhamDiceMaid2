@@ -63,24 +63,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bot\ArgumentValidater.cs" />
-    <Compile Include="Bot\Command.cs" />
-    <Compile Include="Bot\Dispatcher.cs" />
-    <Compile Include="Bot\Env.cs" />
     <Compile Include="Bot\EnvValidator.cs" />
-    <Compile Include="Bot\ICmdExecutor.cs" />
-    <Compile Include="Bot\CommandNode.cs" />
     <Compile Include="Bot\CommandDispatcher.cs" />
     <Compile Include="Bot\CompiledCommand.cs" />
     <Compile Include="Bot\ICommand.cs" />
-    <Compile Include="Bot\Params.cs" />
-    <Compile Include="Bot\ParamValidator\AnyParam.cs" />
-    <Compile Include="Bot\ParamValidator\DecParam.cs" />
-    <Compile Include="Bot\ParamValidator\DiceParam.cs" />
-    <Compile Include="Bot\ParamValidator\IParam.cs" />
-    <Compile Include="Bot\ParamValidator\IntParam.cs" />
-    <Compile Include="Bot\ParamValidator\LitParam.cs" />
-    <Compile Include="Bot\ParamValidator\OrParam.cs" />
-    <Compile Include="Bot\ParamValidator\RestParam.cs" />
     <Compile Include="Commands\Command_Check.cs" />
     <Compile Include="Commands\Command_CreateInv.cs" />
     <Compile Include="Commands\Command_CreateScenario.cs" />
@@ -89,6 +75,7 @@
     <Compile Include="Commands\Command_Heal.cs" />
     <Compile Include="Commands\Command_Horse.cs" />
     <Compile Include="Commands\Command_Item.cs" />
+    <Compile Include="Commands\Command_Order.cs" />
     <Compile Include="Commands\Command_SaveScenario.cs" />
     <Compile Include="Commands\Command_Help.cs" />
     <Compile Include="Commands\Command_Global.cs" />
