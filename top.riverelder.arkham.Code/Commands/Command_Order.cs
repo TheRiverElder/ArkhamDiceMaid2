@@ -46,7 +46,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
             if (map.Count > 0) {
                 List<string> list = new List<string>(map.Keys);
-                list.Sort((a, b) => map[a] - map[b]);
+                list.Sort((a, b) => map[b] - map[a]);
                 
                 sb.Append(string.Join(" > ", list.ToArray()));
             }
