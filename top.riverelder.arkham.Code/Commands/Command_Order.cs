@@ -25,8 +25,12 @@ namespace top.riverelder.arkham.Code.Commands {
 
             foreach (string name in invNames) {
                 Match m = Regex.Match(name, @"[+-]\d+$");
-                int fix = m.Success ? int.Parse(m.Value) : 0;
-                string invName = name.Substring(name.Length - m.Value.Length);
+                int fix = 0;
+                string invName = name;
+                if (m.Success) {
+                    invName = name.Substring(0, name.Length - m.Value.Length);
+                    fix = int.Parse(m.Value);
+                }
                 if (scenario.TryGetInvestigator(invName, out Investigator inv)) {
                     if (inv.Values.TryGet(valueName, out Value value)) {
                         map[invName] = value.Val + fix;
