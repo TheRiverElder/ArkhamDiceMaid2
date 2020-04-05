@@ -75,7 +75,7 @@ namespace top.riverelder.RiverCommand {
             }
 
             // 如果有参数名，则将该值赋予参数
-            if (!string.IsNullOrEmpty(ParamName)) {
+            if (!string.IsNullOrEmpty(ParamName) && arg != null) {
                 args[ParamName] = arg;
             }
 

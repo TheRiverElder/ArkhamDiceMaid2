@@ -9,10 +9,6 @@ namespace top.riverelder.arkham.Code.Commands {
     /// 进行全局选项的操作，包括
     /// 配置的保存于载入
     /// 调试模式的开关
-    /// 默认数值的设值
-    /// 默认别名的设值
-    /// 大失败界定
-    /// 大成功界定
     /// </summary>
     class Command_Global : DiceCmdEntry {
 
@@ -48,9 +44,6 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             );
         }
-
-        
-
 
     }
 }
