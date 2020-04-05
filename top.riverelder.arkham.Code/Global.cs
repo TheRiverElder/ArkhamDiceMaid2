@@ -70,7 +70,7 @@ namespace top.riverelder.arkham.Code {
 
             Dispatcher.Register(new Command_Check());
             Dispatcher.Register(new Command_Coc7());
-            //Dispatcher.Register(new Command_Control());
+            Dispatcher.Register(new Command_Control());
             //Dispatcher.Register(new Command_CreateInv());
             //Dispatcher.Register(new Command_Display());
             //Dispatcher.Register(new Command_Fight());

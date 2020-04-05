@@ -1,27 +1,26 @@
-﻿//using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-//using top.riverelder.arkham.Code.Model;
-//using top.riverelder.arkham.Code.Utils;
+using top.riverelder.arkham.Code.Model;
+using top.riverelder.arkham.Code.Utils;
+using top.riverelder.RiverCommand;
 
-//namespace top.riverelder.arkham.Code.Commands {
-//    class Command_Control : DiceCmdEntry {
-//        public string Name => "控制";
+namespace top.riverelder.arkham.Code.Commands {
+    class Command_Control : DiceCmdEntry {
 
-//        public string Usage => "控制 <卡名>";
+        public string Usage => "控制 <卡名>";
 
-//        public string Execute(string[] listArgs, IDictionary<string, string> dictArgs, string originalString, CmdEnv env) {
-//            string name = listArgs[0];
+        public static string Control(long selfId, Scenario sce, Investigator inv) {
+            sce.Control(selfId, inv.Name);
+            SaveUtil.Save(sce);
+            return $"早啊，{inv.Name}！";
+        }
 
-//            if (!env.ScenarioExist) {
-//                return "还未开团";
-//            }
-//            if (!env.Scenario.ExistInvestigator(name)) {
-//                return $"不存在调查员：{name}";
-//            }
-
-//            env.Scenario.Control(env.User, name);
-//            SaveUtil.Save(env.Scenario);
-//            return $"现在你是：{name}";
-//        }
-//    }
-//}
+        public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
+            dispatcher.Register("控制").Then(
+                PresetNodes.String<DMEnv>("卡名")
+                .Handles(Extensions.ExistInv())
+                .Executes((env, args, dict) => Control(env.SelfId, env.Sce, args.GetInv("卡名")))
+            );
+        }
+    }
+}

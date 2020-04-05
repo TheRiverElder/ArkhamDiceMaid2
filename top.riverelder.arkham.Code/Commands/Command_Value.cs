@@ -14,16 +14,22 @@ namespace top.riverelder.arkham.Code.Commands {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("数值").Then(
                 PresetNodes.String<DMEnv>("数值名").Then(
-                    PresetNodes.Literal<DMEnv>("增加").Then(Extensions.Dice<DMEnv>("增量").Executes((env, args, dict) => IncVal(env.Inv, args.GetStr("数值名"), args.GetDice("增量"))))
+                    PresetNodes.Literal<DMEnv>("增加")
+                    .Then(Extensions.Dice<DMEnv>("增量")
+                        .Executes((env, args, dict) => IncVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetDice("增量"))))
                 ).Then(
-                    PresetNodes.Literal<DMEnv>("设置").Then(Extensions.Value<DMEnv>("新值").Executes((env, args, dict) => SetVal(env.Inv, args.GetStr("数值名"), args.Get<Value>("新值"))))
+                    PresetNodes.Literal<DMEnv>("设置")
+                    .Then(Extensions.Value<DMEnv>("新值")
+                        .Executes((env, args, dict) => SetVal(env.Sce, env.Inv, args.GetStr("数值名"), args.Get<Value>("新值"))))
                 ).Then(
-                    PresetNodes.Literal<DMEnv>("别名").Then(PresetNodes.String<DMEnv>("新名").Executes((env, args, dict) => NewName(env.Inv, args.GetStr("数值名"), args.GetStr("新名"))))
+                    PresetNodes.Literal<DMEnv>("别名")
+                    .Then(PresetNodes.String<DMEnv>("新名")
+                        .Executes((env, args, dict) => NewName(env.Sce, env.Inv, args.GetStr("数值名"), args.GetStr("新名"))))
                 )
             ).Handles(Extensions.ExistSelfInv());
         }
 
-        public static string IncVal(Investigator inv, string valueName, Dice increment) {
+        public static string IncVal(Scenario scenario, Investigator inv, string valueName, Dice increment) {
             if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
                 value = new Value(1);
                 inv.Values.Put(valueName, value);
@@ -31,10 +37,11 @@ namespace top.riverelder.arkham.Code.Commands {
             int prev = value.Val;
             int inc = increment.Roll();
             value.Add(inc);
+            SaveUtil.Save(scenario);
             return $"{inv.Name}的{valueName}: {prev} + {inc} => {value.Val}";
         }
 
-        public static string SetVal(Investigator inv, string valueName, Value newValue) {
+        public static string SetVal(Scenario scenario, Investigator inv, string valueName, Value newValue) {
             if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
                 value = new Value(1);
                 inv.Values.Put(valueName, value);
@@ -44,14 +51,16 @@ namespace top.riverelder.arkham.Code.Commands {
                 value.Max = newValue.Max;
             }
             value.Set(newValue.Val);
+            SaveUtil.Save(scenario);
             return $"{inv.Name}的{valueName}: {prev} => {value.ToString()}";
         }
 
-        public static string NewName(Investigator inv, string valueName, string newName) {
+        public static string NewName(Scenario scenario, Investigator inv, string valueName, string newName) {
             if (!inv.Values.Names.Contains(valueName)) {
                 return $"{inv.Name}没有本名为{valueName}的数值";
             }
             inv.Values.Set(valueName, newName);
+            SaveUtil.Save(scenario);
             return $"{inv.Name}的{valueName}的新别名：{newName}";
         }
     }
