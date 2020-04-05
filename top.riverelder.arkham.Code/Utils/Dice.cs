@@ -127,6 +127,8 @@ namespace top.riverelder.arkham.Code.Utils {
 
     class DiceItem {
 
+        static int seed = (int)DateTime.Now.Ticks;
+
         public const int TypeConstant = 0;
         public const int TypeRandom = 1;
         public const int TypeDamageBonus = 2;
@@ -153,7 +155,7 @@ namespace top.riverelder.arkham.Code.Utils {
             } else if (type == TypeDamageBonus) {
                 return sign * times * (string.IsNullOrEmpty(db) ? 0 : Dice.Roll(db));
             }
-            Random random = new Random((int)DateTime.Now.Ticks);
+            Random random = new Random(seed++);
             int sum = 0;
             for (int i = 0; i < times; i++) {
                 sum += random.Next(value) + 1;

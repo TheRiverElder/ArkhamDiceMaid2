@@ -23,12 +23,15 @@ namespace top.riverelder.arkham.Code.Commands {
                 if (i > 0) {
                     sb.AppendLine();
                 }
+                int rest = 0;
                 for (int j = 0; j < properties.Length; j++) {
-                    if (j > 0) {
-                        sb.Append(' ');
-                    }
-                    sb.Append(properties[j]).Append('：').Append(Dice.Roll("3d6") * 5);
+                    int val = Dice.Roll("3d6") * 5;
+                    sb.Append(' ').Append(properties[j]).Append(':').Append(val);
+                    rest += val;
                 }
+                int luck = Dice.Roll("3d6") * 5;
+                sb.Append("幸运:").Append(luck).AppendLine();
+                sb.Append($"带幸运：{rest + luck}，不带幸运：{rest}");
             }
             return sb.ToString();
         }
