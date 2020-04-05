@@ -22,6 +22,10 @@ namespace top.riverelder.arkham.Code.Commands {
                     .Then(Extensions.Value<DMEnv>("新值")
                         .Executes((env, args, dict) => SetVal(env.Sce, env.Inv, args.GetStr("数值名"), args.Get<Value>("新值"))))
                 ).Then(
+                    PresetNodes.Literal<DMEnv>("上限")
+                    .Then(PresetNodes.Int<DMEnv>("上限值")
+                        .Executes((env, args, dict) => SetMax(env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("上限值"))))
+                ).Then(
                     PresetNodes.Literal<DMEnv>("别名")
                     .Then(PresetNodes.String<DMEnv>("新名")
                         .Executes((env, args, dict) => NewName(env.Sce, env.Inv, args.GetStr("数值名"), args.GetStr("新名"))))
@@ -51,6 +55,17 @@ namespace top.riverelder.arkham.Code.Commands {
                 value.Max = newValue.Max;
             }
             value.Set(newValue.Val);
+            SaveUtil.Save(scenario);
+            return $"{inv.Name}的{valueName}: {prev} => {value.ToString()}";
+        }
+
+        public static string SetMax(Scenario scenario, Investigator inv, string valueName, int max) {
+            if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
+                value = new Value(1);
+                inv.Values.Put(valueName, value);
+            }
+            string prev = value.ToString();
+            value.Max = max;
             SaveUtil.Save(scenario);
             return $"{inv.Name}的{valueName}: {prev} => {value.ToString()}";
         }

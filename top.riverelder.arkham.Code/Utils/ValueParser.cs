@@ -13,12 +13,12 @@ namespace top.riverelder.arkham.Code.Utils {
         public override string Tip => "数值";
 
         protected override bool Parse(StringReader reader, out object result) {
-            if (!reader.HasNext || char.IsDigit(reader.Peek())) {
+            if (!reader.HasNext || !char.IsDigit(reader.Peek())) {
                 result = null;
                 return false;
             }
             int start = reader.Cursor;
-            if (reader.HasNext && char.IsDigit(reader.Peek())) {
+            while (reader.HasNext && char.IsDigit(reader.Peek())) {
                 reader.Skip();
             }
             if (!int.TryParse(reader.Slice(start), out int val)) {
@@ -35,7 +35,7 @@ namespace top.riverelder.arkham.Code.Utils {
                 return true;
             }
             start = reader.Cursor;
-            if (reader.HasNext && char.IsDigit(reader.Peek())) {
+            while (reader.HasNext && char.IsDigit(reader.Peek())) {
                 reader.Skip();
             }
             if (!int.TryParse(reader.Slice(start), out int max)) {
