@@ -82,9 +82,7 @@ namespace top.riverelder.arkham.Code.Model
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Value this[string name] {
-            get => values.ContainsKey(name) ? values[name] : values[aliases[name]];
-        }
+        public Value this[string name] => TryWidelyGet(name, out Value value) ? value : null;
 
         /// <summary>
         /// 设置值

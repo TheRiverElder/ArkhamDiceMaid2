@@ -70,7 +70,7 @@ namespace top.riverelder.arkham.Code.Utils {
             };
         }
 
-        public static PreProcess<DMEnv> ExistSelfValue() {
+        public static PreProcess<DMEnv> GetSelfValue() {
             return (DMEnv env, Args args, object ori, out object arg, out string err) => {
                 arg = null;
                 if (ori == null || !(ori is string)) {
@@ -91,6 +91,31 @@ namespace top.riverelder.arkham.Code.Utils {
                 }
                 err = null;
                 arg = value;
+                return true;
+            };
+        }
+
+        public static PreProcess<DMEnv> ExistSelfValue() {
+            return (DMEnv env, Args args, object ori, out object arg, out string err) => {
+                arg = null;
+                if (ori == null || !(ori is string)) {
+                    err = "参数错误";
+                    return false;
+                }
+                if (!env.TryGetInv(out Scenario sce, out Investigator inv)) {
+                    if (sce == null) {
+                        err = "还未开团";
+                        return false;
+                    }
+                    err = "你还未车卡";
+                    return false;
+                }
+                string valueName = (string)ori;
+                if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
+                    err = $"未找到{inv.Name}的{valueName}";
+                }
+                err = null;
+                arg = ori;
                 return true;
             };
         }

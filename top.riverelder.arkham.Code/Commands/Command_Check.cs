@@ -10,105 +10,92 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public string Usage => "检定 <数值名> [普通|困难|极难|对抗|奖励|惩罚] [对手名] [对抗数值名]";
 
-        //public string Execute(string[] listArgs, IDictionary<string, string> dictArgs, string originalString, CmdEnv env) {
-        //    string valueName = listArgs[0];
-        //    string hardness = listArgs.Length > 1 ? listArgs[1] : "普通";
-        //    string opposite = listArgs.Length > 2 ? listArgs[2] : null;
-        //    string againstValueName = listArgs.Length > 3 ? listArgs[3] : null;
-
-        //    if (!EnvValidator.ExistValue(env, valueName, out Value value, out string err)) {
-        //        return err;
-        //    }
-
-        //    Scenario scenario = env.Scenario;
-        //    Investigator inv = env.Investigator;
-
-        //    StringBuilder builder = new StringBuilder();
-
-        //    if ("对抗".Equals(hardness)) {
-        //        if (string.IsNullOrEmpty(opposite)) {
-        //            return $"对抗需输入对手名";
-        //        }
-        //        if (!scenario.TryGetInvestigator(opposite, out Investigator target)) {
-        //            return $"未找到对手：{opposite}";
-        //        } else {
-        //            if (string.IsNullOrEmpty(againstValueName)) {
-        //                againstValueName = valueName;
-        //            }
-        //            if (!target.Values.TryGet(againstValueName, out Value againstValue)) {
-        //                return $"未找到{opposite}的对抗属性：{againstValueName}";
-        //            } else {
-        //                builder.AppendLine($"{inv.Name}对抗{opposite}的{againstValueName}({againstValue.Val})");
-        //                int val = againstValue.Val;
-        //                if (val < 50) {
-        //                    hardness = "普通";
-        //                } else if (val < 90) {
-        //                    hardness = "困难";
-        //                } else {
-        //                    hardness = "极难";
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    CheckResult result = null;
-        //    string rrText = "";
-        //    if ("奖励" == hardness || "惩罚" == hardness) {
-        //        result = value.Check(CheckResult.NormalSuccess);
-        //        CheckResult result2 = value.Check(CheckResult.NormalSuccess);
-        //        CheckResult smaller = result.result <= result2.result ? result : result2;
-        //        CheckResult larger = result.result >= result2.result ? result : result2;
-        //        if ("奖励" == hardness) {
-        //            result = smaller;
-        //            rrText = $"{smaller.result} <= {larger.result}";
-        //        } else {
-        //            result = larger;
-        //            rrText = $"{larger.result} >= {smaller.result}";
-        //        }
-        //    } else {
-        //        switch (hardness) {
-        //            case "普通": result = value.Check(CheckResult.NormalSuccess); break;
-        //            case "困难": result = value.Check(CheckResult.HardSuccess); break;
-        //            case "极难": result = value.Check(CheckResult.ExtremeSuccess); break;
-        //            default: result = value.Check(CheckResult.NormalSuccess); break;
-        //        }
-        //        rrText = string.Empty + result.result;
-        //    }
-
-        //    builder.AppendLine($"{inv.Name}检定{hardness}{valueName}({result.target}/{result.value})：");
-        //    builder.Append($"{result.dice} = {rrText}, 判定为 {result.ActualTypeString}");
-
-        //    return builder.ToString();
-        //}
-
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            IDictionary<object, object> map = new Dictionary<object, object> {
+            IDictionary<object, object> hardnessMap = new Dictionary<object, object> {
                 ["普通"] = CheckResult.NormalSuccess,
                 ["困难"] = CheckResult.HardSuccess,
                 ["极难"] = CheckResult.ExtremeSuccess,
             };
-            dispatcher.Register("检定")
+            IDictionary<object, object> twiceMap = new Dictionary<object, object> {
+                ["奖励"] = true,
+                ["惩罚"] = false,
+            };
+            dispatcher.Register("检定").Then(
+                PresetNodes.String<DMEnv>("数值名")
+                .Handles(Extensions.ExistSelfValue())
+                .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), CheckResult.NormalSuccess))
                 .Then(
-                    PresetNodes.String<DMEnv>("数值名")
-                    .Handles(Extensions.ExistSelfValue())
-                    .Then(
-                        PresetNodes.Or<DMEnv>("难度", "普通", "困难", "极难")
-                        .Handles(PreProcesses.Mapper<DMEnv>(map))
-                        .Executes((env, args, dict) => SimpleCheck(args.GetVal("数值名"), args.GetInt("难度")))
-                ).Executes((env, args, dict) => SimpleCheck(args.Get<Value>("数值名"), CheckResult.NormalSuccess))
+                    PresetNodes.Or<DMEnv>("难度", "普通", "困难", "极难")
+                    .Handles(PreProcesses.Mapper<DMEnv>(hardnessMap))
+                    .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), args.GetInt("难度")))
+                ).Then(
+                    PresetNodes.Or<DMEnv>("奖惩", "奖励", "惩罚")
+                    .Handles(PreProcesses.Mapper<DMEnv>(twiceMap))
+                    .Executes((env, args, dict) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩")))
+                ).Then(
+                    PresetNodes.Literal<DMEnv>("对抗").Then(
+                        PresetNodes.String<DMEnv>("对手名")
+                        .Handles(Extensions.ExistInv())
+                        .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名")))
+                        .Then(
+                            PresetNodes.String<DMEnv>("对抗数值名")
+                            .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("对抗数值名")))
+                        )
+                    )
+                )
             );
         }
 
-        public string SimpleCheck(Value value, int hardness) {
-            return "";
+        public string SimpleCheck(Investigator inv, string valueName, int hardness) {
+            CheckResult result = inv.Values[valueName].Check(hardness);
+            string hardnessStr;
+            switch (hardness) {
+                case CheckResult.ExtremeSuccess: hardnessStr = "极难"; break;
+                case CheckResult.HardSuccess: hardnessStr = "困难"; break;
+                case CheckResult.NormalSuccess: hardnessStr = "普通"; break;
+                default: hardnessStr = "普通"; break;
+            }
+
+            return new StringBuilder()
+                .AppendLine($"{inv.Name}的{hardnessStr}{valueName}：")
+                .Append($"({result.target}/{result.value}) => {result.result}，{result.ActualTypeString}")
+                .ToString();
         }
 
-        public string TwiceCheck(Value value, bool isBonus) {
-            return "";
+        public string TwiceCheck(Investigator inv, string valueName, bool isBonus) {
+            Value value = inv.Values[valueName];
+            CheckResult bigger = value.Check();
+            CheckResult smaller = value.Check();
+            if (bigger.result < smaller.result) {
+                CheckResult tmp = bigger;
+                bigger = smaller;
+                smaller = tmp;
+            }
+            if (isBonus) {
+                return new StringBuilder()
+                    .AppendLine($"{inv.Name}的奖励{valueName}：")
+                    .Append($"({smaller.value}) => {smaller.result}({bigger.result})，{smaller.ActualTypeString}")
+                    .ToString();
+            } else {
+                return new StringBuilder()
+                    .AppendLine($"{inv.Name}的惩罚{valueName}：")
+                    .Append($"({bigger.value}) => {bigger.result}({smaller.result})，{bigger.ActualTypeString}")
+                    .ToString();
+            }
         }
 
-        public string CheckAgainst(Value value, Investigator target) {
-            return "";
+        public string CheckAgainst(Investigator inv, string valueName, Investigator target, string againstValueName) {
+            CheckResult selfResult = inv.Values[valueName].Check();
+            if (!target.Values.TryWidelyGet(againstValueName, out Value againstValue)) {
+                return $"{target.Name}没有{againstValueName}";
+            }
+            CheckResult targetResult = againstValue.Check();
+            
+            return new StringBuilder()
+                .AppendLine($"{inv.Name}的{valueName}：({selfResult.value}) => {selfResult.result}")
+                .AppendLine($"{target.Name}的{againstValueName}：({targetResult.value}) => {targetResult.result}")
+                .Append("对抗：").Append(selfResult.result <= targetResult.result ? "胜利" : "失败")
+                .ToString();
         }
 
     }
