@@ -126,7 +126,6 @@ namespace top.riverelder.arkham.Code.Utils {
     }
 
     class DiceItem {
-        Random random = new Random();
 
         public const int TypeConstant = 0;
         public const int TypeRandom = 1;
@@ -154,6 +153,7 @@ namespace top.riverelder.arkham.Code.Utils {
             } else if (type == TypeDamageBonus) {
                 return sign * times * (string.IsNullOrEmpty(db) ? 0 : Dice.Roll(db));
             }
+            Random random = new Random((int)DateTime.Now.Ticks);
             int sum = 0;
             for (int i = 0; i < times; i++) {
                 sum += random.Next(value) + 1;

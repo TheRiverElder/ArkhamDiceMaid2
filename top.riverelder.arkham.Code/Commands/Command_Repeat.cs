@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
@@ -19,11 +20,12 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public static string Repeat(DiceMaidEnv env, string rawCmd, int times) {
             StringBuilder sb = new StringBuilder();
+            string reply;
             for (int i = 0; i < times; i++) {
                 if (i != 0) {
                     sb.AppendLine();
                 }
-                Global.Dispatcher.Dispatch(rawCmd, env, out string reply);
+                Global.Dispatcher.Dispatch(rawCmd, env, out reply);
                 sb.Append(reply);
             }
             return sb.ToString();
