@@ -21,7 +21,7 @@ namespace top.riverelder.arkham.Code.Commands {
                         return "载入完毕";
                     })
                 ).Then(
-                    PresetNodes.Literal<DiceMaidEnv>("载入")
+                    PresetNodes.Literal<DiceMaidEnv>("保存")
                     .Executes((env, args, dict) => {
                         SaveUtil.SaveGlobal();
                         return "保存完毕";

@@ -143,7 +143,7 @@ namespace top.riverelder.RiverCommand {
             string[] certain = node.Parser.Certain;
             if (certain != null && certain.Length > 0) {
                 foreach (string c in certain) {
-                    certainChuldren.Add(c, node);
+                    certainChuldren[c] = node;
                 }
             } else {
                 children.Add(node);
