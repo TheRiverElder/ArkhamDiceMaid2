@@ -79,7 +79,7 @@ namespace top.riverelder.arkham.Code {
             //Dispatcher.Register(new Command_Horse());
             //Dispatcher.Register(new Command_Item());
             //Dispatcher.Register(new Command_Order());
-            //Dispatcher.Register(new Command_Global());
+            Dispatcher.Register(new Command_Global());
             //Dispatcher.Register(new Command_ReloadScenario());
             Dispatcher.Register(new Command_Roll());
             //Dispatcher.Register(new Command_SanCheck());
