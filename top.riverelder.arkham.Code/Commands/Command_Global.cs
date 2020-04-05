@@ -8,17 +8,6 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public string Usage => "全局 <配置|调试> <载入|保存|开启|关闭>";
 
-        public string Execute(string[] listArgs, IDictionary<string, string> dictArgs, string originalString, CmdEnv env) {
-            string opt = listArgs[0];
-            if ("载入".Equals(opt)) {
-                SaveUtil.LoadGlobal();
-                return "配置载入完毕";
-            } else {
-                SaveUtil.SaveGlobal();
-                return "配置保存完毕";
-            }
-        }
-
         public override void OnRegister(CmdDispatcher<DiceMaidEnv> dispatcher) {
             IDictionary<object, object> oao = new Dictionary<object, object> {
                 ["开"] = true,
