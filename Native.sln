@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Native.Core", "Native.Core\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "top.riverelder.arkham.Code", "top.riverelder.arkham.Code\top.riverelder.arkham.Code.csproj", "{8386F876-96BA-4FDC-9067-27CBE008582D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiverCommand", "RiverCommand\RiverCommand.csproj", "{46C94E8A-79D3-43F3-A3B4-AD340E00D9EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,14 @@ Global
 		{8386F876-96BA-4FDC-9067-27CBE008582D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8386F876-96BA-4FDC-9067-27CBE008582D}.Release|x86.ActiveCfg = Release|Any CPU
 		{8386F876-96BA-4FDC-9067-27CBE008582D}.Release|x86.Build.0 = Release|Any CPU
+		{46C94E8A-79D3-43F3-A3B4-AD340E00D9EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46C94E8A-79D3-43F3-A3B4-AD340E00D9EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46C94E8A-79D3-43F3-A3B4-AD340E00D9EF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{46C94E8A-79D3-43F3-A3B4-AD340E00D9EF}.Debug|x86.Build.0 = Debug|Any CPU
+		{46C94E8A-79D3-43F3-A3B4-AD340E00D9EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46C94E8A-79D3-43F3-A3B4-AD340E00D9EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46C94E8A-79D3-43F3-A3B4-AD340E00D9EF}.Release|x86.ActiveCfg = Release|Any CPU
+		{46C94E8A-79D3-43F3-A3B4-AD340E00D9EF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

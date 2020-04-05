@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using top.riverelder.arkham.Code.Bot;
+using top.riverelder.arkham.Code.Commands;
 using top.riverelder.arkham.Code.Model;
+using top.riverelder.arkham.Code.Utils;
+using top.riverelder.RiverCommand;
 
-namespace top.riverelder.arkham.Code
-{
-    public static class Global
-    {
+namespace top.riverelder.arkham.Code {
+    public static class Global {
         public static string RelDataDir = "data";
         public static string RelConfFile = "game.ini";
 
@@ -21,6 +22,11 @@ namespace top.riverelder.arkham.Code
         /// 召唤骰娘的前缀
         /// </summary>
         public static string Prefix = "/";
+
+        /// <summary>
+        /// 调试模式，打开的话，会返回每一条消息的结果
+        /// </summary>
+        public static bool Debug = true;
         /// <summary>
         /// 默认的人物属性
         /// </summary>
@@ -44,17 +50,42 @@ namespace top.riverelder.arkham.Code
         /// <summary>
         /// 命令调度器
         /// </summary>
-        public static CommandDispatcher Dispatcher = new CommandDispatcher();
+        public static CmdDispatcher<DiceMaidEnv> Dispatcher = new CmdDispatcher<DiceMaidEnv>();
 
-        public static Scenario GetScenario(string name)
-        {
-            if (Scenarios.TryGetValue(name, out Scenario scenario))
-            {
+        public static Scenario GetScenario(string name) {
+            if (Scenarios.TryGetValue(name, out Scenario scenario)) {
                 return scenario;
             }
             scenario = new Scenario(name);
             Scenarios[name] = scenario;
             return scenario;
+        }
+
+        public static void Initialize(string appDir) {
+            AppDir = appDir;
+            ConfFile = Path.Combine(appDir, RelConfFile);
+            DataDir = Path.Combine(appDir, RelDataDir);
+
+            SaveUtil.LoadGlobal();
+
+            //Dispatcher.Register(new Command_Check());
+            //Dispatcher.Register(new Command_Control());
+            //Dispatcher.Register(new Command_CreateInv());
+            //Dispatcher.Register(new Command_CreateScenario());
+            //Dispatcher.Register(new Command_Display());
+            //Dispatcher.Register(new Command_Fight());
+            //Dispatcher.Register(new Command_Heal());
+            //Dispatcher.Register(new Command_Help());
+            //Dispatcher.Register(new Command_Horse());
+            //Dispatcher.Register(new Command_Item());
+            //Dispatcher.Register(new Command_Order());
+            //Dispatcher.Register(new Command_Global());
+            //Dispatcher.Register(new Command_ReloadScenario());
+            Dispatcher.Register(new Command_Roll());
+            //Dispatcher.Register(new Command_SanCheck());
+            //Dispatcher.Register(new Command_SaveScenario());
+            //Dispatcher.Register(new Command_SetPrefix());
+            //Dispatcher.Register(new Command_Value());
         }
     }
 }

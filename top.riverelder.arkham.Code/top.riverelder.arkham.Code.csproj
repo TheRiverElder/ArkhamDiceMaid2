@@ -62,11 +62,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bot\ArgumentValidater.cs" />
-    <Compile Include="Bot\EnvValidator.cs" />
-    <Compile Include="Bot\CommandDispatcher.cs" />
-    <Compile Include="Bot\CompiledCommand.cs" />
-    <Compile Include="Bot\ICommand.cs" />
     <Compile Include="Commands\Command_Check.cs" />
     <Compile Include="Commands\Command_CreateInv.cs" />
     <Compile Include="Commands\Command_CreateScenario.cs" />
@@ -88,8 +83,8 @@
     <Compile Include="Event_CqAppEnable.cs" />
     <Compile Include="Event_CqExit.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="Bot\CmdEnv.cs" />
     <Compile Include="ICQAppEnable.cs" />
+    <Compile Include="Model\DiceMaidEnv.cs" />
     <Compile Include="Model\FightEvent.cs" />
     <Compile Include="Model\Horse.cs" />
     <Compile Include="Model\Scenario.cs" />
@@ -105,6 +100,10 @@
     <Compile Include="Model\Value.cs" />
     <Compile Include="Model\ValueSet.cs" />
     <Compile Include="Model\WeaponInfo.cs" />
+    <Compile Include="Utils\DiceCmdEntry.cs" />
+    <Compile Include="Utils\DiceParser.cs" />
+    <Compile Include="Utils\DicePreprocesses.cs" />
+    <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\SaveUtil.cs" />
     <Compile Include="Utils\ValueConverter.cs" />
   </ItemGroup>
@@ -116,6 +115,10 @@
     <ProjectReference Include="..\Native.Tool\Native.Tool.csproj">
       <Project>{0ca93eb9-4e25-46c6-94d2-0f97137a1606}</Project>
       <Name>Native.Tool</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RiverCommand\RiverCommand.csproj">
+      <Project>{46c94e8a-79d3-43f3-a3b4-ad340e00d9ef}</Project>
+      <Name>RiverCommand</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

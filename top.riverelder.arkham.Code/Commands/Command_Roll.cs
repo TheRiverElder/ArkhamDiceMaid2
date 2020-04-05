@@ -1,26 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using top.riverelder.arkham.Code.Bot;
+
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
+using top.riverelder.RiverCommand;
 
-namespace top.riverelder.arkham.Code.Commands
-{
-    public class Command_Roll : ICommand
-    {
-        public string Name => "投掷";
+namespace top.riverelder.arkham.Code.Commands {
+    public class Command_Roll : DiceCmdEntry {
 
-        public ArgumentValidater Validater { get; } = ArgumentValidater.Empty
-                .SetListArgCount(1)
-                .AddListArg(ArgumentValidater.Dice);
+        public string Usage => "投掷 <骰子>";
 
-        public string Usage => "投掷 <骰子表达式>";
+        public override void OnRegister(CmdDispatcher<DiceMaidEnv> dispatcher) {
+            dispatcher.Register("投掷")
+                .Then(
+                    Extensions.Dice<DiceMaidEnv>("骰子").Executes((env, args, dict) => Roll(args.GetDice("骰子")))
+                );
+        }
 
-        public string Execute(string[] listArgs, IDictionary<string, string> dictArgs, string raw, CmdEnv env)
-        {
-            string diceExp = listArgs[0];
-
-            return $"投掷结果：{diceExp} = {Dice.Roll(diceExp)}";
+        public static string Roll(Dice dice) {
+            return $"{dice.ToString()} = {dice.Roll()}";
         }
     }
 }
