@@ -150,6 +150,12 @@ namespace top.riverelder.RiverCommand {
             }
         }
 
+        private HashSet<CommandNode<TEnv>> GetAllChildren() {
+            HashSet<CommandNode<TEnv>> ac = new HashSet<CommandNode<TEnv>>(certainChuldren.Values);
+            ac.UnionWith(children);
+            return ac;
+        }
+
         public CommandNode<TEnv> Then(CommandNode<TEnv> node) {
             AddChild(node);
             return this;
@@ -182,8 +188,7 @@ namespace top.riverelder.RiverCommand {
         }
 
         public string[] GetTips() {
-            HashSet<CommandNode<TEnv>> allChildren = new HashSet<CommandNode<TEnv>>(certainChuldren.Values);
-            allChildren.UnionWith(children);
+            HashSet<CommandNode<TEnv>> allChildren = GetAllChildren();
             HashSet<string> tips = new HashSet<string>();
             foreach (CommandNode<TEnv> child in allChildren) {
                 tips.Add(string.IsNullOrEmpty(child.ParamName) ? child.Parser.Tip : child.ParamName);
@@ -201,7 +206,7 @@ namespace top.riverelder.RiverCommand {
             if (Executor != null) {
                 ret.Add(self);
             }
-            foreach (CommandNode<TEnv> child in children) {
+            foreach (CommandNode<TEnv> child in GetAllChildren()) {
                 List<string> childHelp = child.GetHelp();
                 foreach (string s in childHelp) {
                     ret.Add(self + " " + s);
