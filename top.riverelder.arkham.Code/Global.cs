@@ -72,7 +72,6 @@ namespace top.riverelder.arkham.Code {
             Dispatcher.Register(new Command_Coc7());
             //Dispatcher.Register(new Command_Control());
             //Dispatcher.Register(new Command_CreateInv());
-            //Dispatcher.Register(new Command_CreateScenario());
             //Dispatcher.Register(new Command_Display());
             //Dispatcher.Register(new Command_Fight());
             //Dispatcher.Register(new Command_Heal());
@@ -81,11 +80,10 @@ namespace top.riverelder.arkham.Code {
             //Dispatcher.Register(new Command_Item());
             //Dispatcher.Register(new Command_Order());
             Dispatcher.Register(new Command_Global());
-            Dispatcher.Register(new Command_Scenario());
             Dispatcher.Register(new Command_Repeat());
             Dispatcher.Register(new Command_Roll());
             //Dispatcher.Register(new Command_SanCheck());
-            //Dispatcher.Register(new Command_SaveScenario());
+            Dispatcher.Register(new Command_Scenario());
             //Dispatcher.Register(new Command_SetPrefix());
             Dispatcher.Register(new Command_Value());
         }
