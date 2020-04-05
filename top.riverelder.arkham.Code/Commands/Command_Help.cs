@@ -22,10 +22,8 @@ namespace top.riverelder.arkham.Code.Commands {
         public static string PrintAllHelp() {
             StringBuilder builder = new StringBuilder().AppendLine("可用的命令集：");
             foreach (CommandNode<DMEnv> node in Global.Dispatcher.Commands) {
-                builder.AppendLine();
-                foreach (string s in node.GetHelp()) {
-                    builder.AppendLine().Append(Global.Prefix).Append(s);
-                }
+                builder.AppendLine(string.Join("\n", node.GetHelp()));
+                builder.AppendLine("----------------");
             }
             return builder.ToString();
         }
