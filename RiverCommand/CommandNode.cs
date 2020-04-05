@@ -182,12 +182,11 @@ namespace top.riverelder.RiverCommand {
         }
 
         public string[] GetTips() {
-            IList<string> tips = new List<string>();
-            foreach (CommandNode<TEnv> child in certainChuldren.Values) {
-                tips.Add(child.Parser.Tip + (string.IsNullOrEmpty(child.ParamName) ? "" : $"（{child.ParamName}）"));
-            }
-            foreach (CommandNode<TEnv> child in children) {
-                tips.Add(child.Parser.Tip + (string.IsNullOrEmpty(child.ParamName) ? "" : $"（{child.ParamName}）"));
+            HashSet<CommandNode<TEnv>> allChildren = new HashSet<CommandNode<TEnv>>(certainChuldren.Values);
+            allChildren.UnionWith(children);
+            HashSet<string> tips = new HashSet<string>();
+            foreach (CommandNode<TEnv> child in allChildren) {
+                tips.Add(string.IsNullOrEmpty(child.ParamName) ? child.Parser.Tip : child.ParamName);
             }
             return tips.ToArray();
         }
