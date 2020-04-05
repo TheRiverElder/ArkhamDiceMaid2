@@ -73,10 +73,9 @@
     <Compile Include="Commands\Command_Item.cs" />
     <Compile Include="Commands\Command_Order.cs" />
     <Compile Include="Commands\Command_Repeat.cs" />
-    <Compile Include="Commands\Command_SaveScenario.cs" />
     <Compile Include="Commands\Command_Help.cs" />
     <Compile Include="Commands\Command_Global.cs" />
-    <Compile Include="Commands\Command_ReloadScenario.cs" />
+    <Compile Include="Commands\Command_Scenario.cs" />
     <Compile Include="Commands\Command_Roll.cs" />
     <Compile Include="Commands\Command_SanCheck.cs" />
     <Compile Include="Commands\Command_SetPrefix.cs" />
