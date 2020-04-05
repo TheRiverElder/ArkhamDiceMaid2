@@ -86,5 +86,11 @@ namespace top.riverelder.RiverCommand.Utils {
                 Cursor++;
             }
         }
+
+        public string ReadToEnd() {
+            int start = Cursor;
+            Cursor = Data.Length;
+            return Data.Substring(start);
+        }
     }
 }

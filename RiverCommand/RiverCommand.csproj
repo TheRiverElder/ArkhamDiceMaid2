@@ -51,6 +51,7 @@
     <Compile Include="ParamParsers\LiteralParser.cs" />
     <Compile Include="ParamParsers\OrParser.cs" />
     <Compile Include="ParamParsers\ParamParser.cs" />
+    <Compile Include="ParamParsers\RestParser.cs" />
     <Compile Include="ParamParsers\StringParser.cs" />
     <Compile Include="PreProcesses.cs" />
     <Compile Include="PresetNodes.cs" />

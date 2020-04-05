@@ -71,6 +71,7 @@
     <Compile Include="Commands\Command_Horse.cs" />
     <Compile Include="Commands\Command_Item.cs" />
     <Compile Include="Commands\Command_Order.cs" />
+    <Compile Include="Commands\Command_Repeat.cs" />
     <Compile Include="Commands\Command_SaveScenario.cs" />
     <Compile Include="Commands\Command_Help.cs" />
     <Compile Include="Commands\Command_Global.cs" />

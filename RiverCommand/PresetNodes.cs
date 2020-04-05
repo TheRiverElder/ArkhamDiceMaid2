@@ -24,5 +24,9 @@ namespace top.riverelder.RiverCommand {
         public static CommandNode<TEnv> Or<TEnv>(string name, params string[] words) {
             return new CommandNode<TEnv>(name, new OrParser(words));
         }
+
+        public static CommandNode<TEnv> Rest<TEnv>(string name) {
+            return new CommandNode<TEnv>(name, new RestParser());
+        }
     }
 }
