@@ -92,5 +92,9 @@ namespace top.riverelder.RiverCommand.Utils {
             Cursor = Data.Length;
             return Data.Substring(start);
         }
+
+        public string Slice(int index) {
+            return Data.Substring(index < Cursor ? index : Cursor, Math.Abs(Cursor - index));
+        }
     }
 }

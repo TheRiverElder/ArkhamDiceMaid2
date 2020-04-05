@@ -4,6 +4,16 @@ using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
 
 namespace top.riverelder.arkham.Code.Commands {
+
+    /// <summary>
+    /// 进行全局选项的操作，包括
+    /// 配置的保存于载入
+    /// 调试模式的开关
+    /// 默认数值的设值
+    /// 默认别名的设值
+    /// 大失败界定
+    /// 大成功界定
+    /// </summary>
     class Command_Global : DiceCmdEntry {
 
         public string Usage => "全局 <配置|调试> <载入|保存|开启|关闭>";

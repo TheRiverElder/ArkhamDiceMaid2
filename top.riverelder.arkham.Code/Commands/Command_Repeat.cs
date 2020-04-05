@@ -9,6 +9,9 @@ using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
 
 namespace top.riverelder.arkham.Code.Commands {
+    /// <summary>
+    /// 将一个指令重复n遍
+    /// </summary>
     public class Command_Repeat : DiceCmdEntry {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("重复").Then(
