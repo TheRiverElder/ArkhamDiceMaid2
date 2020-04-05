@@ -113,6 +113,8 @@ namespace top.riverelder.arkham.Code.Utils {
                 string valueName = (string)ori;
                 if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
                     err = $"未找到{inv.Name}的{valueName}";
+                    arg = ori;
+                    return false;
                 }
                 err = null;
                 arg = ori;
