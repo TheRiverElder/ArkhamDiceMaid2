@@ -21,13 +21,25 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("读取")
-                .Handles(Extensions.ExistSce())
                 .Executes((env, args, dict) => LoadScenario(env.GroupId))
                 .Then(
                     PresetNodes.String<DMEnv>("团名")
                     .Executes((env, args, dict) => LoadScenario(env.GroupId, args.GetStr("团名")))
                 )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("开始")
+                .Then(
+                    PresetNodes.String<DMEnv>("团名")
+                    .Executes((env, args, dict) => StartScenario(env.GroupId, args.GetStr("团名"), false))
+                    .Then(
+                        PresetNodes.Literal<DMEnv>("强制")
+                        .Executes((env, args, dict) => StartScenario(env.GroupId, args.GetStr("团名"), true))
+                    )
+                )
             );
+            dispatcher.SetAlias("读团", "团子 读取");
+            dispatcher.SetAlias("存团", "团子 保存");
+            dispatcher.SetAlias("开团", "团子 开始");
         }
 
         public static string LoadScenario(long groupId) {
@@ -61,6 +73,17 @@ namespace top.riverelder.arkham.Code.Commands {
                 return "保存完毕：" + sceName;
             }
             return $"未找到团：{sceName}";
+        }
+
+        public static string StartScenario(long groupId, string sceName, bool force) {
+            if (Global.Scenarios.ContainsKey(sceName) && !force) {
+                return $"已经存在团：{sceName}，若要强制开团，请加参数“强制”";
+            }
+            Scenario s = new Scenario(sceName);
+            Global.Scenarios[sceName] = s;
+            Global.Groups[groupId] = s.Name;
+            SaveUtil.Save(s);
+            return $"【{sceName}】开团啦！";
         }
     }
 }
