@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\Command_Check.cs" />
+    <Compile Include="Commands\Command_Coc7.cs" />
     <Compile Include="Commands\Command_CreateInv.cs" />
     <Compile Include="Commands\Command_CreateScenario.cs" />
     <Compile Include="Commands\Command_Display.cs" />
