@@ -94,7 +94,7 @@ namespace top.riverelder.arkham.Code.Commands {
             return new StringBuilder()
                 .AppendLine($"{inv.Name}的{valueName}：({selfResult.value}) => {selfResult.result}")
                 .AppendLine($"{target.Name}的{againstValueName}：({targetResult.value}) => {targetResult.result}")
-                .Append("对抗：").Append(selfResult.result <= targetResult.result ? "胜利" : "失败")
+                .Append(inv.Name).Append('：').Append(selfResult.result <= targetResult.result ? "胜利" : "失败")
                 .ToString();
         }
 

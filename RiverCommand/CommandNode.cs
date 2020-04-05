@@ -213,6 +213,6 @@ namespace top.riverelder.RiverCommand {
         /// <summary>
         /// 获取帮助信息
         /// </summary>
-        public virtual string Help => $"<{ParamName}>";
+        public virtual string Help => string.IsNullOrEmpty(ParamName) ? Parser.Tip : ParamName;
     }
 }

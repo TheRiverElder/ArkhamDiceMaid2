@@ -13,6 +13,8 @@ namespace top.riverelder.RiverCommand {
         private Dictionary<string, string> aliases = new Dictionary<string, string>();
         private Dictionary<string, CommandNode<TEnv>> commands = new Dictionary<string, CommandNode<TEnv>>();
 
+        public Dictionary<string, CommandNode<TEnv>> CommandMap => new Dictionary<string, CommandNode<TEnv>>(commands);
+
         public ICollection<CommandNode<TEnv>> Commands => commands.Values;
 
         public CommandNode<TEnv> this[string head] {
