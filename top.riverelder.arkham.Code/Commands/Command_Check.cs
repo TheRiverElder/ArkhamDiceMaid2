@@ -90,7 +90,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("检定")
                 .Then(
                     PresetNodes.String<DMEnv>("数值名")
-                    .Handles(DicePreprocesses.GetSelfValue())
+                    .Handles(Extensions.ExistSelfValue())
                     .Then(
                         PresetNodes.Or<DMEnv>("难度", "普通", "困难", "极难")
                         .Handles(PreProcesses.Mapper<DMEnv>(map))

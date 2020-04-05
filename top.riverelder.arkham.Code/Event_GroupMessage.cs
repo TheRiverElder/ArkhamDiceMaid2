@@ -21,10 +21,10 @@ namespace top.riverelder.arkham.Code {
                 string[] cmds = Regex.Split(raw, @"[ \t\n\r；;]+" + Global.Prefix);
                 StringBuilder sb = new StringBuilder().Append(CQApi.CQCode_At(e.FromQQ));
                 bool flag = false;
+                DMEnv env = new DMEnv(e.FromQQ.Id, e.FromGroup.Id);
                 foreach (string c in cmds) {
                     e.CQLog.InfoReceive("DiceCommand", c);
-                    if (Global.Dispatcher.Dispatch(c, new DMEnv(), out string reply) || Global.Debug) {
-                        //CmdEnv env = new CmdEnv(e.FromQQ.Id, e.FromGroup.Id, Global.Groups.TryGetValue(e.FromGroup.Id, out string name) ? name : string.Empty);
+                    if (Global.Dispatcher.Dispatch(c, env, out string reply) || Global.Debug) {
                         sb.AppendLine().Append(reply);
                         flag = true;
                     }

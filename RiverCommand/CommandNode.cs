@@ -69,9 +69,9 @@ namespace top.riverelder.RiverCommand {
             }
 
             // 预处理得到的参数，包括参数的可行检测，以及转换
-            if (Process != null && !Process(env, args, arg, out arg)) {
+            if (Process != null && !Process(env, args, arg, out arg, out err)) {
                 reply = err;
-                return DispatchResult.Unmatched;
+                return DispatchResult.MatchedSelf;
             }
 
             // 如果有参数名，则将该值赋予参数

@@ -9,7 +9,15 @@ namespace top.riverelder.RiverCommand {
     public static class PreProcesses {
 
         public static PreProcess<TEnv> Mapper<TEnv>(IDictionary<object, object> map) {
-            return (TEnv env, Args args, object ori, out object arg) => map.TryGetValue(ori, out arg);
+            return (TEnv env, Args args, object ori, out object arg, out string err) => {
+                if (map.TryGetValue(ori, out arg)) {
+                    err = null;
+                    return true;
+                } else {
+                    err = "不合法的输入：" + ori;
+                    return false;
+                }
+            };
         }
 
     }

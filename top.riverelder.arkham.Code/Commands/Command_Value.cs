@@ -1,54 +1,58 @@
-﻿//using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-//using top.riverelder.arkham.Code.Model;
-//using top.riverelder.arkham.Code.Utils;
+using top.riverelder.arkham.Code.Model;
+using top.riverelder.arkham.Code.Utils;
+using top.riverelder.RiverCommand;
 
-//namespace top.riverelder.arkham.Code.Commands
-//{
-//    class Command_Value : DiceCmdEntry {
-//        public string Name => "数值";
+namespace top.riverelder.arkham.Code.Commands {
 
-//        public ArgumentValidater Validater { get; } = ArgumentValidater.Empty
-//                .SetListArgCount(3)
-//                .AddListArg(@"增加|设置|别名")
-//                .AddListArg(ArgumentValidater.Any)
-//                .AddListArg(ArgumentValidater.Any);
 
-//        public string Usage => "数值 <增加|设置|别名> <属性名> <调整数值|新名字>";
+    class Command_Value : DiceCmdEntry {
 
-//        public string Execute(string[] listArgs, IDictionary<string, string> dictArgs, string originalString, CmdEnv env)
-//        {
-//            if (!EnvValidator.ExistInv(env, out Investigator inv, out string err)) {
-//                return err;
-//            }
+        public string Usage => "数值 <属性名> <增加|设置|别名> <调整数值|新名字>";
 
-//            string opt = listArgs[0];
-//            string name = listArgs[1];
-//            string arg3 = listArgs[2];
+        public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
+            dispatcher.Register("数值").Then(
+                PresetNodes.String<DMEnv>("数值名").Then(
+                    PresetNodes.Literal<DMEnv>("增加").Then(Extensions.Dice<DMEnv>("增量").Executes((env, args, dict) => IncVal(env.Inv, args.GetStr("数值名"), args.GetDice("增量"))))
+                ).Then(
+                    PresetNodes.Literal<DMEnv>("设置").Then(Extensions.Value<DMEnv>("新值").Executes((env, args, dict) => SetVal(env.Inv, args.GetStr("数值名"), args.Get<Value>("新值"))))
+                ).Then(
+                    PresetNodes.Literal<DMEnv>("别名").Then(PresetNodes.String<DMEnv>("新名").Executes((env, args, dict) => NewName(env.Inv, args.GetStr("数值名"), args.GetStr("新名"))))
+                )
+            ).Handles(Extensions.ExistSelfInv());
+        }
 
-//            if ("别名".Equals(opt)) {
-//                inv.Values.Set(name, arg3);
-//                return $"{name}的新别名：{arg3}";
-//            }
+        public static string IncVal(Investigator inv, string valueName, Dice increment) {
+            if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
+                value = new Value(1);
+                inv.Values.Put(valueName, value);
+            }
+            int prev = value.Val;
+            int inc = increment.Roll();
+            value.Add(inc);
+            return $"{inv.Name}的{valueName}: {prev} + {inc} => {value.Val}";
+        }
 
-//            if (!inv.Values.TryGet(name, out Value v)) {
-//                v = new Value(1);
-//                inv.Values.Put(name, v);
-//            }
+        public static string SetVal(Investigator inv, string valueName, Value newValue) {
+            if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
+                value = new Value(1);
+                inv.Values.Put(valueName, value);
+            }
+            string prev = value.ToString();
+            if (newValue.Max > 0) {
+                value.Max = newValue.Max;
+            }
+            value.Set(newValue.Val);
+            return $"{inv.Name}的{valueName}: {prev} => {value.ToString()}";
+        }
 
-//            if (!Dice.TryParse(arg3, out Dice dice, out int length) || length == 0) {
-//                return $"数值必须是整数或骰子表达式：{arg3}";
-//            }
-//            int value = dice.Roll();
-
-//            int prev = v.Val;
-//            string addon = "";
-//            switch (opt) {
-//                case "增加": v.Add(value); addon = $" + {value}"; break;
-//                case "设置": v.Set(value); break;
-//            }
-//            SaveUtil.Save(env.Scenario);
-//            return $"{inv.Name}的{name}: {prev}{addon} => {v.Val}";
-//        }
-//    }
-//}
+        public static string NewName(Investigator inv, string valueName, string newName) {
+            if (!inv.Values.Names.Contains(valueName)) {
+                return $"{inv.Name}没有本名为{valueName}的数值";
+            }
+            inv.Values.Set(valueName, newName);
+            return $"{inv.Name}的{valueName}的新别名：{newName}";
+        }
+    }
+}

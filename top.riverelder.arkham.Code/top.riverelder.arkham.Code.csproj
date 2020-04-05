@@ -86,7 +86,7 @@
     <Compile Include="Event_CqExit.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="ICQAppEnable.cs" />
-    <Compile Include="Model\DiceMaidEnv.cs" />
+    <Compile Include="Model\DMEnv.cs" />
     <Compile Include="Model\FightEvent.cs" />
     <Compile Include="Model\Horse.cs" />
     <Compile Include="Model\Scenario.cs" />
@@ -104,10 +104,10 @@
     <Compile Include="Model\WeaponInfo.cs" />
     <Compile Include="Utils\DiceCmdEntry.cs" />
     <Compile Include="Utils\DiceParser.cs" />
-    <Compile Include="Utils\DicePreprocesses.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\SaveUtil.cs" />
     <Compile Include="Utils\ValueConverter.cs" />
+    <Compile Include="Utils\ValueParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Native.Sdk\Native.Sdk.csproj">
