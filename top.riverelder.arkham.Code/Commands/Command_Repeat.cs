@@ -10,15 +10,15 @@ using top.riverelder.RiverCommand;
 
 namespace top.riverelder.arkham.Code.Commands {
     public class Command_Repeat : DiceCmdEntry {
-        public override void OnRegister(CmdDispatcher<DiceMaidEnv> dispatcher) {
+        public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("重复").Then(
-                PresetNodes.Int<DiceMaidEnv>("次数").Then(
-                    PresetNodes.Rest<DiceMaidEnv>("命令").Executes((env, args, dict) => Repeat(env, args.GetStr("命令"), args.GetInt("次数")))
+                PresetNodes.Int<DMEnv>("次数").Then(
+                    PresetNodes.Rest<DMEnv>("命令").Executes((env, args, dict) => Repeat(env, args.GetStr("命令"), args.GetInt("次数")))
                 )
             );
         }
 
-        public static string Repeat(DiceMaidEnv env, string rawCmd, int times) {
+        public static string Repeat(DMEnv env, string rawCmd, int times) {
             StringBuilder sb = new StringBuilder();
             string reply;
             for (int i = 0; i < times; i++) {

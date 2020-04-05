@@ -9,9 +9,9 @@ using top.riverelder.RiverCommand;
 
 namespace top.riverelder.arkham.Code.Commands {
     public class Command_Coc7 : DiceCmdEntry {
-        public override void OnRegister(CmdDispatcher<DiceMaidEnv> dispatcher) {
+        public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("coc7").Then(
-                PresetNodes.Int<DiceMaidEnv>("数量").Executes((env, args, dict) => DrawProperties(args.GetInt("数量")))
+                PresetNodes.Int<DMEnv>("数量").Executes((env, args, dict) => DrawProperties(args.GetInt("数量")))
             ).Executes((env, args, dict) => DrawProperties(5));
         }
 
@@ -26,7 +26,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 int rest = 0;
                 for (int j = 0; j < properties.Length; j++) {
                     int val = Dice.Roll("3d6") * 5;
-                    sb.Append(' ').Append(properties[j]).Append(':').Append(val);
+                    sb.Append(properties[j]).Append(':').Append(val).Append(' ');
                     rest += val;
                 }
                 int luck = Dice.Roll("3d6") * 5;

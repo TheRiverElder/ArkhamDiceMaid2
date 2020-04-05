@@ -10,10 +10,10 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public string Usage => "投掷 <骰子>";
 
-        public override void OnRegister(CmdDispatcher<DiceMaidEnv> dispatcher) {
+        public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("投掷")
                 .Then(
-                    Extensions.Dice<DiceMaidEnv>("骰子").Executes((env, args, dict) => Roll(args.GetDice("骰子")))
+                    Extensions.Dice<DMEnv>("骰子").Executes((env, args, dict) => Roll(args.GetDice("骰子")))
                 );
         }
 

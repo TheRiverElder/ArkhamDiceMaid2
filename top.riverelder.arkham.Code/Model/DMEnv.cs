@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace top.riverelder.arkham.Code.Model {
-    public class DiceMaidEnv {
+    public class DMEnv {
 
         public Investigator Inv { get; }
     }

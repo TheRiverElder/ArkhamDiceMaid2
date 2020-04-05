@@ -81,7 +81,7 @@ namespace top.riverelder.arkham.Code.Commands {
         //    return builder.ToString();
         //}
 
-        public override void OnRegister(CmdDispatcher<DiceMaidEnv> dispatcher) {
+        public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             IDictionary<object, object> map = new Dictionary<object, object> {
                 ["普通"] = CheckResult.NormalSuccess,
                 ["困难"] = CheckResult.HardSuccess,
@@ -89,11 +89,11 @@ namespace top.riverelder.arkham.Code.Commands {
             };
             dispatcher.Register("检定")
                 .Then(
-                    PresetNodes.String<DiceMaidEnv>("数值名")
+                    PresetNodes.String<DMEnv>("数值名")
                     .Handles(DicePreprocesses.GetSelfValue())
                     .Then(
-                        PresetNodes.Or<DiceMaidEnv>("难度", "普通", "困难", "极难")
-                        .Handles(PreProcesses.Mapper<DiceMaidEnv>(map))
+                        PresetNodes.Or<DMEnv>("难度", "普通", "困难", "极难")
+                        .Handles(PreProcesses.Mapper<DMEnv>(map))
                         .Executes((env, args, dict) => SimpleCheck(args.GetVal("数值名"), args.GetInt("难度")))
                 ).Executes((env, args, dict) => SimpleCheck(args.Get<Value>("数值名"), CheckResult.NormalSuccess))
             );

@@ -9,8 +9,8 @@ using top.riverelder.RiverCommand;
 namespace top.riverelder.arkham.Code.Utils {
     public static class DicePreprocesses {
 
-        public static PreProcess<DiceMaidEnv> GetSelfValue() {
-            return (DiceMaidEnv env, Args args, object ori, out object arg) => {
+        public static PreProcess<DMEnv> GetSelfValue() {
+            return (DMEnv env, Args args, object ori, out object arg) => {
                 Investigator inv = env.Inv;
                 if (inv.Values.TryWidelyGet((string)ori, out Value v)) {
                     arg = v;

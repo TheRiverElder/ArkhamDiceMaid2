@@ -50,7 +50,7 @@ namespace top.riverelder.arkham.Code {
         /// <summary>
         /// 命令调度器
         /// </summary>
-        public static CmdDispatcher<DiceMaidEnv> Dispatcher = new CmdDispatcher<DiceMaidEnv>();
+        public static CmdDispatcher<DMEnv> Dispatcher = new CmdDispatcher<DMEnv>();
 
         public static Scenario GetScenario(string name) {
             if (Scenarios.TryGetValue(name, out Scenario scenario)) {

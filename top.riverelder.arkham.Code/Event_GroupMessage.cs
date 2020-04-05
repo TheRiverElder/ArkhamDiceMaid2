@@ -23,7 +23,7 @@ namespace top.riverelder.arkham.Code {
                 bool flag = false;
                 foreach (string c in cmds) {
                     e.CQLog.InfoReceive("DiceCommand", c);
-                    if (Global.Dispatcher.Dispatch(c, new DiceMaidEnv(), out string reply) || Global.Debug) {
+                    if (Global.Dispatcher.Dispatch(c, new DMEnv(), out string reply) || Global.Debug) {
                         //CmdEnv env = new CmdEnv(e.FromQQ.Id, e.FromGroup.Id, Global.Groups.TryGetValue(e.FromGroup.Id, out string name) ? name : string.Empty);
                         sb.AppendLine().Append(reply);
                         flag = true;
