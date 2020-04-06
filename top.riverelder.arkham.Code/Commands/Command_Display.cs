@@ -52,12 +52,12 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!string.IsNullOrEmpty(valueName)) {
                 if (inv.Values.TryWidelyGet(valueName, out Value value)) {
                     StringBuilder b = new StringBuilder()
-                        .Append($"{inv.Name}的 {valueName}：")
+                        .Append($"{inv.Name}的{valueName}：")
                         .Append(value.Val).Append('/')
                         .Append(value.HardVal).Append('/')
                         .Append(value.ExtremeVal);
                     if (value.Max > 0) {
-                        b.Append('/').Append(value.Max);
+                        b.Append('(').Append(value.Max).Append(')');
                     }
                     return b.ToString();
                 } else {
