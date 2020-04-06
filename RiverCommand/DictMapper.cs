@@ -49,7 +49,6 @@ namespace top.riverelder.RiverCommand {
             while (reader.HasNext) {
                 if (!ParseNext(reader, dict, out string error)) {
                     errors.Add(error);
-                } else {
                     break;
                 }
             }
