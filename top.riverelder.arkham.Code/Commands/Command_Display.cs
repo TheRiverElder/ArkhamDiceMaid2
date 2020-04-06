@@ -52,7 +52,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!string.IsNullOrEmpty(valueName)) {
                 if (inv.Values.TryWidelyGet(valueName, out Value value)) {
                     StringBuilder b = new StringBuilder()
-                        .AppendLine($"{inv.Name}的 {value}：")
+                        .Append($"{inv.Name}的 {valueName}：")
                         .Append(value.Val).Append('/')
                         .Append(value.HardVal).Append('/')
                         .Append(value.ExtremeVal);
