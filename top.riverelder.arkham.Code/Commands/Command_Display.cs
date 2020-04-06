@@ -33,7 +33,7 @@ namespace top.riverelder.arkham.Code.Commands {
                             .Append("连发数：").AppendLine(w.MaxCount.ToString())
                             .Append("弹匣：").AppendLine(w.Capacity.ToString())
                             .Append("故障：").AppendLine(w.Mulfunction.ToString())
-                            .Append("弹药：").Append(w.CurrentLoad.ToString())
+                            .Append("弹药：").AppendLine(w.CurrentLoad.ToString())
                             .Append("消耗：").Append(w.Cost.ToString());
                     }
                     return b.ToString();
