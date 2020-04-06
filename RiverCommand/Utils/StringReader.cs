@@ -39,6 +39,18 @@ namespace top.riverelder.RiverCommand.Utils {
 
         public char Peek() => Data.ElementAt(Cursor);
 
+        public bool Read(string s) {
+            int start = Cursor;
+            for (int i = 0; i < s.Length; i++) {
+                if (!HasNext || Data[Cursor] != s[i]) {
+                    Cursor = start;
+                    return false;
+                }
+                Cursor++;
+            }
+            return true;
+        }
+
         public void Skip() => Cursor++;
 
         public void SkipWhiteSpace() {

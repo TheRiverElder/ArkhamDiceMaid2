@@ -11,8 +11,10 @@ namespace top.riverelder.RiverCommand {
     public class DictMapper {
 
         public static readonly string LinkChs = ":：=";
+        public static readonly string DictSep = ";；\n";
 
-
+        private ParamParser restParser = null;
+        private bool acceptRest = true;
         private readonly Dictionary<string, ParamParser> parsers = new Dictionary<string, ParamParser>();
         private readonly Dictionary<string, object> markedValues = new Dictionary<string, object>();
 
@@ -27,6 +29,16 @@ namespace top.riverelder.RiverCommand {
             return this;
         }
 
+        public DictMapper Rest(ParamParser parser) {
+            restParser = parser;
+            return this;
+        }
+
+        public DictMapper SkipRest() {
+            acceptRest = false;
+            return this;
+        }
+
         public DictMapper Mark(string key, object markedValue) {
             markedValues[key] = markedValue;
             return this;
@@ -37,6 +49,8 @@ namespace top.riverelder.RiverCommand {
             while (reader.HasNext) {
                 if (!ParseNext(reader, dict, out string error)) {
                     errors.Add(error);
+                } else {
+                    break;
                 }
             }
             err = string.Join("，", errors);
@@ -47,8 +61,8 @@ namespace top.riverelder.RiverCommand {
                 err = null;
                 return true;
             }
-            reader.SkipWhiteSpaceAnd(";；\n");
-            string key = reader.ReadToWhiteSpaceOr(LinkChs);
+            reader.SkipWhiteSpaceAnd(LinkChs + DictSep);
+            string key = reader.ReadToWhiteSpaceOr(LinkChs + DictSep);
             if (string.IsNullOrEmpty(key)) {
                 err = null;
                 return true;
@@ -68,7 +82,7 @@ namespace top.riverelder.RiverCommand {
                 return true;
             } else {
                 reader.SkipWhiteSpaceAnd(LinkChs);
-                if (parsers.TryGetValue(key, out ParamParser parser)) {
+                if (parsers.TryGetValue(key, out ParamParser parser) || (parser = restParser) != null) {
                     if (parser.TryParse(reader, out object result)) {
                         dict[key] = result;
                     } else {
@@ -76,8 +90,10 @@ namespace top.riverelder.RiverCommand {
                         return false;
                     }
                 } else {
-                    string value = reader.ReadToWhiteSpace();
-                    dict[key] = value;
+                    string value = reader.ReadToWhiteSpaceOr(DictSep);
+                    if (acceptRest) {
+                        dict[key] = value;
+                    }
                 }
             }
             err = null;

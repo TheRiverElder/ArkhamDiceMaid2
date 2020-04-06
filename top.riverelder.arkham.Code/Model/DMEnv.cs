@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using top.riverelder.arkham.Code.Utils;
 
 namespace top.riverelder.arkham.Code.Model {
     public class DMEnv {
@@ -29,6 +30,12 @@ namespace top.riverelder.arkham.Code.Model {
                 return false;
             }
             return true;
+        }
+
+        public void Save() {
+            if (TryGetSce(out Scenario sce)) {
+                SaveUtil.Save(sce);
+            }
         }
 
         public Scenario Sce => TryGetSce(out Scenario sce) ? sce : null;

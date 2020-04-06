@@ -19,17 +19,13 @@ namespace top.riverelder.RiverCommand.ParamParsers {
         }
 
         protected override bool Parse(StringReader reader, out object result) {
-            int index = 0;
-            while (index < Literal.Length) {
-                if (!reader.HasNext || reader.Peek() != Literal[index]) {
-                    result = null;
-                    return false;
-                }
-                reader.Skip();
-                index++;
+            if (reader.Read(Literal)) {
+                result = Literal;
+                return true;
+            } else {
+                result = null;
+                return false;
             }
-            result = Literal;
-            return true;
         }
     }
 }

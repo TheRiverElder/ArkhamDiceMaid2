@@ -56,5 +56,7 @@ namespace top.riverelder.RiverCommand {
         public Dictionary<string, object> Dict => new Dictionary<string, object>(map);
 
         public Args Derives() => new Args(this);
+
+        public int Count => map.Count + (Parent != null ? Parent.Count : 0);
     }
 }

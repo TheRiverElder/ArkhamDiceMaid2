@@ -22,7 +22,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
         protected override bool Parse(StringReader reader, out object result) {
             int start = reader.Cursor;
             foreach (string s in ValidValues) {
-                if (Match(reader, s)) {
+                if (reader.Read(s)) {
                     result = s;
                     return true;
                 }
@@ -30,15 +30,6 @@ namespace top.riverelder.RiverCommand.ParamParsers {
             }
             result = null;
             return false;
-        }
-
-        private bool Match(StringReader reader, string s) {
-            for (int i = 0; i < s.Length; i++) {
-                if (!reader.HasNext || reader.Read() != s[i]) {
-                    return false;
-                }
-            }
-            return true;
         }
     }
 }
