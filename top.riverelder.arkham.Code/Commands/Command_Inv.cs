@@ -59,6 +59,8 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 )
             );
+
+            dispatcher.SetAlias("车卡", "人物卡 新建");
         }
     }
 }
