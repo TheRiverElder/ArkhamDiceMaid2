@@ -17,7 +17,7 @@ namespace top.riverelder.arkham.Code.Commands {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("投掷")
                 .Then(
-                    Extensions.Dice<DMEnv>("骰子").Executes((env, args, dict) => Roll(args.GetDice("骰子")))
+                    Extensions.Dice("骰子").Executes((env, args, dict) => Roll(args.GetDice("骰子")))
                 );
         }
 

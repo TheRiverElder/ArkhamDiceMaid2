@@ -9,8 +9,8 @@ using top.riverelder.RiverCommand;
 namespace top.riverelder.arkham.Code.Utils {
     public static class Extensions {
 
-        public static CommandNode<TEnv> Dice<TEnv>(string name) {
-            return new CommandNode<TEnv>(name, new DiceParser());
+        public static CommandNode<DMEnv> Dice(string name) {
+            return new CommandNode<DMEnv>(name, new DiceParser());
         }
 
         public static CommandNode<TEnv> Value<TEnv>(string name) {

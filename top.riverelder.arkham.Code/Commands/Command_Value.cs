@@ -15,7 +15,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("数值").Then(
                 PresetNodes.String<DMEnv>("数值名").Then(
                     PresetNodes.Literal<DMEnv>("增加")
-                    .Then(Extensions.Dice<DMEnv>("增量")
+                    .Then(Extensions.Dice("增量")
                         .Executes((env, args, dict) => IncVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetDice("增量"))))
                 ).Then(
                     PresetNodes.Literal<DMEnv>("设置")

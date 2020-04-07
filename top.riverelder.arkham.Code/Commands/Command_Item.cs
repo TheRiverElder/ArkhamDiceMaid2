@@ -212,7 +212,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 Literal<DMEnv>("装弹")
                 .Then(
                     String<DMEnv>("武器名").Then(
-                        Dice<DMEnv>("装弹量")
+                        Dice("装弹量")
                         .Executes((env, args, dict) => LoadBullets(env, args.GetStr("武器名"), args.GetDice("装弹量")))
                     )
                 )
