@@ -70,6 +70,7 @@
     <Compile Include="Commands\Command_Heal.cs" />
     <Compile Include="Commands\Command_Horse.cs" />
     <Compile Include="Commands\Command_Item.cs" />
+    <Compile Include="Commands\Command_Misc.cs" />
     <Compile Include="Commands\Command_Order.cs" />
     <Compile Include="Commands\Command_Repeat.cs" />
     <Compile Include="Commands\Command_Help.cs" />

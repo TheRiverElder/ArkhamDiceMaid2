@@ -11,7 +11,7 @@ namespace top.riverelder.RiverCommand {
     public class DictMapper {
 
         public static readonly string LinkChs = ":：=";
-        public static readonly string DictSep = ";；\n";
+        public static readonly string DictSep = "，,;；\n";
 
         private ParamParser restParser = null;
         private bool acceptRest = true;
