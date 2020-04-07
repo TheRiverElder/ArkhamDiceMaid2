@@ -43,6 +43,9 @@ namespace top.riverelder.arkham.Code.Commands {
                     })
                 )
             );
+
+            dispatcher.SetAlias("配置", "全局 配置");
+            dispatcher.SetAlias("调试", "全局 调试");
         }
 
     }
