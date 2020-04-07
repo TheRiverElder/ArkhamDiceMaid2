@@ -58,5 +58,7 @@ namespace top.riverelder.RiverCommand {
         public Args Derives() => new Args(this);
 
         public int Count => map.Count + (Parent != null ? Parent.Count : 0);
+
+        public ICollection<string> Keys => map.Keys;
     }
 }
