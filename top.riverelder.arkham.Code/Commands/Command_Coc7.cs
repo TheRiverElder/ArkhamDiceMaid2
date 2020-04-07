@@ -13,6 +13,10 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("coc7").Then(
                 PresetNodes.Int<DMEnv>("数量").Executes((env, args, dict) => DrawProperties(args.GetInt("数量")))
             ).Executes((env, args, dict) => DrawProperties(5));
+
+            dispatcher.SetAlias("COC7", "coc7");
+            dispatcher.SetAlias("COC", "coc7");
+            dispatcher.SetAlias("coc", "coc7");
         }
 
         public static string[] properties = new string[] { "力量", "体质", "体型", "教育", "智力", "意志", "外貌" };

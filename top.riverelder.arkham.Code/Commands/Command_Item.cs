@@ -217,6 +217,12 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 )
             );
+
+            dispatcher.SetAlias("造物", "物品 创造");
+            dispatcher.SetAlias("销毁", "物品 销毁");
+            dispatcher.SetAlias("丢弃", "物品 丢弃");
+            dispatcher.SetAlias("拾取", "物品 拾取");
+            dispatcher.SetAlias("装弹", "物品 装弹");
         }
     }
 }

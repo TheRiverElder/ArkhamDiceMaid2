@@ -36,6 +36,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (selfName != null) {
                 sce.Control(env.SelfId, selfName);
             }
+            env.Save();
             return $"以{inv.Name}的身份：\n" + reply;
         }
     }
