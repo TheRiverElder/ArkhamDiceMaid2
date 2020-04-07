@@ -32,7 +32,7 @@ namespace top.riverelder.arkham.Code.Commands {
             int luckMax = 0;
 
             long seed = DateTime.Today.Ticks;
-            int p = 50 + (int)(seed % 50);
+            int p = (int)seed;
             string tlsn = GetTodayLuckySkillName(seed);
             foreach (Investigator inv in sce.investigators.Values) {
                 int luck = CalcLuck(inv, p, tlsn);
@@ -59,7 +59,12 @@ namespace top.riverelder.arkham.Code.Commands {
             int con = 0;
             foreach (string key in Params) {
                 if (inv.Values.TryGet(key, out Value value)) {
-                    con ^= (int)(p * Math.Min(1.0f, value.Val / (float)(value.Max > 0 ? value.Max : 100)));
+                    con += (int)(p * Math.Min(1.0f, value.Val / (float)(value.Max > 0 ? value.Max : 100)));
+                    if (con % 2 == 1) {
+                        con ^= value.Val;
+                    } else {
+                        con = con * 3 + 1;
+                    }
                 }
             }
             if (!string.IsNullOrEmpty(tlsn) && inv.Values.TryGet(tlsn, out Value lv)) {
