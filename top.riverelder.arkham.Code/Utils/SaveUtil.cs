@@ -28,14 +28,17 @@ namespace top.riverelder.arkham.Code.Utils {
             options.Converters.Add(new ValueConverter());
         }
 
-
+        public static HashSet<char> InvalidFileNameChars = new HashSet<char>(Path.GetInvalidFileNameChars());
         public static bool Save(Scenario scenario) {
             if (!Directory.Exists(Global.DataDir)) {
                 Directory.CreateDirectory(Global.DataDir);
             }
-
+            string fileName = scenario.Name;
+            foreach (char c in InvalidFileNameChars) {
+                fileName = fileName.Replace(c, '-');
+            }
             string json = JsonConvert.SerializeObject(scenario, Formatting.Indented, options);
-            File.WriteAllText(Path.Combine(Global.DataDir, scenario.Name + ".json"), json);
+            File.WriteAllText(Path.Combine(Global.DataDir, fileName + ".json"), json);
             return true;
         }
 
