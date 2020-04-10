@@ -6,8 +6,8 @@
 	"ret": 1,
 	"apiver": 9,
 	"name": "来自阿卡姆的骰娘",
-	"version": "1.2.1",
-	"version_id": 13,
+	"version": "1.2.2",
+	"version_id": 14,
 	"author": "RiverElder",
 	"description": "一只来自阿卡姆的跑团小助手",
 	"event": [

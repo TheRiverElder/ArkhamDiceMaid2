@@ -35,6 +35,9 @@ namespace top.riverelder.arkham.Code.Commands {
                         .Executes((env, args, dict) => NewName(env.Sce, env.Inv, args.GetStr("数值名"), args.GetStr("新名"))))
                 )
             ).Handles(Extensions.ExistSelfInv());
+
+            dispatcher.SetAlias("回血", "数值 体力 增加");
+            dispatcher.SetAlias("扣血", "数值 体力 减少");
         }
 
         public static string ChangeVal(Scenario scenario, Investigator inv, string valueName, Dice increment, bool posotive) {

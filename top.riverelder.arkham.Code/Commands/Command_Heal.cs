@@ -13,19 +13,6 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public string Usage => "治疗 <技能名> <目标> <回血量>";
         
-        public string Execute(string[] listArgs, IDictionary<string, string> dictArgs, string originalString, CmdEnv env) {
-            if (!EnvValidator.ExistInv(env, out Investigator inv, out string err)) {
-                return err;
-            }
-
-            string skillName = listArgs[0];
-            string targetName = listArgs[1];
-            string dice = listArgs[2];
-            //string hardness = listArgs.Length > 2 ? listArgs[2] : "普通";
-
-            
-        }
-
         public static string Heal(DMEnv env, Investigator inv, Investigator target, string valueName, Dice dice) {
             Scenario scenario = env.Sce;
             if (!target.Values.TryWidelyGet("体力", out Value health)) {
