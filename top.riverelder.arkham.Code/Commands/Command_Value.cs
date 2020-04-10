@@ -16,7 +16,11 @@ namespace top.riverelder.arkham.Code.Commands {
                 PresetNodes.String<DMEnv>("数值名").Then(
                     PresetNodes.Literal<DMEnv>("增加")
                     .Then(Extensions.Dice("增量")
-                        .Executes((env, args, dict) => IncVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetDice("增量"))))
+                        .Executes((env, args, dict) => ChangeVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetDice("增量"), true)))
+                ).Then(
+                    PresetNodes.Literal<DMEnv>("减少")
+                    .Then(Extensions.Dice("减量")
+                        .Executes((env, args, dict) => ChangeVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetDice("减量"), false)))
                 ).Then(
                     PresetNodes.Literal<DMEnv>("设置")
                     .Then(Extensions.Value<DMEnv>("新值")
@@ -33,13 +37,13 @@ namespace top.riverelder.arkham.Code.Commands {
             ).Handles(Extensions.ExistSelfInv());
         }
 
-        public static string IncVal(Scenario scenario, Investigator inv, string valueName, Dice increment) {
+        public static string ChangeVal(Scenario scenario, Investigator inv, string valueName, Dice increment, bool posotive) {
             if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
                 value = new Value(1);
                 inv.Values.Put(valueName, value);
             }
             int prev = value.Val;
-            int inc = increment.Roll();
+            int inc = increment.Roll() * (posotive ? 1 : -1);
             value.Add(inc);
             SaveUtil.Save(scenario);
             return $"{inv.Name}的{valueName}: {prev} + {inc} => {value.Val}";
