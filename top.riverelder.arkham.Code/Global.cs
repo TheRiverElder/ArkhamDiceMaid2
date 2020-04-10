@@ -74,7 +74,7 @@ namespace top.riverelder.arkham.Code {
             Dispatcher.Register(new Command_Inv());
             Dispatcher.Register(new Command_Display());
             Dispatcher.Register(new Command_Fight());
-            //Dispatcher.Register(new Command_Heal());
+            Dispatcher.Register(new Command_Heal());
             Dispatcher.Register(new Command_Help());
             //Dispatcher.Register(new Command_Horse());
             Dispatcher.Register(new Command_Item());

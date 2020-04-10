@@ -179,7 +179,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     String<DMEnv>("目标")
                     .Handles(Extensions.ExistInv())
                     .Then(
-                        String<DMEnv>("武器名").Executes((env, args, dict) => CommitFight(env, env.Inv, args.GetInv("目标"), args.GetStr("武器名")))
+                        String<DMEnv>("武器名").Executes((env, args, dict) => CalculateDamage(env, env.Inv, args.GetInv("目标"), args.GetStr("武器名")))
                     )
                 )
             ).Then(
@@ -192,6 +192,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
             dispatcher.SetAlias("攻击", "战斗 攻击");
             dispatcher.SetAlias("闪避", "战斗 闪避");
+            dispatcher.SetAlias("射击", "战斗 射击");
         }
     }
 }
