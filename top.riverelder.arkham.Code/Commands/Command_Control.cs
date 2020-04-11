@@ -28,7 +28,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public static string ControlAndAct(DMEnv env, Investigator inv, string action) {
             Scenario sce = env.Sce;
-            if (!sce.player2investigatorMap.TryGetValue(env.SelfId, out string selfName)) {
+            if (!sce.PlayerNames.TryGetValue(env.SelfId, out string selfName)) {
                 selfName = null;
             }
             sce.Control(env.SelfId, inv.Name);

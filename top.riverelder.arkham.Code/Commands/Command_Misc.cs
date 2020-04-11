@@ -34,7 +34,7 @@ namespace top.riverelder.arkham.Code.Commands {
             long seed = DateTime.Today.Ticks;
             int p = (int)seed;
             string tlsn = GetTodayLuckySkillName(seed);
-            foreach (Investigator inv in sce.investigators.Values) {
+            foreach (Investigator inv in sce.Investigators.Values) {
                 int luck = CalcLuck(inv, p, tlsn);
                 if (luckOne == null || luck > luckMax) {
                     luckOne = inv;

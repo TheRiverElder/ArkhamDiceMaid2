@@ -56,7 +56,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 newName = name;
             }
             env.TryGetInv(out Scenario sce, out Investigator inv);
-            if (sce.desk.ContainsKey(newName)) {
+            if (sce.Desk.ContainsKey(newName)) {
                 return $"桌子上已有物品：{newName}，请重命名";
             }
             if (!inv.Inventory.TryGet(name, out Item item)) {
@@ -64,7 +64,7 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             inv.Inventory.Remove(name);
             item.Name = newName;
-            sce.desk[item.Name] = item;
+            sce.Desk[item.Name] = item;
             env.Save();
             return $"{inv.Name}丢弃了{name}" + (name == newName ? "" : "，并重命名为：" + newName);
         }
@@ -74,7 +74,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 newName = name;
             }
             env.TryGetInv(out Scenario sce, out Investigator inv);
-            if (!sce.desk.TryGetValue(name, out Item item)) {
+            if (!sce.Desk.TryGetValue(name, out Item item)) {
                 return $"桌子上没有物品：{name}";
             }
             if (inv.Inventory.Has(newName)) {
@@ -82,7 +82,7 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             item.Name = newName;
             inv.Inventory.Put(item);
-            sce.desk.Remove(name);
+            sce.Desk.Remove(name);
             env.Save();
             return $"{inv.Name}拾取了：{name}";
         }

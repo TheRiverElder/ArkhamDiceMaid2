@@ -12,15 +12,15 @@ namespace top.riverelder.arkham.Code.Model
 
         public string Name { get; set; } = "未命名模组";
 
-        public Dictionary<long, string> player2investigatorMap = new Dictionary<long, string>();
+        public Dictionary<long, string> PlayerNames = new Dictionary<long, string>();
 
-        public Dictionary<string, Investigator> investigators = new Dictionary<string, Investigator>();
+        public Dictionary<string, Investigator> Investigators = new Dictionary<string, Investigator>();
 
-        public Dictionary<string, Item> desk = new Dictionary<string, Item>();
+        public Dictionary<string, Item> Desk = new Dictionary<string, Item>();
 
-        public Dictionary<string, Spell> spells = new Dictionary<string, Spell>();
+        public Dictionary<string, Spell> Spells = new Dictionary<string, Spell>();
 
-        public Queue<FightEvent> queue = new Queue<FightEvent>();
+        public FightEvent1 Fight = null;
         
 
         public Scenario(string name)
@@ -41,7 +41,7 @@ namespace top.riverelder.arkham.Code.Model
         /// <returns>是否成功</returns>
         public bool TryGetInvestigator(string name, out Investigator investigator)
         {
-            return investigators.TryGetValue(name, out investigator);
+            return Investigators.TryGetValue(name, out investigator);
         }
         /// <summary>
         /// 查看的成员是否存在
@@ -50,7 +50,7 @@ namespace top.riverelder.arkham.Code.Model
         /// <returns>是否存在</returns>
         public bool ExistInvestigator(string name)
         {
-            return investigators.ContainsKey(name);
+            return Investigators.ContainsKey(name);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace top.riverelder.arkham.Code.Model
         /// <returns>调查员，若没找到则返回null</returns>
         public Investigator GetInvestigator(string name)
         {
-            if (investigators.TryGetValue(name, out Investigator inv))
+            if (Investigators.TryGetValue(name, out Investigator inv))
             {
                 return inv;
             }
@@ -78,7 +78,7 @@ namespace top.riverelder.arkham.Code.Model
         /// <returns>是否存在</returns>
         public bool ExistInvestigator(long user)
         {
-            return player2investigatorMap.TryGetValue(user, out string name) && investigators.ContainsKey(name);
+            return PlayerNames.TryGetValue(user, out string name) && Investigators.ContainsKey(name);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace top.riverelder.arkham.Code.Model
         /// <returns>调查员，若没找到则返回null</returns>
         public Investigator GetInvestigator(long user)
         {
-            if (player2investigatorMap.TryGetValue(user, out string name) && investigators.TryGetValue(name, out Investigator inv))
+            if (PlayerNames.TryGetValue(user, out string name) && Investigators.TryGetValue(name, out Investigator inv))
             {
                 return inv;
             }
@@ -103,12 +103,12 @@ namespace top.riverelder.arkham.Code.Model
         /// <returns>是否成功</returns>
         public bool TryGetInvestigator(long user, out Investigator investigator)
         {
-            if (!player2investigatorMap.TryGetValue(user, out string name))
+            if (!PlayerNames.TryGetValue(user, out string name))
             {
                 investigator = null;
                 return false;
             }
-            return investigators.TryGetValue(name, out investigator);
+            return Investigators.TryGetValue(name, out investigator);
         }
 
         #endregion
@@ -119,7 +119,7 @@ namespace top.riverelder.arkham.Code.Model
         /// <param name="inv">调查员</param>
         public void PutInvestigator(Investigator inv)
         {
-            investigators[inv.Name] = inv;
+            Investigators[inv.Name] = inv;
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace top.riverelder.arkham.Code.Model
         /// <param name="name">调查员名</param>
         public void Control(long qq, string name)
         {
-            player2investigatorMap[qq] = name;
+            PlayerNames[qq] = name;
         }
 
         #endregion

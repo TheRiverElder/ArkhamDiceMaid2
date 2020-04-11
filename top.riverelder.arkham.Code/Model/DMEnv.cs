@@ -23,7 +23,7 @@ namespace top.riverelder.arkham.Code.Model {
         public bool TryGetInv(out Scenario sce, out Investigator inv) {
             if (!Global.Groups.TryGetValue(GroupId, out string sceName) 
                 || !Global.Scenarios.TryGetValue(sceName, out sce) 
-                || !sce.player2investigatorMap.TryGetValue(SelfId, out string invName) 
+                || !sce.PlayerNames.TryGetValue(SelfId, out string invName) 
                 || !sce.TryGetInvestigator(invName, out inv)) {
                 sce = null;
                 inv = null;

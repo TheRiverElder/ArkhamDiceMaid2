@@ -55,7 +55,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public static string CreateSpell(DMEnv env, string name, Args cost) {
             Scenario sce = env.Sce;
-            if (sce.spells.ContainsKey(name)) {
+            if (sce.Spells.ContainsKey(name)) {
                 return "已经存在法术：" + name;
             }
 
@@ -66,24 +66,24 @@ namespace top.riverelder.arkham.Code.Commands {
                 }
             }
             Spell spell = new Spell(name, costStr);
-            sce.spells[name] = spell;
+            sce.Spells[name] = spell;
             env.Save();
             return "成功创造法术：" + name;
         }
 
         public static string DestorySpell(DMEnv env, string name) {
             Scenario sce = env.Sce;
-            if (!sce.spells.ContainsKey(name)) {
+            if (!sce.Spells.ContainsKey(name)) {
                 return "不存在法术：" + name;
             }
-            sce.spells.Remove(name);
+            sce.Spells.Remove(name);
             env.Save();
             return "成功销毁法术：" + name;
         }
 
         public static string LearnSpell(DMEnv env, Investigator inv, string name) {
             Scenario sce = env.Sce;
-            if (!sce.spells.ContainsKey(name)) {
+            if (!sce.Spells.ContainsKey(name)) {
                 return "不存在法术：" + name;
             } else if (inv.Spells.Contains(name)) {
                 return inv.Name + "已经学会了" + name;
@@ -107,7 +107,7 @@ namespace top.riverelder.arkham.Code.Commands {
             Scenario sce = env.Sce;
             if (!inv.Spells.Contains(name)) {
                 return inv.Name + "还没学会" + name;
-            } else if (!sce.spells.TryGetValue(name, out Spell spell)) {
+            } else if (!sce.Spells.TryGetValue(name, out Spell spell)) {
                 return "不存在法术：" + name;
             } else if (spell.Use(inv, out string reply)) {
                 return "施法失败\n" + reply;
