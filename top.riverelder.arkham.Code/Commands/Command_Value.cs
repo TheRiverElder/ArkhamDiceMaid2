@@ -54,7 +54,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             );
 
-            dispatcher.SetAlias("设值", "数值 设值");
+            dispatcher.SetAlias("设值", "数值 设置");
             dispatcher.SetAlias("增值", "数值 增加");
             dispatcher.SetAlias("减值", "数值 减少");
             dispatcher.SetAlias("回血", "数值 增加 体力");
