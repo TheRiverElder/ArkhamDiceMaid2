@@ -112,7 +112,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 return inv.Name + "还没学会" + name;
             } else if (!sce.Spells.TryGetValue(name, out Spell spell)) {
                 return "不存在法术：" + name;
-            } else if (spell.Use(inv, out string reply)) {
+            } else if (!spell.Use(inv, out string reply)) {
                 return "施法失败\n" + reply;
             } else { 
                 env.Save();
