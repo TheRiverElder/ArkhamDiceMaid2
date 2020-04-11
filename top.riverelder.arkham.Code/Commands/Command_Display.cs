@@ -102,7 +102,7 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             StringBuilder sb = new StringBuilder().Append($"{spellName}消耗：");
             foreach (var e in spell.Cost) {
-                sb.AppendLine().Append(e.Key).Append('：').Append(e.Key);
+                sb.AppendLine().Append(e.Key).Append('：').Append(e.Value);
             }
             return sb.ToString();
         }
