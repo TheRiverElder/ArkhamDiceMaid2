@@ -15,10 +15,6 @@ namespace top.riverelder.arkham.Code.Commands {
         public string Usage => "全局 <配置|调试> <载入|保存|开启|关闭>";
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            IDictionary<object, object> oao = new Dictionary<object, object> {
-                ["开"] = true,
-                ["关"] = false,
-            };
             dispatcher.Register("全局").Then(
                 PresetNodes.Literal<DMEnv>("配置").Then(
                     PresetNodes.Literal<DMEnv>("载入")
@@ -35,17 +31,26 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("调试").Then(
-                    PresetNodes.Or<DMEnv>("开关", "开", "关")
-                    .Handles(PreProcesses.Mapper<DMEnv>(oao))
+                    PresetNodes.Bool<DMEnv>("开关", "开", "关")
                     .Executes((env, args, dict) => {
                         Global.Debug = args.GetBool("开关");
                         return "调试模式：" + (Global.Debug ? "开" : "关");
+                    })
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("回复").Then(
+                    PresetNodes.Bool<DMEnv>("开关", "开", "关")
+                    .Executes((env, args, dict) => {
+                        Global.DoAt = args.GetBool("开关");
+                        SaveUtil.SaveGlobal();
+                        return "调试模式：" + (Global.DoAt ? "开" : "关");
                     })
                 )
             );
 
             dispatcher.SetAlias("配置", "全局 配置");
             dispatcher.SetAlias("调试", "全局 调试");
+            dispatcher.SetAlias("回复", "全局 回复");
         }
 
     }

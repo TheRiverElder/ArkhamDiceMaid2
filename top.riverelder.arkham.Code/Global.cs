@@ -23,6 +23,11 @@ namespace top.riverelder.arkham.Code {
         /// </summary>
         public static string Prefix = "/";
 
+
+        /// <summary>
+        /// 每个消息都会At发信人
+        /// </summary>
+        public static bool DoAt = true;
         /// <summary>
         /// 调试模式，打开的话，会返回每一条消息的结果
         /// </summary>

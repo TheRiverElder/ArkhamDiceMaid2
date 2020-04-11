@@ -25,6 +25,10 @@ namespace top.riverelder.RiverCommand {
             return new CommandNode<TEnv>(name, new OrParser(words));
         }
 
+        public static CommandNode<TEnv> Bool<TEnv>(string name, string trueValue, string falseValue) {
+            return new CommandNode<TEnv>(name, new BoolParser(trueValue, falseValue));
+        }
+
         public static CommandNode<TEnv> Rest<TEnv>(string name) {
             return new CommandNode<TEnv>(name, new RestParser());
         }

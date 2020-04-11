@@ -19,7 +19,10 @@ namespace top.riverelder.arkham.Code {
             if (msg.StartsWith(Global.Prefix)) {
                 string raw = msg.Substring(Global.Prefix.Length);
                 string[] cmds = Regex.Split(raw, @"[ \t\n\r；;]+" + Global.Prefix);
-                StringBuilder sb = new StringBuilder().Append(CQApi.CQCode_At(e.FromQQ));
+                StringBuilder sb = new StringBuilder();
+                if (Global.DoAt) {
+                    sb.Append(CQApi.CQCode_At(e.FromQQ));
+                }
                 bool flag = false;
                 DMEnv env = new DMEnv(e.FromQQ.Id, e.FromGroup.Id);
                 foreach (string c in cmds) {
@@ -30,7 +33,7 @@ namespace top.riverelder.arkham.Code {
                     }
                 }
                 if (flag) {
-                    e.CQApi.SendGroupMessage(e.FromGroup, sb.ToString());
+                    e.CQApi.SendGroupMessage(e.FromGroup, sb.ToString().Trim());
                 }
             }
         }

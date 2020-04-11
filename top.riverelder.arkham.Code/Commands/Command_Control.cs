@@ -37,7 +37,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 sce.Control(env.SelfId, selfName);
             }
             env.Save();
-            return $"以{inv.Name}的身份：\n" + reply;
+            return /*$"以{inv.Name}的身份：\n" +*/ reply;
         }
     }
 }

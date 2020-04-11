@@ -52,6 +52,7 @@ namespace top.riverelder.arkham.Code.Utils {
 
                 IniSection conf = global["Config"];
                 if (conf.TryGetValue("Prefix", out IniValue prefix)) Global.Prefix = prefix.ToString();
+                if (conf.TryGetValue("DoAt", out IniValue doAt)) Global.DoAt = prefix.ToBoolean();
                 if (conf.TryGetValue("GreatSuccess", out IniValue gs)) Global.GreatSuccess = gs.ToInt32();
                 if (conf.TryGetValue("GreatFailure", out IniValue gf)) Global.GreatFailure = gf.ToInt32();
 
@@ -86,6 +87,7 @@ namespace top.riverelder.arkham.Code.Utils {
         public static bool SaveGlobal() {
             IniSection conf = new IniSection("Config") {
                 ["Prefix"] = new IniValue(Global.Prefix),
+                ["DoAt"] = new IniValue(Global.DoAt),
                 ["GreatSuccess"] = new IniValue(Global.GreatSuccess.ToString()),
                 ["GreatFailure"] = new IniValue(Global.GreatFailure.ToString())
             };
