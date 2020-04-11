@@ -19,8 +19,6 @@ namespace top.riverelder.arkham.Code.Model
         public Dictionary<string, Item> Desk = new Dictionary<string, Item>();
 
         public Dictionary<string, Spell> Spells = new Dictionary<string, Spell>();
-
-        public FightEvent1 Fight = null;
         
 
         public Scenario(string name)
