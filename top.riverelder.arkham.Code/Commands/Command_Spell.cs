@@ -19,30 +19,30 @@ namespace top.riverelder.arkham.Code.Commands {
             .Handles(Extensions.ExistSce())
             .Then(
                 Literal<DMEnv>("创造").Then(
-                    Literal<DMEnv>("法术名")
+                    String<DMEnv>("法术名")
                     .MapDict(mapper)
                     .Executes((env, args, dict) => CreateSpell(env, args.GetStr("法术名"), dict))
                 )
             ).Then(
                 Literal<DMEnv>("销毁").Then(
-                    Literal<DMEnv>("法术名")
+                    String<DMEnv>("法术名")
                     .Executes((env, args, dict) => DestorySpell(env, args.GetStr("法术名")))
                 )
             ).Then(
                 Literal<DMEnv>("学习").Then(
-                    Literal<DMEnv>("法术名")
+                    String<DMEnv>("法术名")
                     .Handles(Extensions.ExistSelfInv())
                     .Executes((env, args, dict) => LearnSpell(env, env.Inv, args.GetStr("法术名")))
                 )
             ).Then(
                 Literal<DMEnv>("忘记").Then(
-                    Literal<DMEnv>("法术名")
+                    String<DMEnv>("法术名")
                     .Handles(Extensions.ExistSelfInv())
                     .Executes((env, args, dict) => ForgetSpell(env, env.Inv, args.GetStr("法术名")))
                 )
             ).Then(
                 Literal<DMEnv>("使用").Then(
-                    Literal<DMEnv>("法术名")
+                    String<DMEnv>("法术名")
                     .Handles(Extensions.ExistSelfInv())
                     .Executes((env, args, dict) => UseSpell(env, env.Inv, args.GetStr("法术名")))
                 )
