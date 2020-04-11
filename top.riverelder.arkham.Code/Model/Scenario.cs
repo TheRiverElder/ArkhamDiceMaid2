@@ -18,7 +18,10 @@ namespace top.riverelder.arkham.Code.Model
 
         public Dictionary<string, Item> desk = new Dictionary<string, Item>();
 
+        public Dictionary<string, Spell> spells = new Dictionary<string, Spell>();
+
         public Queue<FightEvent> queue = new Queue<FightEvent>();
+        
 
         public Scenario(string name)
         {

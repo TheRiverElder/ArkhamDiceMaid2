@@ -36,6 +36,11 @@ namespace top.riverelder.arkham.Code.Model {
         /// </summary>
         public Queue<FightEvent> Fights = new Queue<FightEvent>();
 
+        /// <summary>
+        /// 角色学会的法术
+        /// </summary>
+        public HashSet<string> Spells = new HashSet<string>();
+
         public Investigator(string name, string desc) {
             Name = name;
             Desc = desc;
