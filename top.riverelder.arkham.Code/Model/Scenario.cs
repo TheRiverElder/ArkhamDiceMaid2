@@ -131,15 +131,6 @@ namespace top.riverelder.arkham.Code.Model
         }
 
         #endregion
-
-        public void Emit(FightEvent e) {
-            queue.Enqueue(e);
-        }
-
-        public bool Handle(string targetName, out FightEvent e) {
-            FightEvent[] es = queue.Where(evt => evt.TargetName == targetName).ToArray();
-            e = es.Length == 0 ? null : es[0];
-            return es.Length != 0;
-        }
+        
     }
 }
