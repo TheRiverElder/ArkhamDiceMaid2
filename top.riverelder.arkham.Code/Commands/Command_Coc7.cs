@@ -19,7 +19,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("coc", "coc7");
         }
 
-        public static string[] properties = new string[] { "力量", "体质", "体型", "教育", "智力", "意志", "外貌" };
+        public static string[] properties = new string[] { "力量", "敏捷", "体质", "体型", "教育", "智力", "意志", "外貌" };
 
         public static string DrawProperties(int size) {
             StringBuilder sb = new StringBuilder();
