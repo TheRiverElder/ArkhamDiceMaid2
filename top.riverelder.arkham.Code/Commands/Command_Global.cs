@@ -43,7 +43,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     .Executes((env, args, dict) => {
                         Global.DoAt = args.GetBool("开关");
                         SaveUtil.SaveGlobal();
-                        return "调试模式：" + (Global.DoAt ? "开" : "关");
+                        return "回复：" + (Global.DoAt ? "开" : "关");
                     })
                 )
             );
