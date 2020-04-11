@@ -83,6 +83,30 @@ namespace top.riverelder.arkham.Code.Commands {
             return sb.ToString();
         }
 
+        public static string DisplaySpells(Investigator inv) {
+            if (inv.Spells.Count == 0) {
+                return inv.Name + "不会任何法术";
+            }
+            StringBuilder sb = new StringBuilder().Append($"{inv.Name}的法术：");
+            foreach (string sn in inv.Spells) {
+                sb.AppendLine().Append(sn);
+            }
+            return sb.ToString();
+        }
+
+        public static string DisplaySpell(Scenario sce, Investigator inv, string spellName) {
+            if (!sce.Spells.TryGetValue(spellName, out Spell spell)) {
+                return "不存在法术：" + spellName;
+            } else if (!inv.Spells.Contains(spellName)) {
+                return inv.Name + "还未学会" + spellName;
+            }
+            StringBuilder sb = new StringBuilder().Append($"{spellName}消耗：");
+            foreach (var e in spell.Cost) {
+                sb.AppendLine().Append(e.Key).Append('：').Append(e.Key);
+            }
+            return sb.ToString();
+        }
+
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("显示")
             .Handles(Extensions.ExistSelfInv())
@@ -102,6 +126,12 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 Literal<DMEnv>("战斗").Executes((env, args, dict) => DisplayFightEvents(env.Inv))
+            ).Then(
+                Literal<DMEnv>("法术")
+                .Executes((env, args, dict) => DisplaySpells(env.Inv))
+                .Then(
+                    String<DMEnv>("法术名").Executes((env, args, dict) => DisplaySpell(env.Sce, env.Inv, args.GetStr("法术名")))
+                )
             );
         }
     }
