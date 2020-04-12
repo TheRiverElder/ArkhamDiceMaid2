@@ -31,7 +31,6 @@ namespace top.riverelder.arkham.Code.Model {
                 actualCost[e.Key] = c;
             }
             StringBuilder builder = new StringBuilder();
-            builder.Append("消耗");
             foreach (var e in actualCost) {
                 if (!user.Values.TryWidelyGet(e.Key, out Value value)) {
                     reply = user.Name + "不存在数值：" + e.Key;
