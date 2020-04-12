@@ -20,7 +20,7 @@ namespace top.riverelder.arkham.Code {
                 string raw = msg.Substring(Global.Prefix.Length);
                 string[] cmds = Regex.Split(raw, @"[ \t\n\r；;]+" + Global.Prefix);
                 StringBuilder sb = new StringBuilder();
-                if (Global.DoAt) {
+                if (Global.DoAt != 0) {
                     sb.Append(CQApi.CQCode_At(e.FromQQ));
                 }
                 bool flag = false;

@@ -52,7 +52,7 @@ namespace top.riverelder.arkham.Code.Utils {
 
                 IniSection conf = global["Config"];
                 if (conf.TryGetValue("Prefix", out IniValue prefix)) Global.Prefix = prefix.ToString();
-                if (conf.TryGetValue("DoAt", out IniValue doAt)) Global.DoAt = doAt.ToBoolean();
+                if (conf.TryGetValue("DoAt", out IniValue doAt)) Global.DoAt = doAt.ToInt32();
                 if (conf.TryGetValue("GreatSuccess", out IniValue gs)) Global.GreatSuccess = gs.ToInt32();
                 if (conf.TryGetValue("GreatFailure", out IniValue gf)) Global.GreatFailure = gf.ToInt32();
 
@@ -78,7 +78,8 @@ namespace top.riverelder.arkham.Code.Utils {
                         Global.Groups[g] = groups[key].ToString();
                     }
                 }
-            } catch {
+            } catch (Exception e) {
+                Global.Log(e.Message);
                 return false;
             }
             return true;

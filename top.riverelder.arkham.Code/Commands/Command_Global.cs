@@ -18,16 +18,10 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("全局").Then(
                 PresetNodes.Literal<DMEnv>("配置").Then(
                     PresetNodes.Literal<DMEnv>("载入")
-                    .Executes((env, args, dict) => {
-                        SaveUtil.LoadGlobal();
-                        return "载入完毕";
-                    })
+                    .Executes((env, args, dict) => ("载入" + (SaveUtil.LoadGlobal() ? "成功" : "失败")))
                 ).Then(
                     PresetNodes.Literal<DMEnv>("保存")
-                    .Executes((env, args, dict) => {
-                        SaveUtil.SaveGlobal();
-                        return "保存完毕";
-                    })
+                    .Executes((env, args, dict) => ("保存" + (SaveUtil.SaveGlobal() ? "成功" : "失败")))
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("调试").Then(
@@ -41,9 +35,9 @@ namespace top.riverelder.arkham.Code.Commands {
                 PresetNodes.Literal<DMEnv>("回复").Then(
                     PresetNodes.Bool<DMEnv>("开关", "开", "关")
                     .Executes((env, args, dict) => {
-                        Global.DoAt = args.GetBool("开关");
+                        Global.DoAt = args.GetBool("开关") ? 1 : 0;
                         SaveUtil.SaveGlobal();
-                        return "回复：" + (Global.DoAt ? "开" : "关");
+                        return "回复：" + (Global.DoAt != 0 ? "开" : "关");
                     })
                 )
             );

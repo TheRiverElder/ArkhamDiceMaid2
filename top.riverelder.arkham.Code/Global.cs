@@ -13,10 +13,25 @@ namespace top.riverelder.arkham.Code {
     public static class Global {
         public static string RelDataDir = "data";
         public static string RelConfFile = "game.ini";
+        public static string RelLogFile = "log.txt";
 
         public static string AppDir = "/";
         public static string DataDir = AppDir + RelDataDir;
         public static string ConfFile = AppDir + RelConfFile;
+        public static string LogFile = AppDir + RelLogFile;
+
+        public static void  SetAppDir(string appDir) {
+            AppDir = appDir;
+            ConfFile = Path.Combine(appDir, RelConfFile);
+            DataDir = Path.Combine(appDir, RelDataDir);
+            LogFile = Path.Combine(appDir, RelLogFile);
+        }
+
+        public static void Log(params string[] content) {
+            try {
+                File.WriteAllLines(LogFile, content);
+            } catch { }
+        }
 
         /// <summary>
         /// 召唤骰娘的前缀
@@ -27,7 +42,7 @@ namespace top.riverelder.arkham.Code {
         /// <summary>
         /// 每个消息都会At发信人
         /// </summary>
-        public static bool DoAt = true;
+        public static int DoAt = 1;
         /// <summary>
         /// 调试模式，打开的话，会返回每一条消息的结果
         /// </summary>
@@ -67,9 +82,7 @@ namespace top.riverelder.arkham.Code {
         }
 
         public static void Initialize(string appDir) {
-            AppDir = appDir;
-            ConfFile = Path.Combine(appDir, RelConfFile);
-            DataDir = Path.Combine(appDir, RelDataDir);
+            SetAppDir(appDir);
 
             SaveUtil.LoadGlobal();
 
