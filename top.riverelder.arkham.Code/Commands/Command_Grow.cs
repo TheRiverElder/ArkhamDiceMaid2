@@ -12,6 +12,12 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("成长").Then(
+                Extensions.Dice("增量").Rest(
+                    PresetNodes.String<DMEnv>("技能名")
+                    .Handles(Extensions.ConvertObjectArrayToStringArray())
+                    .Executes((env, args, dict) => Grow(env, env.Inv, args.Get<string[]>("技能名"), args.GetDice("增量")))
+                )
+            ).Rest(
                 PresetNodes.String<DMEnv>("技能名")
                 .Handles(Extensions.ConvertObjectArrayToStringArray())
                 .Executes((env, args, dict) => Grow(env, env.Inv, args.Get<string[]>("技能名"), Dice.Of("1d10")))

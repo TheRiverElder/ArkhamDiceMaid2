@@ -86,7 +86,6 @@
     <Compile Include="Event_CqAppEnable.cs" />
     <Compile Include="Event_CqExit.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="ICQAppEnable.cs" />
     <Compile Include="Model\DMEnv.cs" />
     <Compile Include="Model\FightEvent.cs" />
     <Compile Include="Model\Horse.cs" />
