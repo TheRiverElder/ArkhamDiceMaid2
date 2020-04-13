@@ -18,10 +18,10 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("coc7").Then(
                 PresetNodes.Int<DMEnv>("数量")
                 .MapDict(mapper)
-                .Executes((env, args, dict) => DrawProperties(args.GetInt("数量"), -1))
+                .Executes((env, args, dict) => DrawProperties(args.GetInt("数量"), dict.Get("年龄", -1)))
             )
             .MapDict(mapper)
-            .Executes((env, args, dict) => DrawProperties(5, -1));
+            .Executes((env, args, dict) => DrawProperties(5, dict.Get("年龄", -1)));
 
             dispatcher.SetAlias("COC7", "coc7");
             dispatcher.SetAlias("COC", "coc7");
@@ -43,7 +43,7 @@ namespace top.riverelder.arkham.Code.Commands {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < size; i++) {
                 if (i > 0) {
-                    sb.AppendLine("----------------");
+                    sb.AppendLine().AppendLine("----------------");
                 }
                 sb.Append(DrawProperty(age));
             }
