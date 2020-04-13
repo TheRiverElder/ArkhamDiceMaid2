@@ -89,6 +89,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 }
             }
             // 统计
+            int i = 0;
             foreach (var e in result) {
                 sb.Append(e.Key).Append(':');
                 int value = e.Value;
@@ -103,8 +104,12 @@ namespace top.riverelder.arkham.Code.Commands {
                 } else {
                     sb.Append(e.Value);
                 }
-                sb.Append(' ');
+                sb.Append('；');
                 rest += value;
+                i++;
+                if (i % 3 == 0) {
+                    sb.AppendLine();
+                }
             }
             int luck = Dice.Roll("3d6") * 5;
             sb.Append("幸运:");
