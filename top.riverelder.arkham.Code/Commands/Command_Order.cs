@@ -62,6 +62,7 @@ namespace top.riverelder.arkham.Code.Commands {
             .Then(
                 PresetNodes.String<DMEnv>("数值名").Rest(
                     PresetNodes.String<DMEnv>("调查员名")
+                    .Handles(Extensions.ConvertObjectArrayToStringArray())
                     .Executes((env, args, dict) => OrderByValue(env.Sce, args.Get<string[]>("调查员名"), args.GetStr("数值名")))
                 )
             );

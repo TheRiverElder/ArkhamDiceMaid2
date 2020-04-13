@@ -124,6 +124,24 @@ namespace top.riverelder.arkham.Code.Utils {
             };
         }
 
+        public static PreProcess<DMEnv> ConvertObjectArrayToStringArray() {
+            return (DMEnv env, Args args, object ori, out object arg, out string err) => {
+                arg = null;
+                if (ori == null || !(ori is object[])) {
+                    err = "参数错误";
+                    return false;
+                }
+                object[] oa = (object[])ori;
+                string[] sa = new string[oa.Length];
+                for (int i = 0; i < oa.Length; i++) {
+                    sa[i] = Convert.ToString(oa[i]);
+                }
+                arg = sa;
+                err = null;
+                return true;
+            };
+        }
+
 
 
 
