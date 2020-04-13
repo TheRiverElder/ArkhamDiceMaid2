@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,6 +48,19 @@ namespace top.riverelder.RiverCommand {
             return default(TValue);
         }
 
+        public TValue Get<TValue>(string key, TValue defaultValue) {
+            if (map.TryGetValue(key, out object v)) {
+                if (v is TValue) {
+                    return (TValue)v;
+                }
+            } else if (Parent != null) {
+                if (Parent.TryGet(key, out TValue value)) {
+                    return value;
+                }
+            }
+            return defaultValue;
+        }
+
         public object this[string key] {
             get => TryGet(key, out object value) ? value : null;
             set => map[key] = value;
@@ -61,4 +74,4 @@ namespace top.riverelder.RiverCommand {
 
         public ICollection<string> Keys => map.Keys;
     }
-}
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
