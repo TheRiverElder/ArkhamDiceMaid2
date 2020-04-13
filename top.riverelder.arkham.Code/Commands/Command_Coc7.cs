@@ -107,7 +107,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 sb.Append('；');
                 rest += value;
                 i++;
-                if (i % 3 == 0) {
+                if (i % 2 == 0) {
                     sb.AppendLine();
                 }
             }
