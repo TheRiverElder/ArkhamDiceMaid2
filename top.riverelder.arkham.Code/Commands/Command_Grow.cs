@@ -38,7 +38,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!inv.Values.TryWidelyGet(skillName, out Value skill)) {
                 return "❓未找到" + skillName;
             }
-            if (skill.Check().succeed) {
+            if (!skill.Check().succeed) {
                 int prev = skill.Val;
                 int delta = dice.Roll();
                 skill.Add(delta);
