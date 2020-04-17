@@ -44,9 +44,19 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 ).Then(
                     PresetNodes.String<DMEnv>("目标")
-                    .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), CheckResult.NormalSuccess) + $"\n{env.Inv.Name}把{args.GetStr("目标")}给{args.GetStr("数值名")}了")
+                    .Executes((env, args, dict) => SimpleCheckTo(env.Inv, args.GetStr("数值名"), args.GetStr("目标")))
                 )
             );
+        }
+
+        public string SimpleCheckTo(Investigator inv, string valueName, string target) {
+            CheckResult result = inv.Values[valueName].Check();
+
+            return new StringBuilder()
+                .AppendLine($"{inv.Name}的{valueName}：")
+                .Append($"({result.target}/{result.value}) => {result.result}，{result.ActualTypeString}")
+                .Append(result.succeed ? $"{inv.Name}把{target}给{valueName}了！" : "")
+                .ToString();
         }
 
         public string SimpleCheck(Investigator inv, string valueName, int hardness) {
