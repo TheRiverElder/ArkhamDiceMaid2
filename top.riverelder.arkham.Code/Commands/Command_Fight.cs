@@ -134,7 +134,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
             StringBuilder sb = new StringBuilder();
             string damage = Regex.Replace(w.Damage, @"DB", source.DamageBonus, RegexOptions.IgnoreCase);
-            int r = Dice.Roll(damage);
+            int r = Dice.RollWith(damage, source.DamageBonus);
             int cost = Math.Min(w.Cost, w.CurrentLoad);
             w.CurrentLoad -= cost;
             sb.AppendLine($"伤害{r}，弹药{cost}，剩余{w.CurrentLoad}/{w.Capacity}");

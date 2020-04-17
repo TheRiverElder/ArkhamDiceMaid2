@@ -185,7 +185,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 )
             ).Then(
-                Literal<DMEnv>("捡起")
+                Literal<DMEnv>("拾取")
                 .Then(
                     String<DMEnv>("物品名")
                     .MapDict(mapper)
