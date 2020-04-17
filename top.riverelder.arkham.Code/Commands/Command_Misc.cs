@@ -21,8 +21,8 @@ namespace top.riverelder.arkham.Code.Commands {
             .AppendLine(Repeat(Clap, 8))
             .AppendLine("|        " + Face + "        |")
             .AppendLine("|        🥇        |")
-            .AppendLine("| {1}")
-            .AppendLine("| {2}")
+            .AppendLine(Clap + "{1}" + Clap)
+            .AppendLine(Clap + "{2}" + Clap)
             .AppendLine(Repeat(Clap, 8))
             .Append("让我们再次把热烈的掌声送给他")
             .ToString();
@@ -70,7 +70,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!string.IsNullOrEmpty(tlsn) && inv.Values.TryGet(tlsn, out Value lv)) {
                 con ^= lv.Val;
             }
-            return Math.Abs(con ^ p);
+            return (Math.Abs(con ^ p) / 100);
         }
 
         public static string Repeat(string s, int times) {

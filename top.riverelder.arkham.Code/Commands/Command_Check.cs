@@ -42,6 +42,9 @@ namespace top.riverelder.arkham.Code.Commands {
                             .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("对抗数值名")))
                         )
                     )
+                ).Then(
+                    PresetNodes.String<DMEnv>("目标")
+                    .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), CheckResult.NormalSuccess) + $"\n{env.Inv.Name}把{args.GetStr("目标")}给{args.GetStr("数值名")}了")
                 )
             );
         }
