@@ -126,7 +126,11 @@ namespace top.riverelder.arkham.Code.Model
             aliases.Clear();
         }
 
-        public void Fill(ValueSet tmp)
+        /// <summary>
+        /// 填充模板中的所有属性与别名，会覆盖已有属性
+        /// </summary>
+        /// <param name="tmp">用来填充的模板</param>
+        public void FillWith(ValueSet tmp)
         {
             foreach (KeyValuePair<string, Value> pair in tmp.values.AsEnumerable())
             {
@@ -135,6 +139,23 @@ namespace top.riverelder.arkham.Code.Model
             foreach (KeyValuePair<string, string> pair in tmp.aliases.AsEnumerable())
             {
                 aliases[pair.Key] = pair.Value;
+            }
+        }
+
+        /// <summary>
+        /// 补充没有的属性与别名，不会覆盖已有属性
+        /// </summary>
+        /// <param name="tmp">用来补充的模板</param>
+        public void CompleteWith(ValueSet tmp) {
+            foreach (var pair in tmp.values) {
+                if (!values.ContainsKey(pair.Key)) {
+                    values[pair.Key] = pair.Value.Copy();
+                }
+            }
+            foreach (var pair in tmp.aliases) {
+                if (!aliases.ContainsKey(pair.Key)) {
+                    aliases[pair.Key] = pair.Value;
+                }
             }
         }
     }

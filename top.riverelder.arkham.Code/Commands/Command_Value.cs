@@ -56,6 +56,16 @@ namespace top.riverelder.arkham.Code.Commands {
                         .Executes((env, args, dict) => NewName(env.Sce, env.Inv, args.GetStr("数值名"), args.GetStr("新名")))
                     )
                 )
+            ).Then(
+                Literal<DMEnv>("补全")
+                .Executes((env, args, dict) => CompleteWithDefaultValues(env.Sce, env.Inv))
+            ).Then(
+                Literal<DMEnv>("覆盖")
+                .Executes((env, args, dict) => FillWithDefaultValues(env.Sce, env.Inv, false))
+                .Then(
+                    Literal<DMEnv>("强制")
+                    .Executes((env, args, dict) => FillWithDefaultValues(env.Sce, env.Inv, true))
+                )
             );
 
             dispatcher.SetAlias("设值", "数值 设置");
@@ -106,6 +116,21 @@ namespace top.riverelder.arkham.Code.Commands {
             inv.Values.Set(valueName, newName);
             SaveUtil.Save(scenario);
             return $"{inv.Name}的{valueName}的新别名：{newName}";
+        }
+
+        public static string FillWithDefaultValues(Scenario scenario, Investigator inv, bool force) {
+            if (!force) {
+                return "覆盖操作有极大可能会对你已经设定的数值进行更改！若确定你在做什么，请在指令后面加上“强制”";
+            }
+            inv.Values.FillWith(Global.DefaultValues);
+            SaveUtil.Save(scenario);
+            return $"{inv.Name}的数值与别名已被默认值覆盖！已有的数值可能被覆盖！";
+        }
+
+        public static string CompleteWithDefaultValues(Scenario scenario, Investigator inv) {
+            inv.Values.CompleteWith(Global.DefaultValues);
+            SaveUtil.Save(scenario);
+            return $"{inv.Name}的数值与别名已被默认值补全！已有的数值未被修改！";
         }
     }
 }

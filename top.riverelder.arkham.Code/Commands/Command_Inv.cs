@@ -15,7 +15,7 @@ namespace top.riverelder.arkham.Code.Commands {
             Scenario sce = env.Sce;
             Investigator inv = new Investigator(name, desc);
 
-            inv.Values.Fill(Global.DefaultValues);
+            inv.Values.FillWith(Global.DefaultValues);
 
             foreach (string key in dict.Keys) {
                 if (dict.TryGet(key, out Value value)) {
