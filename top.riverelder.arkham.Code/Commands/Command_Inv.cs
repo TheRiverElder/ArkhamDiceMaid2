@@ -29,6 +29,9 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!string.IsNullOrEmpty(desc)) {
                 builder.AppendFormat("描述：{0}", desc).AppendLine();
             }
+            builder
+                .Append("体格：").Append(inv.Build)
+                .Append("伤害加值：").AppendLine(inv.DamageBonus);
             
             foreach (string key in inv.Values.Names) {
                 if (inv.Values.TryWidelyGet(key, out Value value)) {
@@ -39,6 +42,17 @@ namespace top.riverelder.arkham.Code.Commands {
             sce.Control(env.SelfId, inv.Name);
             env.Save();
             return builder.ToString();
+        }
+
+        public static string ReCalc(DMEnv env, Investigator inv) {
+            inv.Calc(out string err);
+            env.Save();
+
+            return new StringBuilder()
+                .Append(inv.Name).AppendLine("的数据：")
+                .Append("体格：").Append(inv.Build)
+                .Append("伤害加值：").Append(inv.DamageBonus)
+                .ToString();
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
@@ -57,6 +71,15 @@ namespace top.riverelder.arkham.Code.Commands {
                         .MapDict(mapper)
                         .Executes((env, args, dict) => CreateInv(env, args.GetStr("名称"), args.GetStr("描述"), dict))
                     )
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("重算")
+                .Handles(Extensions.ExistSelfInv())
+                .Executes((env, args, dict) => ReCalc(env, env.Inv))
+                .Then(
+                    PresetNodes.String<DMEnv>("名称")
+                    .Handles(Extensions.ExistInv())
+                    .Executes((env, args, dict) => ReCalc(env, args.GetInv("名称")))
                 )
             );
 

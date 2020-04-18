@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-
+using System.Text;
+using System.Text.RegularExpressions;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
@@ -57,6 +58,13 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 )
             ).Then(
+                Literal<DMEnv>("st")
+                .Executes((env, args, dict) => StHelp())
+                .Then(
+                    Rest<DMEnv>("数值串")
+                    .Executes((env, args, dict) => St(env, env.Inv, args.GetStr("数值串")))
+                )
+            ).Then(
                 Literal<DMEnv>("补全")
                 .Executes((env, args, dict) => CompleteWithDefaultValues(env.Sce, env.Inv))
             ).Then(
@@ -73,6 +81,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("减值", "数值 减少");
             dispatcher.SetAlias("回血", "数值 增加 体力");
             dispatcher.SetAlias("扣血", "数值 减少 体力");
+            dispatcher.SetAlias("st", "数值 st");
         }
 
         public static string ChangeVal(Scenario scenario, Investigator inv, string valueName, Dice increment, bool posotive) {
@@ -131,6 +140,31 @@ namespace top.riverelder.arkham.Code.Commands {
             inv.Values.CompleteWith(Global.DefaultValues);
             SaveUtil.Save(scenario);
             return $"{inv.Name}的数值与别名已被默认值补全！已有的数值未被修改！";
+        }
+
+        public static string StHelp() {
+            return $"使用st子指令时，请保证除了“st”与剩下内容之间的空格外，再没有其它空白了！";
+        }
+
+        public static string St(DMEnv env, Investigator inv, string str) {
+            ValueSet values = inv.Values;
+            StringBuilder sb = new StringBuilder().Append(inv.Name).Append("的数值：");
+            Regex reg = new Regex(@"(\D+)(\d+)");
+            Match m = reg.Match(str);
+            int i = 0;
+            while (m.Success) {
+                int val = int.TryParse(m.Groups[2].Value, out int v) ? v : 1;
+                string name = m.Groups[1].Value;
+                Value value = new Value(val);
+                values.Put(name, value);
+                if (i++ % 3 == 0) {
+                    sb.AppendLine();
+                }
+                sb.Append(name).Append('：').Append(value.ToString()).Append(' ');
+                m = m.NextMatch();
+            }
+            env.Save();
+            return sb.ToString();
         }
     }
 }
