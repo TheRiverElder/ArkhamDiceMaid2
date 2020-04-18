@@ -49,12 +49,17 @@ namespace top.riverelder.arkham.Code.Commands {
             );
         }
 
+        public string RandomResult(string[] results) {
+            int index = Dice.Roll("1d" + results.Length) - 1;
+            return results[index];
+        }
+
         public string SimpleCheckTo(Investigator inv, string valueName, string target) {
             CheckResult result = inv.Values[valueName].Check();
 
             return new StringBuilder()
                 .AppendLine($"{inv.Name}的{valueName}：")
-                .Append($"({result.target}/{result.value}) => {result.result}，{result.ActualTypeString}")
+                .AppendLine($"({result.target}/{result.value}) => {result.result}，{result.ActualTypeString}")
                 .Append(result.succeed ? $"{inv.Name}把{target}给{valueName}了！" : "")
                 .ToString();
         }

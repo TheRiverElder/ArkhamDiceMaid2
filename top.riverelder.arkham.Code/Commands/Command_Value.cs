@@ -32,8 +32,12 @@ namespace top.riverelder.arkham.Code.Commands {
             ).Then(
                 Literal<DMEnv>("设置").Then(
                     String<DMEnv>("数值名").Then(
-                        Extensions.Value<DMEnv>("新值")
-                        .Executes((env, args, dict) => SetVal(env.Sce, env.Inv, args.GetStr("数值名"), args.Get<Value>("新值")))
+                        Int<DMEnv>("新值")
+                        .Executes((env, args, dict) => SetVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("新值"), -1))
+                        .Then(
+                            Int<DMEnv>("上限")
+                            .Executes((env, args, dict) => SetVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("新值"), args.GetInt("上限")))
+                        )
                     )
                 )
             ).Then(
@@ -73,16 +77,16 @@ namespace top.riverelder.arkham.Code.Commands {
             return $"{inv.Name}的{valueName}: {prev} + {inc} => {value.Val}";
         }
 
-        public static string SetVal(Scenario scenario, Investigator inv, string valueName, Value newValue) {
+        public static string SetVal(Scenario scenario, Investigator inv, string valueName, int val, int max) {
             if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
                 value = new Value(1);
                 inv.Values.Put(valueName, value);
             }
             string prev = value.ToString();
-            if (newValue.Max > 0) {
-                value.Max = newValue.Max;
+            if (max > 0) {
+                value.Max = max;
             }
-            value.Set(newValue.Val);
+            value.Set(val);
             SaveUtil.Save(scenario);
             return $"{inv.Name}的{valueName}: {prev} => {value.ToString()}";
         }

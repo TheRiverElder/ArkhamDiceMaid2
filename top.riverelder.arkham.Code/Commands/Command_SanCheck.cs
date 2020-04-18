@@ -29,11 +29,6 @@ namespace top.riverelder.arkham.Code.Commands {
                 Extensions.Dice("成功骰子").Then(
                     Extensions.Dice("失败骰子")
                     .Executes((env, args, dict) => SanCheck(env.Sce, env.Inv, args.GetDice("成功骰子"), args.GetDice("失败骰子")))
-                ).Then(
-                    PresetNodes.Literal<DMEnv>("/").Then(
-                        Extensions.Dice("失败骰子")
-                        .Executes((env, args, dict) => SanCheck(env.Sce, env.Inv, args.GetDice("成功骰子"), args.GetDice("失败骰子")))
-                    )
                 )
             );
             dispatcher.SetAlias("sc", "SC");
