@@ -155,12 +155,16 @@ namespace top.riverelder.arkham.Code.Commands {
             while (m.Success) {
                 int val = int.TryParse(m.Groups[2].Value, out int v) ? v : 1;
                 string name = m.Groups[1].Value;
-                Value value = new Value(val);
-                values.Put(name, value);
+                if (values.TryWidelyGet(name, out Value value)) {
+                    value.Set(val);
+                } else {
+                    value = new Value(val);
+                    values.Put(name, value);
+                }
                 if (i++ % 3 == 0) {
                     sb.AppendLine();
                 }
-                sb.Append(name).Append('：').Append(value.ToString()).Append(' ');
+                sb.Append(name).Append('：').Append(value).Append(' ');
                 m = m.NextMatch();
             }
             env.Save();
