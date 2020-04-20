@@ -82,22 +82,22 @@ namespace top.riverelder.arkham.Code.Commands {
                         .MapDict(mapper)
                         .Executes((env, args, dict) => CreateInv(env, args.GetStr("名称"), args.GetStr("描述"), dict))
                     )
-                ).Then(
-                    PresetNodes.Literal<DMEnv>("重算")
-                    .Handles(Extensions.ExistSelfInv())
-                    .Executes((env, args, dict) => ReCalc(env, env.Inv))
-                    .Then(
-                        PresetNodes.String<DMEnv>("名称")
-                        .Handles(Extensions.ExistInv())
-                        .Executes((env, args, dict) => ReCalc(env, args.GetInv("名称")))
-                    )
-                ).Then(
-                    PresetNodes.Literal<DMEnv>("伤害加值")
-                    .Then(
-                        Extensions.Dice("数值")
-                        .Handles(Extensions.ExistSelfInv())
-                        .Executes((env, args, dict) => SetDB(env, env.Inv, args.GetDice("数值")))
-                    )
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("重算")
+                .Handles(Extensions.ExistSelfInv())
+                .Executes((env, args, dict) => ReCalc(env, env.Inv))
+                .Then(
+                    PresetNodes.String<DMEnv>("名称")
+                    .Handles(Extensions.ExistInv())
+                    .Executes((env, args, dict) => ReCalc(env, args.GetInv("名称")))
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("伤害加值")
+                .Handles(Extensions.ExistSelfInv())
+                .Then(
+                    Extensions.Dice("数值")
+                    .Executes((env, args, dict) => SetDB(env, env.Inv, args.GetDice("数值")))
                 )
             );
 
