@@ -50,7 +50,18 @@ namespace top.riverelder.arkham.Code.Commands {
 
             return new StringBuilder()
                 .Append(inv.Name).AppendLine("的数据：")
-                .Append("体格：").Append(inv.Build)
+                .Append("体格：").Append(inv.Build).Append('，')
+                .Append("伤害加值：").Append(inv.DamageBonus)
+                .ToString();
+        }
+
+        public static string SetDB(DMEnv env, Investigator inv, Dice db) {
+            inv.DamageBonus = db.ToString();
+            env.Save();
+
+            return new StringBuilder()
+                .Append(inv.Name).AppendLine("的数据：")
+                .Append("体格：").Append(inv.Build).Append('，')
                 .Append("伤害加值：").Append(inv.DamageBonus)
                 .ToString();
         }
@@ -80,6 +91,13 @@ namespace top.riverelder.arkham.Code.Commands {
                     PresetNodes.String<DMEnv>("名称")
                     .Handles(Extensions.ExistInv())
                     .Executes((env, args, dict) => ReCalc(env, args.GetInv("名称")))
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("伤害加值")
+                .Then(
+                    Extensions.Dice("数值")
+                    .Handles(Extensions.ExistSelfInv())
+                    .Executes((env, args, dict) => SetDB(env, env.Inv, args.GetDice("数值")))
                 )
             );
 

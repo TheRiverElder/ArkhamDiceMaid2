@@ -50,7 +50,7 @@ namespace top.riverelder.arkham.Code.Model {
         }
 
         public int Build { get; private set; } = 0;
-        public string DamageBonus { get; private set; } = "0";
+        public string DamageBonus { get; set; } = "0";
 
         /// <summary>
         /// 自动计算体格、伤害加值

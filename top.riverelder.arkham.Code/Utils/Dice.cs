@@ -109,6 +109,9 @@ namespace top.riverelder.arkham.Code.Utils {
         }
 
         public override string ToString() {
+            if (items.Count == 0) {
+                return "0";
+            }
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < items.Count; i++) {
                 DiceItem item = items[i];
