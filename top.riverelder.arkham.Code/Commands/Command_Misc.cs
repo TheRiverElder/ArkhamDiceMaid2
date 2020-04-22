@@ -113,8 +113,7 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             return Repeat(Clap, times.Roll());
         }
-
-
+        
         public static string MakeName(string dict, int len) {
             dict = dict ?? "武侠";
             if (len <= 0) {
@@ -124,7 +123,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 return "未找到字集：" + dict;
             }
             List<char> list = new List<char>();
-            Random random = new Random();
+            Random random = new Random(Seed++);
             for (int i = 0; i < len; i++) {
                 list.Add(set[random.Next(set.Length)]);
             }
