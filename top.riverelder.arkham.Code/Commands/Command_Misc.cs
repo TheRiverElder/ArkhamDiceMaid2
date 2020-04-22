@@ -82,13 +82,53 @@ namespace top.riverelder.arkham.Code.Commands {
         }
 
         private static int Seed = (int)DateTime.Now.Ticks;
-        
+
+
+        public static Dictionary<string, string> NameLetterSet = new Dictionary<string, string> {
+            ["武侠"] = 
+            "男默言肖枫子杰尹灵奇女幽妍梦屏蔚蓝樱朵姬夜旋璎珞颜离如烟清沙婉儿" +
+            "慕莫奈南宫契权寰宇安佐旭郝连水渊仙人气质的白夕若冷萧逸皓月司徒雨" +
+            "瞳奕世贵形依娜筱羽馨煜婷弯久皇旒漫妮千爱火怜影凤舞幻风夏洋景杨柯" +
+            "寻越冉承苍神薰光上空瑞稀裴翼商易伊楚凌漪楼焰麟翔冰北堂赫烨航百里" +
+            "淇自殷尧云沂耀卓常柏卫圣龙孤鹤沉瀚海岭零毓禹秦希宋吟阎岚霍菁方璇" +
+            "燕勒绯臻莱玥拉班布岳寒霄泽弈硕锦衡归听雪段洛霆遥落盛关葵紫竹雅绿" +
+            "小宝玄秋星经凯惠乐家谷正志蔺睿好匡胜东郭俊弼郗华鄂和昶滑英闵鸿蒋" +
+            "勇喻元驹鞠宏伟禄资车良策马寇博容韩宜修启罗天阳佟游林向牟嘉熙浩邈" +
+            "勾君扶弘业文辛学乌粱朗玉堵豪纵鱼达聪夔晖那成周加祺然魏包顾苏爽邱" +
+            "发红淼泰初慎真雷永张麻焦翰杭炎彬从仲孙兴德戚语茂",
+            ["外译中"] = 
+            "布普德特格克弗夫兹斯什吉奇思赫姆尔伍伊茨巴芭帕达塔加卡瓦娃法扎萨" +
+            "沙贾查撒哈马玛纳娜拉夸亚察阿艾拜派代戴泰盖凯赛蔡海迈奈莱赖怀厄伯" +
+            "珀泽瑟舍哲彻默勒沃耶策埃贝佩维费塞谢杰切黑梅内雷韦惠奎比皮迪蒂基" +
+            "菲齐西锡希米尼利莉里丽威乌杜图古库武富朱苏舒丘胡穆努卢鲁尤楚奥博" +
+            "波多托戈科福佐索肖乔霍莫诺洛罗约鲍保道陶高考豪毛瑙劳姚允久休纽柳" +
+            "留班潘丹坦甘坎范赞桑香詹钱汉曼南檑兰万扬因恩敦査本彭登根肯文芬增" +
+            "森中琴亨门伦温昆延岑宾平丁廷金津辛欣钦明林英青昂邦庞唐汤冈康冯方" +
+            "藏琼杭芒农朗旺匡仓翁蓬东栋通贡孔丰宗松雄洪蒙隆龙荣聪邓滕",
+        };
 
         public static string SendClaps(Dice times) {
             if (times == null) {
                 times = Dice.Of("1d5");
             }
             return Repeat(Clap, times.Roll());
+        }
+
+
+        public static string MakeName(string dict, int len) {
+            dict = dict ?? "武侠";
+            if (len <= 0) {
+                return "名字长度必须是正整数！";
+            }
+            if (!NameLetterSet.TryGetValue(dict, out string set)) {
+                return "未找到字集：" + dict;
+            }
+            List<char> list = new List<char>();
+            Random random = new Random();
+            for (int i = 0; i < len; i++) {
+                list.Add(set[random.Next(set.Length)]);
+            }
+            return string.Join("", list);
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
@@ -102,10 +142,24 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Then(
                     Extensions.Dice("次数").Executes((env, args, dict) => SendClaps(args.GetDice("次数")))
                 )
+            ).Then(
+                Literal<DMEnv>("取名")
+                .Executes((env, args, dict) => MakeName("武侠", 3))
+                .Then(
+                    Int<DMEnv>("长度")
+                    .Executes((env, args, dict) => MakeName("武侠", args.GetInt("长度")))
+                    .Then(
+                        String<DMEnv>("字集")
+                        .Executes((env, args, dict) => MakeName(args.GetStr("字集"), args.GetInt("长度")))
+                    )
+                ).Then(
+                    Literal<DMEnv>("字集").Executes((env, args, dict) => string.Join("", NameLetterSet.Keys))
+                )
             );
 
             dispatcher.SetAlias("今日幸运儿", "杂项 今日幸运儿");
             dispatcher.SetAlias("鼓掌", "杂项 鼓掌");
+            dispatcher.SetAlias("取名", "杂项 取名");
         }
     }
 }
