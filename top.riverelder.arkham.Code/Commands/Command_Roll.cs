@@ -30,7 +30,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public static string Choose(string[] results) {
             if (results.Length > 0) {
-                int index = Dice.Roll("1d" + results.Length);
+                int index = Dice.Roll("1d" + results.Length) - 1;
                 if (index >= 0 && index < results.Length) {
                     return results[index];
                 } else {
