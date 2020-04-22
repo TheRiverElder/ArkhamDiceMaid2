@@ -18,7 +18,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("投掷").Then(
                 Extensions.Dice("骰子").Executes((env, args, dict) => Roll(args.GetDice("骰子")))
             ).Rest(
-                Extensions.Dice("选项组")
+                PresetNodes.String<DMEnv>("选项组")
                 .Handles(Extensions.ConvertObjectArrayToStringArray())
                 .Executes((env, args, dict) => Choose(args.Get<string[]>("选项组")))
             );
