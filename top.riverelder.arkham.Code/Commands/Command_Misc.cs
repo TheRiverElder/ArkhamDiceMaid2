@@ -70,7 +70,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!string.IsNullOrEmpty(tlsn) && inv.Values.TryGet(tlsn, out Value lv)) {
                 con ^= lv.Val;
             }
-            return (Math.Abs(con ^ p) / 100);
+            return (int)(Math.Abs(con ^ p) / (float)p);
         }
 
         public static string Repeat(string s, int times) {

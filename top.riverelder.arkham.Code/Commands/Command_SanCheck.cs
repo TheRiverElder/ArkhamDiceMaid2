@@ -46,7 +46,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
             int v = result.succeed ? success.Roll() : failure.Roll();
             if (v > 0) {
-                builder.AppendLine(Desc[new Random().Next(Desc.Length)]);
+                builder.AppendLine().Append(Desc[new Random().Next(Desc.Length)]);
             }
             int prev = value.Val;
             value.Sub(v);

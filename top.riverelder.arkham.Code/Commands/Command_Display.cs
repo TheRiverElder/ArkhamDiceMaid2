@@ -23,19 +23,16 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!string.IsNullOrEmpty(itemName)) {
                 if (inv.Inventory.TryGet(itemName, out Item it)) {
                     StringBuilder b = new StringBuilder().AppendLine($"{inv.Name}的 {itemName}：");
-                    if (it.IsWeapon) {
-                        WeaponInfo w = it.Weapon;
-                        b
-                            .Append("技能名：").AppendLine(w.SkillName)
-                            .Append("技能值：").AppendLine(w.SkillValue.ToString())
-                            .Append("伤害：").AppendLine(w.Damage)
-                            .Append("贯穿：").AppendLine(w.Impale ? "是" : "否")
-                            .Append("连发数：").AppendLine(w.MaxCount.ToString())
-                            .Append("弹匣：").AppendLine(w.Capacity.ToString())
-                            .Append("故障：").AppendLine(w.Mulfunction.ToString())
-                            .Append("弹药：").AppendLine(w.CurrentLoad.ToString())
-                            .Append("消耗：").Append(w.Cost.ToString());
-                    }
+                    b
+                        .Append("技能名：").AppendLine(it.SkillName)
+                        .Append("类型：").AppendLine(it.Type)
+                        .Append("伤害：").AppendLine(it.Damage)
+                        .Append("贯穿：").AppendLine(it.Impale ? "是" : "否")
+                        .Append("连发数：").AppendLine(it.MaxCount.ToString())
+                        .Append("弹匣：").AppendLine(it.Capacity.ToString())
+                        .Append("故障值：").AppendLine(it.Mulfunction.ToString())
+                        .Append("弹药：").AppendLine(it.CurrentLoad.ToString())
+                        .Append("消耗：").Append(it.Cost.ToString());
                     return b.ToString();
                 } else {
                     return $"{inv.Name}没有{itemName}";

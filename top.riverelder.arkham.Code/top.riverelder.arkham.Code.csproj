@@ -103,7 +103,6 @@
     <Compile Include="Util.cs" />
     <Compile Include="Model\Value.cs" />
     <Compile Include="Model\ValueSet.cs" />
-    <Compile Include="Model\WeaponInfo.cs" />
     <Compile Include="Utils\DiceCmdEntry.cs" />
     <Compile Include="Utils\DiceParser.cs" />
     <Compile Include="Utils\Extensions.cs" />

@@ -69,19 +69,5 @@ namespace top.riverelder.arkham.Code.Model {
             err = null;
             return true;
         }
-
-        public bool Attack(Investigator target, string weaponName, out string err) {
-            if (!Inventory.TryGet(weaponName, out Item item) || !item.IsWeapon) {
-                err = $"未找到武器：{weaponName}";
-                return false;
-            }
-            WeaponInfo wi = item.Weapon;
-            if (!Values.TryGet(wi.SkillName, out Value skill)) {
-                skill = new Value(wi.SkillValue);
-            }
-            CheckResult result = skill.Check();
-            err = null;
-            return true;
-        }
     }
 }

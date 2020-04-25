@@ -17,28 +17,31 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public string Usage => "物品 <创造|丢弃|拾取|销毁|编辑|装弹> <物品名> [重命名|弹药数]";
 
+        static string FillWeaponInfo(Item item, Args dict) {
+            StringBuilder sb = new StringBuilder();
+            if (dict.TryGet("技能名", out string sn)) sb.AppendLine().Append("技能名：").Append(item.SkillName = sn);
+            if (dict.TryGet("类型", out string t)) sb.AppendLine().Append("类型：").Append(item.Type = t);
+            if (dict.TryGet("伤害", out string d)) sb.AppendLine().Append("伤害：").Append(item.Damage = d);
+            if (dict.TryGet("穿刺", out bool i)) sb.AppendLine().Append("穿刺：").Append(item.Impale = i);
+            if (dict.TryGet("连发数", out int mc)) sb.AppendLine().Append("连发数：").Append(item.MaxCount = mc);
+            if (dict.TryGet("弹匣", out int c)) sb.AppendLine().Append("弹匣：").Append(item.Capacity = c);
+            if (dict.TryGet("故障值", out int m)) sb.AppendLine().Append("故障值：").Append(item.Mulfunction = m);
+            if (dict.TryGet("弹药", out int cl)) sb.AppendLine().Append("弹药：").Append(item.CurrentLoad = cl);
+            if (dict.TryGet("消耗", out int co)) sb.AppendLine().Append("消耗：").Append(item.Cost = co);
+            return sb.ToString();
+        }
+
         string CreateItem(DMEnv env, string name, Args dict) {
             Investigator inv = env.Inv;
             if (inv.Inventory.Has(name)) {
                 return $"{inv.Name}的物品栏中已经存在{name}，请重命名";
             }
             Item item = new Item(name);
-            if (dict.Count > 0) {
-                item.Weapon = new WeaponInfo(
-                    dict.TryGet("技能名", out string sn) ? sn : "肉搏",
-                    dict.TryGet("技能值", out int sv) ? sv : 25,
-                    dict.TryGet("伤害", out string d) ? d : "1d1+DB",
-                    dict.TryGet("穿刺", out bool i) ? i : false,
-                    dict.TryGet("连发数", out int mc) ? mc : 1,
-                    dict.TryGet("弹匣", out int c) ? c : 1,
-                    dict.TryGet("故障", out int m) ? m : 100,
-                    dict.TryGet("弹药", out int cl) ? cl : 0,
-                    dict.TryGet("消耗", out int co) ? co : 0
-                );
-            }
+            string ret = $"{inv.Name}创造了物品：{name}" + FillWeaponInfo(item, dict);
+
             inv.Inventory.Put(item);
             env.Save();
-            return $"{inv.Name}创造了物品：{name}";
+            return ret;
         }
 
         string DestoryItem(DMEnv env, string name) {
@@ -95,21 +98,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!inv.Inventory.TryGet(name, out Item item)) {
                 return $"{inv.Name}的物品栏中不存在{name}";
             }
-            if (dict.Count > 0) {
-                if (!item.IsWeapon) {
-                    item.Weapon = new WeaponInfo();
-                }
-                WeaponInfo w = item.Weapon;
-                if (dict.TryGet("技能名", out string sn)) w.SkillName = sn;
-                if (dict.TryGet("技能值", out int sv)) w.SkillValue = sv;
-                if (dict.TryGet("伤害", out string d)) w.Damage = d;
-                if (dict.TryGet("穿刺", out bool i)) w.Impale = i;
-                if (dict.TryGet("连发数", out int mc)) w.MaxCount = mc;
-                if (dict.TryGet("弹匣", out int c)) w.Capacity = c;
-                if (dict.TryGet("故障", out int m)) w.Mulfunction = m;
-                if (dict.TryGet("弹药", out int cl)) w.CurrentLoad = cl;
-                if (dict.TryGet("消耗", out int co)) w.Cost = co;
-            }
+            string wiChanges = FillWeaponInfo(item, dict);
             if (!string.Equals(name, newName)) {
                 inv.Inventory.Remove(name);
                 item.Name = newName;
@@ -118,7 +107,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 return $"{inv.Name}重命名了物品：{name} => {newName}";
             } else {
                 env.Save();
-                return $"{inv.Name}编辑了物品：{name}";
+                return $"{inv.Name}编辑了物品：{name}" + wiChanges;
             }
         }
 
@@ -127,19 +116,15 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!inv.Inventory.TryGet(name, out Item item)) {
                 return $"{inv.Name}的物品栏中不存在{name}";
             }
-            if (!item.IsWeapon) {
-                return $"{item.Name}不是武器";
-            }
-            WeaponInfo w = item.Weapon;
-            int left = w.Capacity - w.CurrentLoad;
+            int left = item.Capacity - item.CurrentLoad;
             if (left <= 0) {
                 return "弹匣已经装满，无需装弹";
             }
             int loaded = Math.Min(left, amount.Roll());
-            w.CurrentLoad += loaded;
+            item.CurrentLoad += loaded;
             env.Save();
             return new StringBuilder().AppendLine($"{inv.Name}为{name}装弹{loaded}")
-                .Append($"弹药：{w.CurrentLoad}/{w.Capacity}").ToString();
+                .Append($"弹药：{item.CurrentLoad}/{item.Capacity}").ToString();
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
@@ -150,7 +135,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Then("穿刺", new BoolParser("是", "否"), true)
                 .Then("连发数", new IntParser())
                 .Then("弹匣", new IntParser())
-                .Then("故障", new IntParser())
+                .Then("故障值", new IntParser())
                 .Then("弹药", new IntParser())
                 .Then("消耗", new IntParser())
                 .SkipRest();

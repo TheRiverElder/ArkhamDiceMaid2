@@ -11,11 +11,22 @@ using top.riverelder.RiverCommand;
 using static top.riverelder.RiverCommand.PresetNodes;
 
 namespace top.riverelder.arkham.Code.Commands {
+
+    /// <summary>
+    /// 战斗 攻击 <目标> [武器]
+    /// 战斗 闪避
+    /// 战斗 反击
+    /// 战斗 逃跑
+    /// 战斗 战技 [指令]
+    /// 
+    /// 战斗 放弃
+    /// 战斗跳过
+    /// </summary>
     class Command_Fight : DiceCmdEntry {
 
         public string Usage => "战斗 <攻击|闪避|跳过|放弃|射击> [目标] [武器名]";
 
-        private string GiveUpFight(DMEnv env, Investigator inv) {
+        private string GiveUp(DMEnv env, Investigator inv) {
             if (inv.Fights.Count == 0) {
                 return "未找到打斗事件";
             }
@@ -28,7 +39,7 @@ namespace top.riverelder.arkham.Code.Commands {
             return CalculateDamage(env, source, inv, fight.WeaponName);
         }
 
-        private string SkipFight(DMEnv env, Investigator inv) {
+        private string Skip(DMEnv env, Investigator inv) {
             if (inv.Fights.Count > 0) {
                 FightEvent fight = inv.Fights.Dequeue();
                 env.Save();
@@ -37,7 +48,7 @@ namespace top.riverelder.arkham.Code.Commands {
             return "没有需要跳过打斗";
         }
 
-        string DodgeFight(DMEnv env, Investigator inv) {
+        string Dodge(DMEnv env, Investigator inv) {
             if (inv.Fights.Count == 0) {
                 return "未找到打斗事件";
             }
@@ -63,33 +74,19 @@ namespace top.riverelder.arkham.Code.Commands {
             }
         }
 
-        public static string CommitFight(DMEnv env, Investigator source, Investigator target, string weaponName) {
+        public static string Attack(DMEnv env, Investigator source, Investigator target, string weaponName) {
 
-            WeaponInfo w;
+            Item w = null;
             if (weaponName != null) {
-                if (!source.Inventory.TryGet(weaponName, out Item item)) {
+                if (!source.Inventory.TryGet(weaponName, out w)) {
                     return $"未找到{source.Name}武器：{weaponName}";
                 }
-                if (!item.IsWeapon) {
-                    return $"{source.Name}的{weaponName}不是武器";
-                }
-                w = item.Weapon;
             } else {
-                w = new WeaponInfo {
-                    SkillName = "斗殴",
-                    SkillValue = 25,
-                    Damage = "1D3+DB",
-                    Impale = false,
-                    MaxCount = 1,
-                    Capacity = 1,
-                    Mulfunction = 100,
-                    CurrentLoad = 1,
-                    Cost = 1,
-                };
+                w = new Item("身体");
             }
 
-            if (!source.Values.TryGet(w.SkillName, out Value skill)) {
-                skill = new Value(w.SkillValue);
+            if (!source.Values.TryGet(w.SkillName, out Value skill) && !Global.DefaultValues.TryGet(w.SkillName, out skill)) {
+                return $"未找到的{w.SkillName}技能及其默认值";
             }
             CheckResult result = skill.Check();
 
@@ -97,35 +94,30 @@ namespace top.riverelder.arkham.Code.Commands {
                 return $"{source.Name}对{target.Name}的攻击失败";
             }
 
+            switch (w.Type) {
+                case "肉搏": return CommitFight(env, source, target, weaponName);
+                case "投掷": return CommitFight(env, source, target, weaponName);
+                case "射击": return CalculateDamage(env, source, target, weaponName);
+            }
+            
+            return $"未知的武器类型：{w.Type}，只能是：肉搏、投掷、射击";
+        }
+
+        static string CommitFight(DMEnv env, Investigator source, Investigator target, string weaponName) {
             string wName = string.IsNullOrEmpty(weaponName) ? "肉体" : weaponName;
             target.Fights.Enqueue(new FightEvent(source.Name, target.Name, weaponName));
             env.Save();
             return $"{source.Name}使用{wName}对{target.Name}发起了攻击";
         }
 
-        string CalculateDamage(DMEnv env, Investigator source, Investigator target, string weaponName) {
-
-            WeaponInfo w;
+        static string CalculateDamage(DMEnv env, Investigator source, Investigator target, string weaponName) {
+            Item w = null;
             if (weaponName != null) {
-                if (!source.Inventory.TryGet(weaponName, out Item item)) {
+                if (!source.Inventory.TryGet(weaponName, out w)) {
                     return $"未找到{source.Name}武器：{weaponName}";
                 }
-                if (!item.IsWeapon) {
-                    return $"{source.Name}的{weaponName}不是武器";
-                }
-                w = item.Weapon;
             } else {
-                w = new WeaponInfo {
-                    SkillName = "斗殴",
-                    SkillValue = 25,
-                    Damage = "1D3+DB",
-                    Impale = false,
-                    MaxCount = 1,
-                    Capacity = 1,
-                    Mulfunction = 100,
-                    CurrentLoad = 1,
-                    Cost = 0,
-                };
+                w = new Item("身体");
             }
 
             if (w.CurrentLoad <= 0) {
@@ -133,11 +125,10 @@ namespace top.riverelder.arkham.Code.Commands {
             }
 
             StringBuilder sb = new StringBuilder();
-            string damage = Regex.Replace(w.Damage, @"DB", source.DamageBonus, RegexOptions.IgnoreCase);
-            int r = Dice.RollWith(damage, source.DamageBonus);
+            int r = Dice.RollWith(w.Damage, source.DamageBonus);
             int cost = Math.Min(w.Cost, w.CurrentLoad);
             w.CurrentLoad -= cost;
-            sb.AppendLine($"伤害{r}，弹药{cost}，剩余{w.CurrentLoad}/{w.Capacity}");
+            sb.AppendLine($"造成伤害{r}，弹药消耗{cost}，弹药剩余{w.CurrentLoad}/{w.Capacity}");
             if (r > 0) {
                 if (!target.Values.TryGet("体力", out Value th)) {
                     return sb.Append("而对方没有体力").ToString();
@@ -169,30 +160,27 @@ namespace top.riverelder.arkham.Code.Commands {
                 Literal<DMEnv>("攻击").Then(
                     String<DMEnv>("目标")
                     .Handles(Extensions.ExistInv())
-                    .Executes((env, args, dict) => CommitFight(env, env.Inv, args.GetInv("目标"), null))
+                    .Executes((env, args, dict) => Attack(env, env.Inv, args.GetInv("目标"), null))
                     .Then(
-                        String<DMEnv>("武器名").Executes((env, args, dict) => CommitFight(env, env.Inv, args.GetInv("目标"), args.GetStr("武器名")))
+                        String<DMEnv>("武器名").Executes((env, args, dict) => Attack(env, env.Inv, args.GetInv("目标"), args.GetStr("武器名")))
                     )
                 )
             ).Then(
-                Literal<DMEnv>("射击").Then(
-                    String<DMEnv>("目标")
-                    .Handles(Extensions.ExistInv())
-                    .Then(
-                        String<DMEnv>("武器名").Executes((env, args, dict) => CalculateDamage(env, env.Inv, args.GetInv("目标"), args.GetStr("武器名")))
-                    )
-                )
+                Literal<DMEnv>("闪避").Executes((env, args, dict) => Dodge(env, env.Inv))
+            //).Then(
+            //    Literal<DMEnv>("反击").Executes((env, args, dict) => DodgeFight(env, env.Inv))
+            //).Then(
+            //    Literal<DMEnv>("战技").Executes((env, args, dict) => DodgeFight(env, env.Inv))
+            //).Then(
+            //    Literal<DMEnv>("逃跑").Executes((env, args, dict) => DodgeFight(env, env.Inv))
             ).Then(
-                Literal<DMEnv>("闪避").Executes((env, args, dict) => DodgeFight(env, env.Inv))
+                Literal<DMEnv>("跳过").Executes((env, args, dict) => Skip(env, env.Inv))
             ).Then(
-                Literal<DMEnv>("跳过").Executes((env, args, dict) => SkipFight(env, env.Inv))
-            ).Then(
-                Literal<DMEnv>("放弃").Executes((env, args, dict) => GiveUpFight(env, env.Inv))
+                Literal<DMEnv>("放弃").Executes((env, args, dict) => GiveUp(env, env.Inv))
             );
 
             dispatcher.SetAlias("攻击", "战斗 攻击");
             dispatcher.SetAlias("闪避", "战斗 闪避");
-            dispatcher.SetAlias("射击", "战斗 射击");
         }
     }
 }
