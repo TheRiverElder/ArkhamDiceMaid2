@@ -9,11 +9,15 @@ namespace top.riverelder.arkham.Code.Model {
         public string SourceName { get; set; }
         public string TargetName { get; set; }
         public string WeaponName { get; set; }
+        public int Points { get; set; }
+        public int ResultType { get; set; }
 
-        public FightEvent(string sourceName, string targetName, string weaponName) {
+        public FightEvent(string sourceName, string targetName, string weaponName, int points, int resultType) {
             SourceName = sourceName;
             TargetName = targetName;
             WeaponName = weaponName;
+            Points = points;
+            ResultType = resultType;
         }
     }
 

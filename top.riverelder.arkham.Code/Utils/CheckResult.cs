@@ -8,7 +8,7 @@ using top.riverelder.arkham.Code.Model;
 namespace top.riverelder.arkham.Code.Utils {
 
     public class CheckResult {
-        private static Dictionary<int, string> typeStrings = new Dictionary<int, string> {
+        public static readonly Dictionary<int, string> TypeStrings = new Dictionary<int, string> {
             [Unkonwn] = "未知",
             [GreatSuccess] = "大成功",
             [ExtremeSuccess] = "极难成功",
@@ -51,7 +51,7 @@ namespace top.riverelder.arkham.Code.Utils {
         /// 获取结果类型所对应的字符串表达
         /// </summary>
         /// <returns>对应的字符串表达</returns>
-        public string TypeString => typeStrings[type];
+        public string TypeString => TypeStrings[type];
 
         /// <summary>
         /// 获取结果类型的精确字符串表达
@@ -60,9 +60,9 @@ namespace top.riverelder.arkham.Code.Utils {
         public string ActualTypeString {
             get {
                 if (succeed) {
-                    return typeStrings[type];
+                    return TypeStrings[type];
                 }
-                return type == GreatFailure ? typeStrings[GreatFailure] : typeStrings[Failure];
+                return type == GreatFailure ? TypeStrings[GreatFailure] : TypeStrings[Failure];
             }
         }
 

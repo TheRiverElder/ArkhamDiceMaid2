@@ -95,17 +95,64 @@ namespace top.riverelder.arkham.Code.Commands {
             }
 
             switch (w.Type) {
-                case "肉搏": return CommitFight(env, source, target, weaponName);
-                case "投掷": return CommitFight(env, source, target, weaponName);
+                case "肉搏": return CommitFight(env, source, target, weaponName, result.result, result.type);
+                case "投掷": return CommitFight(env, source, target, weaponName, result.result, result.type);
                 case "射击": return CalculateDamage(env, source, target, weaponName);
             }
             
             return $"未知的武器类型：{w.Type}，只能是：肉搏、投掷、射击";
         }
 
-        static string CommitFight(DMEnv env, Investigator source, Investigator target, string weaponName) {
+        public static string FightBack(DMEnv env, Investigator target, string weaponName) {
+
+            Item selfWeapon = null;
+            if (weaponName != null) {
+                if (!target.Inventory.TryGetValue(weaponName, out selfWeapon)) {
+                    return $"未找到{target.Name}的{weaponName}";
+                }
+            } else {
+                selfWeapon = new Item("身体");
+            }
+
+            if (target.Fights.Count == 0) {
+                return "未找到打斗事件";
+            }
+            FightEvent fight = target.Fights.Dequeue();
+
+            if (!env.Sce.TryGetInvestigator(fight.SourceName, out Investigator source)) {
+                return $"未找到打斗来源：{fight.SourceName}";
+            }
+
+            Item oppositeWeapon = null;
+            if (fight.WeaponName != null) {
+                if (!source.Inventory.TryGetValue(fight.WeaponName, out oppositeWeapon)) {
+                    return $"未找到{source.Name}的{fight.WeaponName}";
+                }
+            } else {
+                oppositeWeapon = new Item("身体");
+            }
+
+            if (oppositeWeapon.Type != "肉搏") {
+                return oppositeWeapon + "不是肉搏武器，仅肉搏可反击！";
+            }
+
+            if (!target.Values.TryGet(oppositeWeapon.SkillName, out Value skill)) {
+                return $"未找到{target.Name}的{oppositeWeapon.SkillName}";
+            }
+
+            CheckResult result = skill.Check();
+            string r = "出现异常";
+            if (result.succeed && result.type < fight.ResultType) {
+                r = $"{target.Name}反击成功{source.Name}({result.ActualTypeString}{result.result} < {CheckResult.TypeStrings[fight.ResultType]}{fight.Points})！\n" + CalculateDamage(env, target, source, weaponName);
+            } else {
+                r = $"{target.Name}反击失败\n" + CalculateDamage(env, source, target, fight.WeaponName);
+            }
+            return r;
+        }
+
+        static string CommitFight(DMEnv env, Investigator source, Investigator target, string weaponName, int points, int resultType) {
             string wName = string.IsNullOrEmpty(weaponName) ? "肉体" : weaponName;
-            target.Fights.Enqueue(new FightEvent(source.Name, target.Name, weaponName));
+            target.Fights.Enqueue(new FightEvent(source.Name, target.Name, weaponName, points, resultType));
             env.Save();
             return $"{source.Name}使用{wName}对{target.Name}发起了攻击";
         }
@@ -167,8 +214,11 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 Literal<DMEnv>("闪避").Executes((env, args, dict) => Dodge(env, env.Inv))
-            //).Then(
-            //    Literal<DMEnv>("反击").Executes((env, args, dict) => DodgeFight(env, env.Inv))
+            ).Then(
+                Literal<DMEnv>("反击").Executes((env, args, dict) => FightBack(env, env.Inv, null))
+                .Then(
+                    String<DMEnv>("武器名").Executes((env, args, dict) => FightBack(env, env.Inv, args.GetStr("武器名")))
+                )
             //).Then(
             //    Literal<DMEnv>("战技").Executes((env, args, dict) => DodgeFight(env, env.Inv))
             //).Then(
@@ -181,6 +231,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
             dispatcher.SetAlias("攻击", "战斗 攻击");
             dispatcher.SetAlias("闪避", "战斗 闪避");
+            dispatcher.SetAlias("反击", "战斗 反击");
         }
     }
 }
