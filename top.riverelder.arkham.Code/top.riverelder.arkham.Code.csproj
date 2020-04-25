@@ -81,6 +81,7 @@
     <Compile Include="Commands\Command_SanCheck.cs" />
     <Compile Include="Commands\Command_SetPrefix.cs" />
     <Compile Include="Commands\Command_Spell.cs" />
+    <Compile Include="Commands\Command_Sudo.cs" />
     <Compile Include="Commands\Command_Value.cs" />
     <Compile Include="Commands\Command_Control.cs" />
     <Compile Include="Event_CqAppEnable.cs" />

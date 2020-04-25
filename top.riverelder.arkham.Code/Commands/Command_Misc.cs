@@ -59,7 +59,7 @@ namespace top.riverelder.arkham.Code.Commands {
             int con = 0;
             foreach (string key in Params) {
                 if (inv.Values.TryGet(key, out Value value)) {
-                    con += (int)(p * Math.Min(1.0f, value.Val / (float)(value.Max > 0 ? value.Max : 100)));
+                    con += (int)(p * Math.Min(1.0f, value.Val / (value.Max > 0f ? value.Max : 100f)));
                     if (con % 2 == 1) {
                         con ^= value.Val;
                     } else {
@@ -79,6 +79,13 @@ namespace top.riverelder.arkham.Code.Commands {
                 sb.Append(s);
             }
             return sb.ToString();
+        }
+
+        public static string SendClaps(Dice times) {
+            if (times == null) {
+                times = Dice.Of("1d5");
+            }
+            return Repeat(Clap, times.Roll());
         }
 
         private static int Seed = (int)DateTime.Now.Ticks;
@@ -106,13 +113,6 @@ namespace top.riverelder.arkham.Code.Commands {
             "森中琴亨门伦温昆延岑宾平丁廷金津辛欣钦明林英青昂邦庞唐汤冈康冯方" +
             "藏琼杭芒农朗旺匡仓翁蓬东栋通贡孔丰宗松雄洪蒙隆龙荣聪邓滕",
         };
-
-        public static string SendClaps(Dice times) {
-            if (times == null) {
-                times = Dice.Of("1d5");
-            }
-            return Repeat(Clap, times.Roll());
-        }
         
         public static string MakeName(string dict, int len) {
             dict = dict ?? "武侠";
@@ -152,7 +152,7 @@ namespace top.riverelder.arkham.Code.Commands {
                         .Executes((env, args, dict) => MakeName(args.GetStr("字集"), args.GetInt("长度")))
                     )
                 ).Then(
-                    Literal<DMEnv>("字集").Executes((env, args, dict) => string.Join("", NameLetterSet.Keys))
+                    Literal<DMEnv>("字集").Executes((env, args, dict) => string.Join("，", NameLetterSet.Keys))
                 )
             );
 

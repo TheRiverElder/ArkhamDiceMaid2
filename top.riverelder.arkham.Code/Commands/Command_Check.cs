@@ -28,10 +28,15 @@ namespace top.riverelder.arkham.Code.Commands {
                     PresetNodes.Or<DMEnv>("难度", "普通", "困难", "极难")
                     .Handles(PreProcesses.Mapper<DMEnv>(hardnessMap))
                     .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), args.GetInt("难度")))
+                    .Then(
+                        PresetNodes.Or<DMEnv>("奖惩", "奖励", "惩罚")
+                        .Handles(PreProcesses.Mapper<DMEnv>(twiceMap))
+                        .Executes((env, args, dict) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩"), args.GetInt("难度")))
+                    )
                 ).Then(
                     PresetNodes.Or<DMEnv>("奖惩", "奖励", "惩罚")
                     .Handles(PreProcesses.Mapper<DMEnv>(twiceMap))
-                    .Executes((env, args, dict) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩")))
+                    .Executes((env, args, dict) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩"), CheckResult.NormalSuccess))
                 ).Then(
                     PresetNodes.Literal<DMEnv>("对抗").Then(
                         PresetNodes.String<DMEnv>("对手名")
@@ -80,10 +85,10 @@ namespace top.riverelder.arkham.Code.Commands {
                 .ToString();
         }
 
-        public string TwiceCheck(Investigator inv, string valueName, bool isBonus) {
+        public string TwiceCheck(Investigator inv, string valueName, bool isBonus, int hardness) {
             Value value = inv.Values[valueName];
-            CheckResult bigger = value.Check();
-            CheckResult smaller = value.Check();
+            CheckResult bigger = value.Check(hardness);
+            CheckResult smaller = value.Check(hardness);
             if (bigger.result < smaller.result) {
                 CheckResult tmp = bigger;
                 bigger = smaller;

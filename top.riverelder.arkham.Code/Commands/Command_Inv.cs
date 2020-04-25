@@ -32,7 +32,7 @@ namespace top.riverelder.arkham.Code.Commands {
             builder
                 .Append("体格：").Append(inv.Build)
                 .Append("伤害加值：").AppendLine(inv.DamageBonus);
-            
+
             foreach (string key in inv.Values.Names) {
                 if (inv.Values.TryWidelyGet(key, out Value value)) {
                     builder.AppendFormat("{0}:{1} ", key, value);
@@ -42,6 +42,22 @@ namespace top.riverelder.arkham.Code.Commands {
             sce.Control(env.SelfId, inv.Name);
             env.Save();
             return builder.ToString();
+        }
+
+
+        public static string DestoryInv(DMEnv env, string name) {
+            Scenario sce = env.Sce;
+
+            if (!sce.AdminList.Contains(env.SelfId)) {
+                return "你不是管理员！";
+            } else if (!sce.ExistInvestigator(name)) {
+                return "不存在调查员：" + name;
+            }
+            sce.PlayerNames.Remove(env.SelfId);
+            sce.Investigators.Remove(name);
+            
+            env.Save();
+            return "成功销毁：" + name + "，TA永远地消失了……";
         }
 
         public static string ReCalc(DMEnv env, Investigator inv) {
@@ -84,6 +100,15 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 )
             ).Then(
+                PresetNodes.Literal<DMEnv>("销毁").Then(
+                    PresetNodes.String<DMEnv>("名称")
+                    .Executes((env, args, dict) => "销毁人物卡需要操作者是管理员，并且需要加上“强制”参数！")
+                    .Then(
+                        PresetNodes.Literal<DMEnv>("强制")
+                        .Executes((env, args, dict) => DestoryInv(env, args.GetStr("名称")))
+                    )
+                )
+            ).Then(
                 PresetNodes.Literal<DMEnv>("重算")
                 .Handles(Extensions.ExistSelfInv())
                 .Executes((env, args, dict) => ReCalc(env, env.Inv))
@@ -102,6 +127,7 @@ namespace top.riverelder.arkham.Code.Commands {
             );
 
             dispatcher.SetAlias("车卡", "人物卡 新建");
+            dispatcher.SetAlias("撕卡", "人物卡 销毁");
             dispatcher.SetAlias("重算", "人物卡 重算");
         }
     }

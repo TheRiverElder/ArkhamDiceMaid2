@@ -12,6 +12,8 @@ namespace top.riverelder.arkham.Code.Model
 
         public string Name { get; set; } = "未命名模组";
 
+        public HashSet<long> AdminList = new HashSet<long>();
+
         public Dictionary<long, string> PlayerNames = new Dictionary<long, string>();
 
         public Dictionary<string, Investigator> Investigators = new Dictionary<string, Investigator>();
