@@ -24,6 +24,8 @@ namespace top.riverelder.arkham.Code.Commands {
                 PresetNodes.String<DMEnv>("指令名")
                 .Executes((env, args, dict) => PrintHelp(args.GetStr("指令名")))
             );
+
+            dispatcher.SetAlias("模板", "帮助 模板");
         }
 
         public static string PrintAllHelp() {
