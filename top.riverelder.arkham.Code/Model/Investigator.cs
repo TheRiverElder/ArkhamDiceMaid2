@@ -29,7 +29,7 @@ namespace top.riverelder.arkham.Code.Model {
         /// <summary>
         /// 物品栏
         /// </summary>
-        public Inventory Inventory { get; } = new Inventory();
+        public Dictionary<string, Item> Inventory { get; } = new Dictionary<string, Item>();
 
         /// <summary>
         /// 角色的战斗事件

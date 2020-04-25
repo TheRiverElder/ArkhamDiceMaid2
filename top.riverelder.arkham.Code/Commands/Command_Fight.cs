@@ -78,7 +78,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
             Item w = null;
             if (weaponName != null) {
-                if (!source.Inventory.TryGet(weaponName, out w)) {
+                if (!source.Inventory.TryGetValue(weaponName, out w)) {
                     return $"未找到{source.Name}武器：{weaponName}";
                 }
             } else {
@@ -113,7 +113,7 @@ namespace top.riverelder.arkham.Code.Commands {
         static string CalculateDamage(DMEnv env, Investigator source, Investigator target, string weaponName) {
             Item w = null;
             if (weaponName != null) {
-                if (!source.Inventory.TryGet(weaponName, out w)) {
+                if (!source.Inventory.TryGetValue(weaponName, out w)) {
                     return $"未找到{source.Name}武器：{weaponName}";
                 }
             } else {

@@ -21,7 +21,7 @@ namespace top.riverelder.arkham.Code.Commands {
             StringBuilder sb = new StringBuilder();
             if (dict.TryGet("技能名", out string sn)) sb.AppendLine().Append("技能名：").Append(item.SkillName = sn);
             if (dict.TryGet("类型", out string t)) sb.AppendLine().Append("类型：").Append(item.Type = t);
-            if (dict.TryGet("伤害", out string d)) sb.AppendLine().Append("伤害：").Append(item.Damage = d);
+            if (dict.TryGet("伤害", out Dice d)) sb.AppendLine().Append("伤害：").Append(item.Damage = d.ToString());
             if (dict.TryGet("穿刺", out bool i)) sb.AppendLine().Append("穿刺：").Append(item.Impale = i);
             if (dict.TryGet("连发数", out int mc)) sb.AppendLine().Append("连发数：").Append(item.MaxCount = mc);
             if (dict.TryGet("弹匣", out int c)) sb.AppendLine().Append("弹匣：").Append(item.Capacity = c);
@@ -33,20 +33,20 @@ namespace top.riverelder.arkham.Code.Commands {
 
         string CreateItem(DMEnv env, string name, Args dict) {
             Investigator inv = env.Inv;
-            if (inv.Inventory.Has(name)) {
+            if (inv.Inventory.ContainsKey(name)) {
                 return $"{inv.Name}的物品栏中已经存在{name}，请重命名";
             }
             Item item = new Item(name);
             string ret = $"{inv.Name}创造了物品：{name}" + FillWeaponInfo(item, dict);
 
-            inv.Inventory.Put(item);
+            inv.Inventory[name] = item;
             env.Save();
             return ret;
         }
 
         string DestoryItem(DMEnv env, string name) {
             Investigator inv = env.Inv;
-            if (!inv.Inventory.Has(name)) {
+            if (!inv.Inventory.ContainsKey(name)) {
                 return $"未找到{inv.Name}的{name}";
             }
             inv.Inventory.Remove(name);
@@ -62,7 +62,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (sce.Desk.ContainsKey(newName)) {
                 return $"桌子上已有物品：{newName}，请重命名";
             }
-            if (!inv.Inventory.TryGet(name, out Item item)) {
+            if (!inv.Inventory.TryGetValue(name, out Item item)) {
                 return $"{inv.Name}的物品栏中不存在{name}";
             }
             inv.Inventory.Remove(name);
@@ -80,11 +80,11 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!sce.Desk.TryGetValue(name, out Item item)) {
                 return $"桌子上没有物品：{name}";
             }
-            if (inv.Inventory.Has(newName)) {
+            if (inv.Inventory.ContainsKey(newName)) {
                 return $"{inv.Name}的物品栏中已经存在{newName}，请重命名";
             }
             item.Name = newName;
-            inv.Inventory.Put(item);
+            inv.Inventory[item.Name] = item;
             sce.Desk.Remove(name);
             env.Save();
             return $"{inv.Name}拾取了：{name}";
@@ -95,14 +95,14 @@ namespace top.riverelder.arkham.Code.Commands {
                 newName = name;
             }
             Investigator inv = env.Inv;
-            if (!inv.Inventory.TryGet(name, out Item item)) {
+            if (!inv.Inventory.TryGetValue(name, out Item item)) {
                 return $"{inv.Name}的物品栏中不存在{name}";
             }
             string wiChanges = FillWeaponInfo(item, dict);
             if (!string.Equals(name, newName)) {
                 inv.Inventory.Remove(name);
                 item.Name = newName;
-                inv.Inventory.Put(item);
+                inv.Inventory[item.Name] = (item);
                 env.Save();
                 return $"{inv.Name}重命名了物品：{name} => {newName}";
             } else {
@@ -113,7 +113,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
         string LoadBullets(DMEnv env, string name, Dice amount) {
             Investigator inv = env.Inv;
-            if (!inv.Inventory.TryGet(name, out Item item)) {
+            if (!inv.Inventory.TryGetValue(name, out Item item)) {
                 return $"{inv.Name}的物品栏中不存在{name}";
             }
             int left = item.Capacity - item.CurrentLoad;
@@ -130,8 +130,8 @@ namespace top.riverelder.arkham.Code.Commands {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             DictMapper mapper = new DictMapper()
                 .Then("技能名", new StringParser())
-                .Then("技能值", new IntParser())
-                .Then("伤害", new StringParser())
+                .Then("类型", new OrParser(new string[] { "肉搏", "投掷", "射击" }))
+                .Then("伤害", new DiceParser())
                 .Then("穿刺", new BoolParser("是", "否"), true)
                 .Then("连发数", new IntParser())
                 .Then("弹匣", new IntParser())

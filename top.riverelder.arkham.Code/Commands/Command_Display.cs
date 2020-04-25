@@ -21,7 +21,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 return $"{inv.Name}没有物品";
             }
             if (!string.IsNullOrEmpty(itemName)) {
-                if (inv.Inventory.TryGet(itemName, out Item it)) {
+                if (inv.Inventory.TryGetValue(itemName, out Item it)) {
                     StringBuilder b = new StringBuilder().AppendLine($"{inv.Name}的 {itemName}：");
                     b
                         .Append("技能名：").AppendLine(it.SkillName)
@@ -39,7 +39,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 }
             }
             StringBuilder sb = new StringBuilder().Append($"{inv.Name}的物品：");
-            foreach (Item item in inv.Inventory.Items) {
+            foreach (Item item in inv.Inventory.Values) {
                 sb.AppendLine().Append(item.Name);
             }
             return sb.ToString();
