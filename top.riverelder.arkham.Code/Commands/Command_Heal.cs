@@ -26,14 +26,14 @@ namespace top.riverelder.arkham.Code.Commands {
             sb.Append(cr.TypeString);
             if (cr.succeed) {
                 int r = dice.Roll();
-                sb.AppendLine().Append($"{target.Name}的体力：{prev} + {r} => {health.Add(r)}");
+                sb.AppendLine().Append($"{target.Name}的体力：{prev} + {r}({dice.ToString()}) => {health.Add(r)}");
                 SaveUtil.Save(scenario);
             }
             return sb.ToString();
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            dispatcher.Register("医疗")
+            dispatcher.Register("治疗")
             .Then(
                 PresetNodes.String<DMEnv>("技能名")
                 .Handles(Extensions.ExistSelfValue())
@@ -48,8 +48,8 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             );
 
-            dispatcher.SetAlias("医学", "医疗 医学");
-            dispatcher.SetAlias("急救", "医疗 急救");
+            dispatcher.SetAlias("医学", "治疗 医学");
+            dispatcher.SetAlias("急救", "治疗 急救");
         }
     }
 }
