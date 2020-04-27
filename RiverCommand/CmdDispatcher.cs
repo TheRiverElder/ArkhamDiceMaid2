@@ -10,10 +10,12 @@ namespace top.riverelder.RiverCommand {
 
     public class CmdDispatcher<TEnv> {
 
+        private List<CommandNode<TEnv>> customActions = new List<CommandNode<TEnv>>();
         private Dictionary<string, string> aliases = new Dictionary<string, string>();
         private Dictionary<string, CommandNode<TEnv>> commands = new Dictionary<string, CommandNode<TEnv>>();
 
         public Dictionary<string, CommandNode<TEnv>> CommandMap => new Dictionary<string, CommandNode<TEnv>>(commands);
+
 
         public ICollection<CommandNode<TEnv>> Commands => commands.Values;
 
@@ -36,6 +38,10 @@ namespace top.riverelder.RiverCommand {
             return n;
         }
 
+        public void RegesterCustom(CommandNode<TEnv> node) {
+            customActions.Add(node);
+        }
+
         public void SetAlias(string alias, string replacement) {
             aliases[alias] = replacement;
         }
@@ -51,9 +57,15 @@ namespace top.riverelder.RiverCommand {
             reader.Cursor = 0;
             string head = reader.ReadToWhiteSpace();
             reader.Cursor = 0;
-            if (commands.TryGetValue(head, out CommandNode<TEnv> node)) {
-                return node.Dispatch(reader, env, new Args(), out reply) == DispatchResult.MatchedAll;
+            if (commands.TryGetValue(head, out CommandNode<TEnv> node) 
+                && node.Dispatch(reader, env, new Args(), out reply) == DispatchResult.MatchedAll) {
+                return true;
             } else {
+                foreach (var n in customActions) {
+                    if (n.Dispatch(reader, env, new Args(), out reply) == DispatchResult.MatchedAll) {
+                        return true;
+                    }
+                }
                 reply = "未知指令：" + head;
                 return false;
             }
