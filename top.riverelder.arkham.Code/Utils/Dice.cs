@@ -10,6 +10,10 @@ namespace top.riverelder.arkham.Code.Utils {
     public class Dice {
         private IList<DiceItem> items = new List<DiceItem>();
 
+        public static int Roll(int max) {
+            return DiceItem.random.Next(Math.Max(1, max));
+        }
+
         public static int Roll(string s) => RollWith(s, null);
 
         public static int RollWith(string s, string db) {
@@ -130,7 +134,8 @@ namespace top.riverelder.arkham.Code.Utils {
 
     class DiceItem {
 
-        static int seed = (int)DateTime.Now.Ticks;
+        public static Random random = new Random();
+        //static int seed = (int)DateTime.Now.Ticks;
 
         public const int TypeConstant = 0;
         public const int TypeRandom = 1;
@@ -158,7 +163,7 @@ namespace top.riverelder.arkham.Code.Utils {
             } else if (type == TypeDamageBonus) {
                 return sign * times * (string.IsNullOrEmpty(db) ? 0 : Dice.Roll(db));
             }
-            Random random = new Random(seed++);
+            //Random random = new Random(seed++);
             int sum = 0;
             for (int i = 0; i < times; i++) {
                 sum += random.Next(value) + 1;

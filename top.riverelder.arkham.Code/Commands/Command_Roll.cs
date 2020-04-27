@@ -15,8 +15,10 @@ namespace top.riverelder.arkham.Code.Commands {
         public string Usage => "投掷 <骰子>";
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            dispatcher.Register("投掷").Then(
-                Extensions.Dice("骰子").Executes((env, args, dict) => Roll(args.GetDice("骰子")))
+            dispatcher.Register("投掷")
+            .Executes((env, args, dict) => Roll(env, Dice.Of("1d100")))
+            .Then(
+                Extensions.Dice("骰子").Executes((env, args, dict) => Roll(env, args.GetDice("骰子")))
             ).Rest(
                 PresetNodes.String<DMEnv>("选项组")
                 .Handles(Extensions.ConvertObjectArrayToStringArray())
@@ -24,13 +26,17 @@ namespace top.riverelder.arkham.Code.Commands {
             );
         }
 
-        public static string Roll(Dice dice) {
-            return $"{dice.ToString()} = {dice.Roll()}";
+        public static string Roll(DMEnv env, Dice dice) {
+            if (env.TryGetInv(out Scenario sce, out Investigator inv)) {
+                return $"{dice.ToString()} => {dice.RollWith(inv.DamageBonus)}";
+            } else {
+                return $"{dice.ToString()} => {dice.Roll()}";
+            }
         }
 
         public static string Choose(string[] results) {
             if (results.Length > 0) {
-                int index = Dice.Roll("1d" + results.Length) - 1;
+                int index = Dice.Roll(results.Length) - 1;
                 if (index >= 0 && index < results.Length) {
                     return results[index];
                 } else {
