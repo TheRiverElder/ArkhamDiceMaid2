@@ -97,7 +97,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!string.IsNullOrEmpty(tlsn) && inv.Values.TryGet(tlsn, out Value lv)) {
                 con ^= lv.Val;
             }
-            return Math.Abs((int)((con ^ p) / (float)p)) * 10;
+            return Math.Abs((int)((con ^ p) / (float)p * 10));
         }
 
         public static string Repeat(string s, int times) {

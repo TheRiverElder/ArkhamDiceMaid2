@@ -6,13 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace top.riverelder.arkham.Code.Model
-{
+namespace top.riverelder.arkham.Code.Model {
     /// <summary>
     /// 值集合，用于管理值
     /// </summary>
-    public class ValueSet
-    {
+    public class ValueSet {
         public Dictionary<string, Value> values = new Dictionary<string, Value>();
         public Dictionary<string, string> aliases = new Dictionary<string, string>();
 
@@ -24,14 +22,11 @@ namespace top.riverelder.arkham.Code.Model
         /// </summary>
         /// <param name="name">名字</param>
         /// <returns>判断结果</returns>
-        public bool Has(string name)
-        {
-            if (values.ContainsKey(name))
-            {
+        public bool Has(string name) {
+            if (values.ContainsKey(name)) {
                 return true;
             }
-            if (!aliases.TryGetValue(name, out string alias))
-            {
+            if (!aliases.TryGetValue(name, out string alias)) {
                 return false;
             }
             return values.ContainsKey(alias);
@@ -43,14 +38,11 @@ namespace top.riverelder.arkham.Code.Model
         /// <param name="name">名字</param>
         /// <param name="val">结果</param>
         /// <returns>是否成功</returns>
-        public bool TryGet(string name, out Value val)
-        {
-            if(values.TryGetValue(name, out val))
-            {
+        public bool TryGet(string name, out Value val) {
+            if (values.TryGetValue(name, out val)) {
                 return true;
             }
-            if (aliases.TryGetValue(name, out string alias))
-            {
+            if (aliases.TryGetValue(name, out string alias)) {
                 return values.TryGetValue(alias, out val);
             }
             return false;
@@ -88,8 +80,7 @@ namespace top.riverelder.arkham.Code.Model
         /// 设置值
         /// </summary>
         /// <param name="val">值</param>
-        public void Put(string name, Value val)
-        {
+        public void Put(string name, Value val) {
             values[name] = val;
         }
 
@@ -98,30 +89,24 @@ namespace top.riverelder.arkham.Code.Model
         /// </summary>
         /// <param name="name">主名</param>
         /// <param name="als">别名</param>
-        public void Set(string name, params string[] als)
-        {
-            foreach (string alias in als)
-            {
+        public void Set(string name, params string[] als) {
+            foreach (string alias in als) {
                 aliases[alias] = name;
             }
         }
 
-        public ValueSet Copy()
-        {
+        public ValueSet Copy() {
             ValueSet set = new ValueSet();
-            foreach (KeyValuePair<string, Value> pair in values.AsEnumerable())
-            {
+            foreach (KeyValuePair<string, Value> pair in values.AsEnumerable()) {
                 set.values[pair.Key] = pair.Value.Copy();
             }
-            foreach (KeyValuePair<string, string> pair in aliases.AsEnumerable())
-            {
+            foreach (KeyValuePair<string, string> pair in aliases.AsEnumerable()) {
                 set.aliases[pair.Key] = pair.Value;
             }
             return set;
         }
 
-        public void Clear()
-        {
+        public void Clear() {
             values.Clear();
             aliases.Clear();
         }
@@ -130,14 +115,11 @@ namespace top.riverelder.arkham.Code.Model
         /// 填充模板中的所有属性与别名，会覆盖已有属性
         /// </summary>
         /// <param name="tmp">用来填充的模板</param>
-        public void FillWith(ValueSet tmp)
-        {
-            foreach (KeyValuePair<string, Value> pair in tmp.values.AsEnumerable())
-            {
+        public void FillWith(ValueSet tmp) {
+            foreach (KeyValuePair<string, Value> pair in tmp.values.AsEnumerable()) {
                 values[pair.Key] = pair.Value.Copy();
             }
-            foreach (KeyValuePair<string, string> pair in tmp.aliases.AsEnumerable())
-            {
+            foreach (KeyValuePair<string, string> pair in tmp.aliases.AsEnumerable()) {
                 aliases[pair.Key] = pair.Value;
             }
         }
