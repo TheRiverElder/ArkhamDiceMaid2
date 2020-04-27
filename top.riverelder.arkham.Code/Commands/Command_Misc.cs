@@ -21,11 +21,38 @@ namespace top.riverelder.arkham.Code.Commands {
             .AppendLine(Repeat(Clap, 8))
             .AppendLine("|        " + Face + "        |")
             .AppendLine("|        🥇        |")
-            .AppendLine(Clap + "{1}" + Clap)
-            .AppendLine(Clap + "{2}" + Clap)
+            .AppendLine(Clap + "    {1}    " + Clap)
+            .AppendLine(Clap + "    {2}    " + Clap)
             .AppendLine(Repeat(Clap, 8))
             .Append("让我们再次把热烈的掌声送给他")
             .ToString();
+
+        public static string ListLuck(Scenario sce) {
+            Dictionary<string, int> lucks = new Dictionary<string, int>();
+
+            long seed = DateTime.Today.Ticks;
+            int p = (int)seed;
+            string tlsn = GetTodayLuckySkillName(seed);
+            foreach (Investigator inv in sce.Investigators.Values) {
+                lucks[inv.Name] = CalcLuck(inv, p, tlsn);
+            }
+            List<string> list = new List<string>(lucks.Keys);
+            list.Sort((a, b) => lucks[b] - lucks[a]);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < list.Count; i++) {
+                if (i > 0) {
+                    sb.AppendLine();
+                }
+                string indexStr = Convert.ToString(i + 1) + '.';
+                switch (i + 1) {
+                    case 1: indexStr = "🥇"; break;
+                    case 2: indexStr = "🥈"; break;
+                    case 3: indexStr = "🥉"; break;
+                }
+                sb.Append(indexStr).Append(list[i]).Append('(').Append(lucks[list[i]]).Append(')');
+            }
+            return sb.ToString();
+        }
 
         public static string LuckyOneOfDay(Scenario sce) {
             Investigator luckOne = null;
@@ -70,7 +97,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!string.IsNullOrEmpty(tlsn) && inv.Values.TryGet(tlsn, out Value lv)) {
                 con ^= lv.Val;
             }
-            return (int)(Math.Abs(con ^ p) / (float)p);
+            return Math.Abs((int)((con ^ p) / (float)p)) * 10;
         }
 
         public static string Repeat(string s, int times) {
@@ -134,7 +161,11 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("杂项").Then(
                 Literal<DMEnv>("今日幸运儿")
                 .Handles(Extensions.ExistSce())
-                .Executes((env, args ,dict) => LuckyOneOfDay(env.Sce))
+                .Executes((env, args, dict) => LuckyOneOfDay(env.Sce))
+            ).Then(
+                Literal<DMEnv>("幸运儿")
+                .Handles(Extensions.ExistSce())
+                .Executes((env, args, dict) => ListLuck(env.Sce))
             ).Then(
                 Literal<DMEnv>("鼓掌")
                 .Executes((env, args, dict) => SendClaps(null))
@@ -157,6 +188,7 @@ namespace top.riverelder.arkham.Code.Commands {
             );
 
             dispatcher.SetAlias("今日幸运儿", "杂项 今日幸运儿");
+            dispatcher.SetAlias("幸运儿", "杂项 幸运儿");
             dispatcher.SetAlias("鼓掌", "杂项 鼓掌");
             dispatcher.SetAlias("取名", "杂项 取名");
         }
