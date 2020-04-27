@@ -38,7 +38,7 @@ namespace top.riverelder.RiverCommand {
             return n;
         }
 
-        public void RegesterCustom(CommandNode<TEnv> node) {
+        public void RegisterCustom(CommandNode<TEnv> node) {
             customActions.Add(node);
         }
 
@@ -57,18 +57,22 @@ namespace top.riverelder.RiverCommand {
             reader.Cursor = 0;
             string head = reader.ReadToWhiteSpace();
             reader.Cursor = 0;
-            if (commands.TryGetValue(head, out CommandNode<TEnv> node) 
-                && node.Dispatch(reader, env, new Args(), out reply) == DispatchResult.MatchedAll) {
-                return true;
-            } else {
-                foreach (var n in customActions) {
-                    if (n.Dispatch(reader, env, new Args(), out reply) == DispatchResult.MatchedAll) {
-                        return true;
-                    }
+            string err = null;
+            if (commands.TryGetValue(head, out CommandNode<TEnv> node)) { 
+                if (node.Dispatch(reader, env, new Args(), out string rp) == DispatchResult.MatchedAll) {
+                    reply = rp;
+                    return true;
+                } else {
+                    err = rp;
                 }
-                reply = "未知指令：" + head;
-                return false;
             }
+            foreach (var n in customActions) {
+                if (n.Dispatch(reader, env, new Args(), out reply) == DispatchResult.MatchedAll) {
+                    return true;
+                }
+            }
+            reply = err;
+            return false;
         }
     }
 }

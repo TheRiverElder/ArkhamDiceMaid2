@@ -10,6 +10,8 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public string Usage => "检定 <数值名> [普通|困难|极难|对抗|奖励|惩罚] [对手名] [对抗数值名]";
 
+        public static CommandNode<DMEnv> MainAction = null;
+
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             IDictionary<object, object> hardnessMap = new Dictionary<object, object> {
                 ["普通"] = CheckResult.NormalSuccess,
@@ -21,7 +23,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 ["惩罚"] = false,
             };
             dispatcher.Register("检定").Then(
-                PresetNodes.String<DMEnv>("数值名")
+                MainAction = PresetNodes.String<DMEnv>("数值名")
                 .Handles(Extensions.ExistSelfValue())
                 .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), CheckResult.NormalSuccess))
                 .Then(

@@ -20,10 +20,9 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             Value skill = inv.Values[valueName];
             StringBuilder sb = new StringBuilder();
-            sb.Append($"{inv.Name}检定{valueName}({skill.Val})：");
             int prev = health.Val;
             CheckResult cr = skill.Check();
-            sb.Append(cr.TypeString);
+            sb.Append($"{inv.Name}的{valueName}({skill.Val}) => {cr.result}，{cr.ActualTypeString}");
             if (cr.succeed) {
                 int r = dice.Roll();
                 sb.AppendLine().Append($"{target.Name}的体力：{prev} + {r}({dice.ToString()}) => {health.Add(r)}");

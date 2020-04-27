@@ -24,6 +24,8 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Handles(Extensions.ConvertObjectArrayToStringArray())
                 .Executes((env, args, dict) => Choose(args.Get<string[]>("选项组")))
             );
+
+            dispatcher.SetAlias("r", "投掷");
         }
 
         public static string Roll(DMEnv env, Dice dice) {
