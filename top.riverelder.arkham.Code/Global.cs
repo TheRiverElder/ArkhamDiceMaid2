@@ -108,6 +108,7 @@ namespace top.riverelder.arkham.Code {
             Dispatcher.Register(new Command_Spell());
             Dispatcher.Register(new Command_Status());
             Dispatcher.Register(new Command_Value());
+
             Dispatcher.Register(new Command_Custom());
         }
     }

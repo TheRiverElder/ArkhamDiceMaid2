@@ -58,13 +58,15 @@ namespace top.riverelder.arkham.Code.Commands {
                 return $"未找到打斗来源：{fight.SourceName}";
             }
 
-            if (!inv.Values.TryGet("敏捷", out Value dex)) {
-                return $"未找到{inv.Name}的敏捷属性";
+            if (!inv.Values.TryGet("闪避", out Value dodge)) {
+                if (!inv.Values.TryGet("敏捷", out Value dex)) {
+                    return $"未找到{inv.Name}的闪避或敏捷属性";
+                }
+                dodge = new Value(dex.Val / 2);
             }
-            Value dodge = new Value(dex.Val / 2);
 
             CheckResult result = dodge.Check();
-            if (result.succeed) {
+            if (result.succeed && result.type <= fight.ResultType) {
                 env.Save();
                 return $"{inv.Name}躲开了{source.Name}的攻击";
             } else {
@@ -187,10 +189,10 @@ namespace top.riverelder.arkham.Code.Commands {
                         san = new Value(50);
                     }
                     CheckResult cr = san.Check();
-                    sb.AppendLine().Append($"失血过半，检定意志({san.Val})：");
+                    sb.AppendLine().Append("失血过半，检定意志：");
                     sb.Append($"结果：{cr.result}");
                     if (cr.succeed) {
-                        sb.Append($"成功挺住");
+                        sb.Append("成功挺住");
                     } else {
                         sb.Append($"{target.Name}昏厥");
                     }

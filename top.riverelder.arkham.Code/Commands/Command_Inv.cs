@@ -71,6 +71,24 @@ namespace top.riverelder.arkham.Code.Commands {
                 .ToString();
         }
 
+        public static string AddTags(DMEnv env, Investigator inv, string[] tags) {
+            foreach (string tag in tags) {
+                inv.Tags.Add(tag.ToUpper());
+            }
+            env.Save();
+
+            return inv.Name + "添加了标签：" + string.Join("、", tags);
+        }
+
+        public static string RemoveTags(DMEnv env, Investigator inv, string[] tags) {
+            foreach (string tag in tags) {
+                inv.Tags.Remove(tag.ToUpper());
+            }
+            env.Save();
+
+            return inv.Name + "移除了标签：" + string.Join("、", tags);
+        }
+
         public static string SetDB(DMEnv env, Investigator inv, Dice db) {
             inv.DamageBonus = db.ToString();
             env.Save();
@@ -124,11 +142,31 @@ namespace top.riverelder.arkham.Code.Commands {
                     Extensions.Dice("数值")
                     .Executes((env, args, dict) => SetDB(env, env.Inv, args.GetDice("数值")))
                 )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("标记")
+                .Handles(Extensions.ExistSelfInv())
+                .Then(
+                    PresetNodes.Literal<DMEnv>("添加")
+                    .Rest(
+                        PresetNodes.String<DMEnv>("标签")
+                        .Handles(Extensions.ConvertObjectArrayToStringArray())
+                        .Executes((env, args, dict) => AddTags(env, env.Inv, args.Get<string[]>("标签")))
+                    )
+                ).Then(
+                    PresetNodes.Literal<DMEnv>("移除")
+                    .Rest(
+                        PresetNodes.String<DMEnv>("标签")
+                        .Handles(Extensions.ConvertObjectArrayToStringArray())
+                        .Executes((env, args, dict) => RemoveTags(env, env.Inv, args.Get<string[]>("标签")))
+                    )
+                )
             );
 
             dispatcher.SetAlias("车卡", "人物卡 新建");
             dispatcher.SetAlias("撕卡", "人物卡 销毁");
             dispatcher.SetAlias("重算", "人物卡 重算");
+            dispatcher.SetAlias("标记", "人物卡 标记 添加");
+            dispatcher.SetAlias("反标", "人物卡 标记 移除");
         }
     }
 }

@@ -17,7 +17,7 @@ namespace top.riverelder.arkham.Code.Commands {
         public static string OrderByValue(Scenario scenario, string[] invNames, string valueName) {
             IList<string> notFoundNames = new List<string>();
             IList<string> notFoundValues = new List<string>();
-            IDictionary<string, int> map = new Dictionary<string, int>();
+            IDictionary<Investigator, int> map = new Dictionary<Investigator, int>();
 
             foreach (string name in invNames) {
                 Match m = Regex.Match(name, @"[+-]\d+$");
@@ -29,7 +29,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 }
                 if (scenario.TryGetInvestigator(invName, out Investigator inv)) {
                     if (inv.Values.TryGet(valueName, out Value value)) {
-                        map[invName] = value.Val + fix;
+                        map[inv] = value.Val + fix;
                     } else {
                         notFoundValues.Add(invName);
                     }
@@ -41,10 +41,15 @@ namespace top.riverelder.arkham.Code.Commands {
             StringBuilder sb = new StringBuilder();
 
             if (map.Count > 0) {
-                List<string> list = new List<string>(map.Keys);
+                List<Investigator> list = new List<Investigator>(map.Keys);
                 list.Sort((a, b) => map[b] - map[a]);
-
-                sb.Append(string.Join(" > ", list.ToArray()));
+                for (int i = 0; i < list.Count; i++) {
+                    if (i > 0) {
+                        sb.Append(" > ");
+                    }
+                    Investigator inv = list[i];
+                    sb.Append(inv.Name).Append('(').Append(inv.Is("NPC") ? "???" : Convert.ToString(map[inv])).Append(')');
+                }
             }
             if (notFoundNames.Count > 0) {
                 sb.AppendLine().Append("未找到调查员：").Append(string.Join("、", notFoundNames));

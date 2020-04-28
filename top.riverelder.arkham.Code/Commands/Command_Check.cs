@@ -43,10 +43,20 @@ namespace top.riverelder.arkham.Code.Commands {
                     PresetNodes.Literal<DMEnv>("对抗").Then(
                         PresetNodes.String<DMEnv>("对手名")
                         .Handles(Extensions.ExistInv())
-                        .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名")))
+                        .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名"), false))
                         .Then(
                             PresetNodes.String<DMEnv>("对抗数值名")
-                            .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("对抗数值名")))
+                            .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("对抗数值名"), false))
+                        )
+                    )
+                ).Then(
+                    PresetNodes.Literal<DMEnv>("等级对抗").Then(
+                        PresetNodes.String<DMEnv>("对手名")
+                        .Handles(Extensions.ExistInv())
+                        .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名"), true))
+                        .Then(
+                            PresetNodes.String<DMEnv>("对抗数值名")
+                            .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("对抗数值名"), true))
                         )
                     )
                 ).Then(
@@ -56,22 +66,17 @@ namespace top.riverelder.arkham.Code.Commands {
             );
         }
 
-        public string RandomResult(string[] results) {
-            int index = Dice.Roll("1d" + results.Length) - 1;
-            return results[index];
-        }
-
-        public string SimpleCheckTo(Investigator inv, string valueName, string target) {
+        public static string SimpleCheckTo(Investigator inv, string valueName, string target) {
             CheckResult result = inv.Values[valueName].Check();
 
             return new StringBuilder()
                 .AppendLine($"{inv.Name}的{valueName}：")
-                .AppendLine($"({result.target}/{result.value}) => {result.result}，{result.ActualTypeString}")
+                .AppendLine(GenResultStr(inv, result, true))
                 .Append(result.succeed ? $"{inv.Name}把{target}给{valueName}了！" : "")
                 .ToString();
         }
 
-        public string SimpleCheck(Investigator inv, string valueName, int hardness) {
+        public static string SimpleCheck(Investigator inv, string valueName, int hardness) {
             CheckResult result = inv.Values[valueName].Check(hardness);
             string hardnessStr;
             switch (hardness) {
@@ -83,11 +88,11 @@ namespace top.riverelder.arkham.Code.Commands {
 
             return new StringBuilder()
                 .AppendLine($"{inv.Name}的{hardnessStr}{valueName}：")
-                .Append($"({result.target}/{result.value}) => {result.result}，{result.ActualTypeString}")
+                .Append(GenResultStr(inv, result, true))
                 .ToString();
         }
 
-        public string TwiceCheck(Investigator inv, string valueName, bool isBonus, int hardness) {
+        public static string TwiceCheck(Investigator inv, string valueName, bool isBonus, int hardness) {
             Value value = inv.Values[valueName];
             CheckResult bigger = value.Check(hardness);
             CheckResult smaller = value.Check(hardness);
@@ -99,28 +104,48 @@ namespace top.riverelder.arkham.Code.Commands {
             if (isBonus) {
                 return new StringBuilder()
                     .AppendLine($"{inv.Name}的奖励{valueName}：")
-                    .Append($"({smaller.value}) => {smaller.result}({bigger.result})，{smaller.ActualTypeString}")
+                    .Append(GenResultStr(inv, smaller, false) + $"({bigger.result})，" + smaller.ActualTypeString)
                     .ToString();
             } else {
                 return new StringBuilder()
                     .AppendLine($"{inv.Name}的惩罚{valueName}：")
-                    .Append($"({bigger.value}) => {bigger.result}({smaller.result})，{bigger.ActualTypeString}")
+                    .Append(GenResultStr(inv, bigger, false) + $"({smaller.result})，" + bigger.ActualTypeString)
                     .ToString();
             }
         }
 
-        public string CheckAgainst(Investigator inv, string valueName, Investigator target, string againstValueName) {
+        public static string CheckAgainst(Investigator inv, string valueName, Investigator target, string againstValueName, bool byLevel) {
             CheckResult selfResult = inv.Values[valueName].Check();
             if (!target.Values.TryWidelyGet(againstValueName, out Value againstValue)) {
                 return $"{target.Name}没有{againstValueName}";
             }
             CheckResult targetResult = againstValue.Check();
+            string resultStr = null;
+            if (byLevel) {
+                if (selfResult.type == targetResult.type) {
+                    resultStr = "平分秋色";
+                } else {
+                    resultStr = selfResult.type < targetResult.type ? "完胜" : "完败";
+                }
+            } else {
+                if (selfResult.result == targetResult.result) {
+                    resultStr = "平局";
+                } else {
+                    resultStr = selfResult.result < targetResult.result ? "胜利" : "失败";
+                }
+            }
             
             return new StringBuilder()
-                .AppendLine($"{inv.Name}的{valueName}：({selfResult.value}) => {selfResult.result}")
-                .AppendLine($"{target.Name}的{againstValueName}：({targetResult.value}) => {targetResult.result}")
-                .Append(inv.Name).Append('：').Append(selfResult.result <= targetResult.result ? "胜利" : "失败")
+                .AppendLine($"{inv.Name}的{valueName}：" + GenResultStr(inv, selfResult, false))
+                .AppendLine($"{target.Name}的{againstValueName}：" + GenResultStr(target, targetResult, false))
+                .Append(inv.Name).Append('：').Append(resultStr)
                 .ToString();
+        }
+
+        public static string GenResultStr(Investigator inv, CheckResult result, bool showResultTypeStr) {
+            return (inv.Is("NPC") ? "(???)" : $"({result.target}/{result.value})") +
+                $" => {result.result}" + 
+                (showResultTypeStr ? "，" + result.ActualTypeString : "");
         }
 
     }

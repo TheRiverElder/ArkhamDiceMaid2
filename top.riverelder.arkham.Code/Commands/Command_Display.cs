@@ -104,6 +104,10 @@ namespace top.riverelder.arkham.Code.Commands {
             return sb.ToString();
         }
 
+        public static string DisplayTags(Investigator inv) {
+            return inv.Name + (inv.Tags.Count == 0 ? "没有标签" : "的标签：" + string.Join("、", inv.Tags));
+        }
+
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("显示")
             .Handles(Extensions.ExistSelfInv())
@@ -129,6 +133,9 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Then(
                     String<DMEnv>("法术名").Executes((env, args, dict) => DisplaySpell(env.Sce, env.Inv, args.GetStr("法术名")))
                 )
+            ).Then(
+                Literal<DMEnv>("标签")
+                .Executes((env, args, dict) => DisplayTags(env.Inv))
             );
         }
     }

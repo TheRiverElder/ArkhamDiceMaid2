@@ -41,6 +41,11 @@ namespace top.riverelder.arkham.Code.Model {
         /// </summary>
         public HashSet<string> Spells = new HashSet<string>();
 
+        /// <summary>
+        /// 该人物的标签
+        /// </summary>
+        public HashSet<string> Tags = new HashSet<string>();
+
         public Investigator(string name, string desc) {
             Name = name;
             Desc = desc;
@@ -68,6 +73,10 @@ namespace top.riverelder.arkham.Code.Model {
             }
             err = null;
             return true;
+        }
+
+        public bool Is(string tag) {
+            return Tags.Contains(tag);
         }
     }
 }
