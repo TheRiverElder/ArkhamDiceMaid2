@@ -22,7 +22,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (dict.TryGet("技能名", out string sn)) sb.AppendLine().Append("技能名：").Append(item.SkillName = sn);
             if (dict.TryGet("类型", out string t)) sb.AppendLine().Append("类型：").Append(item.Type = t);
             if (dict.TryGet("伤害", out Dice d)) sb.AppendLine().Append("伤害：").Append(item.Damage = d.ToString());
-            if (dict.TryGet("穿刺", out bool i)) sb.AppendLine().Append("穿刺：").Append(item.Impale = i);
+            if (dict.TryGet("贯穿", out bool i)) sb.AppendLine().Append("贯穿：").Append((item.Impale = i) ? "是" : "否");
             if (dict.TryGet("连发数", out int mc)) sb.AppendLine().Append("连发数：").Append(item.MaxCount = mc);
             if (dict.TryGet("弹匣", out int c)) sb.AppendLine().Append("弹匣：").Append(item.Capacity = c);
             if (dict.TryGet("故障值", out int m)) sb.AppendLine().Append("故障值：").Append(item.Mulfunction = m);
@@ -132,7 +132,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Then("技能名", new StringParser())
                 .Then("类型", new OrParser(new string[] { "肉搏", "投掷", "射击" }))
                 .Then("伤害", new DiceParser())
-                .Then("穿刺", new BoolParser("是", "否"), true)
+                .Then("贯穿", new BoolParser("是", "否"), true)
                 .Then("连发数", new IntParser())
                 .Then("弹匣", new IntParser())
                 .Then("故障值", new IntParser())

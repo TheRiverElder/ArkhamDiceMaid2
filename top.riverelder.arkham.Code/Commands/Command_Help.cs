@@ -66,7 +66,7 @@ namespace top.riverelder.arkham.Code.Commands {
             .AppendLine().Append("技能名：斗殴")
             .AppendLine().Append("类型：肉搏")
             .AppendLine().Append("伤害：1d8+db")
-            .AppendLine().Append("穿刺：否")
+            .AppendLine().Append("贯穿：否")
             .AppendLine().Append("连发数：1")
             .AppendLine().Append("弹匣：1")
             .AppendLine().Append("故障值：100")

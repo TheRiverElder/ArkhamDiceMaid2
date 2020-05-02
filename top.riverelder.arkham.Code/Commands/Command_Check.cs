@@ -122,13 +122,17 @@ namespace top.riverelder.arkham.Code.Commands {
             CheckResult targetResult = againstValue.Check();
             string resultStr = null;
             if (byLevel) {
-                if (selfResult.type == targetResult.type) {
+                if (!selfResult.succeed) {
+                    resultStr = "完败";
+                } else if (selfResult.type == targetResult.type) {
                     resultStr = "平分秋色";
                 } else {
                     resultStr = selfResult.type < targetResult.type ? "完胜" : "完败";
                 }
             } else {
-                if (selfResult.result == targetResult.result) {
+                if (!selfResult.succeed) {
+                    resultStr = "失败";
+                } else if (selfResult.result == targetResult.result) {
                     resultStr = "平局";
                 } else {
                     resultStr = selfResult.result < targetResult.result ? "胜利" : "失败";

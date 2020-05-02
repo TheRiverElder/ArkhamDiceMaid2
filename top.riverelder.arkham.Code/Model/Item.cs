@@ -32,7 +32,7 @@ namespace top.riverelder.arkham.Code.Model {
         public string Damage { get; set; } = "1d3+db";
 
         /// <summary>
-        /// 是否能造成穿刺
+        /// 是否能造成贯穿
         /// </summary>
         public bool Impale { get; set; } = false;
 

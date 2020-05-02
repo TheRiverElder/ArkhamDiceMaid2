@@ -58,21 +58,26 @@ namespace top.riverelder.RiverCommand {
             string head = reader.ReadToWhiteSpace();
             reader.Cursor = 0;
             string err = null;
-            if (commands.TryGetValue(head, out CommandNode<TEnv> node)) { 
-                if (node.Dispatch(reader, env, new Args(), out string rp) == DispatchResult.MatchedAll) {
-                    reply = rp;
-                    return true;
-                } else {
-                    err = rp;
+            try {
+                if (commands.TryGetValue(head, out CommandNode<TEnv> node)) {
+                    if (node.Dispatch(reader, env, new Args(), out string rp) == DispatchResult.MatchedAll) {
+                        reply = rp;
+                        return true;
+                    } else {
+                        err = rp;
+                    }
                 }
-            }
-            foreach (var n in customActions) {
-                if (n.Dispatch(reader, env, new Args(), out reply) == DispatchResult.MatchedAll) {
-                    return true;
+                foreach (var n in customActions) {
+                    if (n.Dispatch(reader, env, new Args(), out reply) == DispatchResult.MatchedAll) {
+                        return true;
+                    }
                 }
+                reply = err;
+                return false;
+            } catch (Exception e) {
+                reply = e.Message;
+                return false;
             }
-            reply = err;
-            return false;
         }
     }
 }

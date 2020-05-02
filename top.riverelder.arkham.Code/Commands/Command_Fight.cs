@@ -156,7 +156,7 @@ namespace top.riverelder.arkham.Code.Commands {
             string wName = string.IsNullOrEmpty(weaponName) ? "肉体" : weaponName;
             target.Fights.Enqueue(new FightEvent(source.Name, target.Name, weaponName, points, resultType));
             env.Save();
-            return $"{source.Name}使用{wName}对{target.Name}发起了攻击";
+            return $"{source.Name}使用{wName}对{target.Name}发起了攻击({CheckResult.TypeStrings[resultType]}{points})";
         }
 
         static string CalculateDamage(DMEnv env, Investigator source, Investigator target, string weaponName) {
@@ -177,13 +177,14 @@ namespace top.riverelder.arkham.Code.Commands {
             int r = Dice.RollWith(w.Damage, source.DamageBonus);
             int cost = Math.Min(w.Cost, w.CurrentLoad);
             w.CurrentLoad -= cost;
-            sb.AppendLine($"造成伤害{r}，弹药消耗{cost}，弹药剩余{w.CurrentLoad}/{w.Capacity}");
+            sb.AppendLine($"{source.Name}对{target.Name}造成伤害{r}，弹药消耗{cost}，弹药剩余{w.CurrentLoad}/{w.Capacity}");
             if (r > 0) {
                 if (!target.Values.TryGet("体力", out Value th)) {
                     return sb.Append("而对方没有体力").ToString();
                 }
                 int prev = th.Val;
-                sb.Append($"{target.Name}的体力：{prev} - {r} => {th.Sub(r).Val}");
+                th.Sub(r);
+                sb.Append($"{target.Name}的体力：{(target.Is("NPC") ? "???" : Convert.ToString(prev))} - {r} => {(target.Is("NPC") ? "???" : Convert.ToString(prev))}");
                 if (r >= th.Max / 2 && th.Val > 0) {
                     if (!target.Values.TryWidelyGet("意志", out Value san)) {
                         san = new Value(50);
@@ -201,6 +202,9 @@ namespace top.riverelder.arkham.Code.Commands {
             env.Save();
             return sb.ToString();
         }
+
+        public static readonly string NPCTag = "NPC";
+        public static readonly string UnkonwnValue = "???";
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("战斗")
