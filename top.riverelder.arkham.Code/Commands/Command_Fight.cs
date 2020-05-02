@@ -68,7 +68,7 @@ namespace top.riverelder.arkham.Code.Commands {
             CheckResult result = dodge.Check();
             if (result.succeed && result.type <= fight.ResultType) {
                 env.Save();
-                return $"{inv.Name}躲开了{source.Name}的攻击";
+                return $"{inv.Name}躲开了{source.Name}的攻击({result.ActualTypeString})！";
             } else {
                 string r = $"{inv.Name}闪避失败\n" + CalculateDamage(env, source, inv, fight.WeaponName);
                 env.Save();
@@ -94,6 +94,11 @@ namespace top.riverelder.arkham.Code.Commands {
 
             if (!result.succeed) {
                 return $"{source.Name}对{target.Name}的攻击失败";
+            }
+
+            int mulfunctionCheckResult = Dice.Roll(100);
+            if (mulfunctionCheckResult > w.Mulfunction) {
+                return $"{source.Name}的{w.Name}({(w.Type == "射击" ? "炸膛" : "坏掉")})了！({mulfunctionCheckResult} > {w.Mulfunction})";
             }
 
             switch (w.Type) {
@@ -145,7 +150,11 @@ namespace top.riverelder.arkham.Code.Commands {
             CheckResult result = skill.Check();
             string r = "出现异常";
             if (result.succeed && result.type < fight.ResultType) {
-                r = $"{target.Name}反击成功{source.Name}({result.ActualTypeString}{result.result} < {CheckResult.TypeStrings[fight.ResultType]}{fight.Points})！\n" + CalculateDamage(env, target, source, weaponName);
+                int mulfunctionCheckResult = Dice.Roll(100);
+                if (mulfunctionCheckResult > selfWeapon.Mulfunction) {
+                    return $"{target.Name}的{selfWeapon.Name}({(selfWeapon.Type == "射击" ? "炸膛" : "坏掉")})了！({mulfunctionCheckResult} > {selfWeapon.Mulfunction})";
+                }
+                r = $"{target.Name}反击成功{source.Name}({result.ActualTypeString})！\n" + CalculateDamage(env, target, source, weaponName);
             } else {
                 r = $"{target.Name}反击失败\n" + CalculateDamage(env, source, target, fight.WeaponName);
             }
