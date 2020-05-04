@@ -98,7 +98,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
             int mulfunctionCheckResult = Dice.Roll(100);
             if (mulfunctionCheckResult > w.Mulfunction) {
-                return $"{source.Name}的{w.Name}({(w.Type == "射击" ? "炸膛" : "坏掉")})了！({mulfunctionCheckResult} > {w.Mulfunction})";
+                return $"{source.Name}的{w.Name}{(w.Type == "射击" ? "炸膛" : "坏掉")}了！({mulfunctionCheckResult} > {w.Mulfunction})";
             }
 
             switch (w.Type) {
@@ -152,7 +152,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (result.succeed && result.type < fight.ResultType) {
                 int mulfunctionCheckResult = Dice.Roll(100);
                 if (mulfunctionCheckResult > selfWeapon.Mulfunction) {
-                    return $"{target.Name}的{selfWeapon.Name}({(selfWeapon.Type == "射击" ? "炸膛" : "坏掉")})了！({mulfunctionCheckResult} > {selfWeapon.Mulfunction})";
+                    return $"{target.Name}的{selfWeapon.Name}{(selfWeapon.Type == "射击" ? "炸膛" : "坏掉")}了！({mulfunctionCheckResult} > {selfWeapon.Mulfunction})";
                 }
                 r = $"{target.Name}反击成功{source.Name}({result.ActualTypeString})！\n" + CalculateDamage(env, target, source, weaponName);
             } else {
@@ -187,13 +187,17 @@ namespace top.riverelder.arkham.Code.Commands {
             int cost = Math.Min(w.Cost, w.CurrentLoad);
             w.CurrentLoad -= cost;
             sb.AppendLine($"{source.Name}对{target.Name}造成伤害{r}，弹药消耗{cost}，弹药剩余{w.CurrentLoad}/{w.Capacity}");
+            if (target.Values.TryGet("护甲", out Value protect)) {
+                r = Math.Max(0, r - protect.Val);
+                sb.AppendLine("护甲阻挡部分伤害，最终伤害：" + r);
+            }
             if (r > 0) {
                 if (!target.Values.TryGet("体力", out Value th)) {
                     return sb.Append("而对方没有体力").ToString();
                 }
                 int prev = th.Val;
                 th.Sub(r);
-                sb.Append($"{target.Name}的体力：{(target.Is("NPC") ? "???" : Convert.ToString(prev))} - {r} => {(target.Is("NPC") ? "???" : Convert.ToString(prev))}");
+                sb.Append($"{target.Name}的体力：{(target.Is("NPC") ? "???" : Convert.ToString(prev))} - {r} => {(target.Is("NPC") ? "???" : Convert.ToString(th.Val))}");
                 if (r >= th.Max / 2 && th.Val > 0) {
                     if (!target.Values.TryWidelyGet("意志", out Value san)) {
                         san = new Value(50);
@@ -247,6 +251,12 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("攻击", "战斗 攻击");
             dispatcher.SetAlias("闪避", "战斗 闪避");
             dispatcher.SetAlias("反击", "战斗 反击");
+
+
+            dispatcher.SetAlias("fg", "战斗");
+            dispatcher.SetAlias("at", "战斗 攻击");
+            dispatcher.SetAlias("dd", "战斗 闪避");
+            dispatcher.SetAlias("fb", "战斗 反击");
         }
     }
 }

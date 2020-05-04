@@ -137,6 +137,11 @@ namespace top.riverelder.arkham.Code.Commands {
                 Literal<DMEnv>("标签")
                 .Executes((env, args, dict) => DisplayTags(env.Inv))
             );
+
+            dispatcher.SetAlias("ds", "显示");
+            dispatcher.SetAlias("dn", "显示 数值");
+            dispatcher.SetAlias("di", "显示 信息");
+            dispatcher.SetAlias("df", "显示 战斗");
         }
     }
 }

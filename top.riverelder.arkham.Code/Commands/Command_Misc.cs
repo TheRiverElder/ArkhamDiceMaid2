@@ -190,12 +190,22 @@ namespace top.riverelder.arkham.Code.Commands {
                 ).Then(
                     Literal<DMEnv>("字集").Executes((env, args, dict) => string.Join("，", NameLetterSet.Keys))
                 )
+            ).Then(
+                Literal<DMEnv>("说")
+                .Handles(Extensions.ExistSelfInv())
+                .Then(
+                    String<DMEnv>("内容")
+                    .Executes((env, args, dict) => env.Inv.Name + "：" + args.GetStr("内容"))
+                )
             );
 
             dispatcher.SetAlias("今日幸运儿", "杂项 今日幸运儿");
             dispatcher.SetAlias("幸运儿", "杂项 幸运儿");
             dispatcher.SetAlias("鼓掌", "杂项 鼓掌");
             dispatcher.SetAlias("取名", "杂项 取名");
+            dispatcher.SetAlias("说", "杂项 说");
+
+            dispatcher.SetAlias("sy", "杂项 说");
         }
     }
 }

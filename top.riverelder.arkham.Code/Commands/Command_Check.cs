@@ -64,6 +64,8 @@ namespace top.riverelder.arkham.Code.Commands {
                     .Executes((env, args, dict) => SimpleCheckTo(env.Inv, args.GetStr("数值名"), args.GetStr("目标")))
                 )
             );
+
+            dispatcher.SetAlias("ch", "检定");
         }
 
         public static string SimpleCheckTo(Investigator inv, string valueName, string target) {

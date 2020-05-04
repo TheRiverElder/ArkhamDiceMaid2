@@ -208,6 +208,14 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("丢弃", "物品 丢弃");
             dispatcher.SetAlias("拾取", "物品 拾取");
             dispatcher.SetAlias("装弹", "物品 装弹");
+
+
+            dispatcher.SetAlias("it", "物品");
+            dispatcher.SetAlias("cr", "物品 创造");
+            dispatcher.SetAlias("ds", "物品 销毁");
+            dispatcher.SetAlias("th", "物品 丢弃");
+            dispatcher.SetAlias("pu", "物品 拾取");
+            dispatcher.SetAlias("ld", "物品 装弹");
         }
     }
 }

@@ -24,6 +24,8 @@ namespace top.riverelder.arkham.Code.Commands {
                     PresetNodes.Rest<DMEnv>("行动").Executes((env, args, dict) => ControlAndAct(env, args.GetInv("卡名"), args.GetStr("行动")))
                 )
             );
+
+            dispatcher.SetAlias("ct", "控制");
         }
 
         public static string ControlAndAct(DMEnv env, Investigator inv, string action) {
