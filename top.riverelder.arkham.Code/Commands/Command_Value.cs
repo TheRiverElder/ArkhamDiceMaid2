@@ -42,8 +42,15 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 )
             ).Then(
+                Literal<DMEnv>("删除").Then(
+                    String<DMEnv>("数值名")
+                    .Handles(Extensions.ExistSelfValue())
+                    .Executes((env, args, dict) => RemoveVal(env.Sce, env.Inv, args.GetStr("数值名")))
+                )
+            ).Then(
                 Literal<DMEnv>("上限").Then(
-                    String<DMEnv>("数值名").Then(
+                    String<DMEnv>("数值名")
+                    .Then(
                         Int<DMEnv>("上限值")
                         .Executes((env, args, dict) => SetMax(env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("上限值")))
                     )
@@ -82,6 +89,21 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("回血", "数值 增加 体力");
             dispatcher.SetAlias("扣血", "数值 减少 体力");
             dispatcher.SetAlias("st", "数值 st");
+
+            dispatcher.SetAlias("vl", "数值");
+            dispatcher.SetAlias("sv", "数值 设置");
+            dispatcher.SetAlias("ic", "数值 增加");
+            dispatcher.SetAlias("dc", "数值 减少");
+            dispatcher.SetAlias("ih", "数值 增加 体力");
+            dispatcher.SetAlias("dh", "数值 减少 体力");
+        }
+
+        public static string RemoveVal(Scenario scenario, Investigator inv, string valueName) {
+            if (inv.Values.Remove(valueName, out bool isAlias)) {
+                SaveUtil.Save(scenario);
+                return $"移除了{inv.Name}的{(isAlias ? "别名" : "数值")}：{valueName}";
+            }
+            return $"未找到{inv.Name}的{valueName}";
         }
 
         public static string ChangeVal(Scenario scenario, Investigator inv, string valueName, Dice increment, bool posotive) {

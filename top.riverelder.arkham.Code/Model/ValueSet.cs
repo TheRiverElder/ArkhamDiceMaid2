@@ -95,6 +95,23 @@ namespace top.riverelder.arkham.Code.Model {
             }
         }
 
+        /// <summary>
+        /// 移除一个数值，如果是别名，则只移除别名
+        /// </summary>
+        /// <param name="name">数值名</param>
+        public bool Remove(string name, out bool isAlias) {
+            if (aliases.Remove(name)) {
+                isAlias = true;
+                return true;
+            } else if (values.Remove(name)) {
+                isAlias = false;
+                return true;
+            } else {
+                isAlias = false;
+                return false;
+            }
+        }
+
         public ValueSet Copy() {
             ValueSet set = new ValueSet();
             foreach (KeyValuePair<string, Value> pair in values.AsEnumerable()) {
