@@ -1,4 +1,5 @@
 ﻿using Native.Sdk.Cqp;
+using Native.Sdk.Cqp.Enum;
 using Native.Sdk.Cqp.EventArgs;
 using Native.Sdk.Cqp.Interface;
 using Native.Sdk.Cqp.Model;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using top.riverelder.arkham.Code.Exceptions;
 using top.riverelder.arkham.Code.Model;
 
 namespace top.riverelder.arkham.Code {
@@ -20,16 +22,24 @@ namespace top.riverelder.arkham.Code {
                 string raw = msg.Substring(Global.Prefix.Length);
                 string[] cmds = Regex.Split(raw, @"[ \t\n\r；;]+" + Global.Prefix);
                 StringBuilder sb = new StringBuilder();
-                if (Global.DoAt != 0) {
+                if (Global.DoAt) {
                     sb.Append(CQApi.CQCode_At(e.FromQQ));
                 }
                 bool flag = false;
-                DMEnv env = new DMEnv(e.FromQQ.Id, e.FromGroup.Id);
+                DMEnv env = new DMEnv(
+                    e.FromQQ.Id, 
+                    e.FromGroup.Id, 
+                    e.FromGroup.GetGroupMemberInfo(e.FromQQ).MemberType == QQGroupMemberType.Manage
+                    );
                 foreach (string c in cmds) {
                     e.CQLog.InfoReceive("DiceCommand", c);
-                    if (Global.Dispatcher.Dispatch(c, env, out string reply) || Global.Debug) {
-                        sb.AppendLine().Append(reply);
-                        flag = true;
+                    try {
+                        if (Global.Dispatcher.Dispatch(c, env, out string reply) || Global.Debug) {
+                            sb.AppendLine().Append(reply);
+                            flag = true;
+                        }
+                    } catch (DiceException ex) {
+                        sb.AppendLine().Append(ex.Message);
                     }
                 }
                 if (flag) {

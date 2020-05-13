@@ -40,9 +40,13 @@ namespace top.riverelder.arkham.Code {
 
 
         /// <summary>
+        /// 自动读团
+        /// </summary>
+        public static bool AutoLoad = true;
+        /// <summary>
         /// 每个消息都会At发信人
         /// </summary>
-        public static int DoAt = 1;
+        public static bool DoAt = true;
         /// <summary>
         /// 调试模式，打开的话，会返回每一条消息的结果
         /// </summary>

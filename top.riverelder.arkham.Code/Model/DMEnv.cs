@@ -10,9 +10,16 @@ namespace top.riverelder.arkham.Code.Model {
 
         public long SelfId;
         public long GroupId;
+        public bool IsAdmin;
+
+        public DMEnv(long selfId, long groupId, bool isAdmin) {
+            SelfId = selfId;
+            GroupId = groupId;
+            IsAdmin = isAdmin;
+        }
 
         public bool TryGetSce(out Scenario sce) {
-            if (!Global.Groups.TryGetValue(GroupId, out string sceName) 
+            if (!Global.Groups.TryGetValue(GroupId, out string sceName)
                 || !Global.Scenarios.TryGetValue(sceName, out sce)) {
                 sce = null;
                 return false;
@@ -21,9 +28,9 @@ namespace top.riverelder.arkham.Code.Model {
         }
 
         public bool TryGetInv(out Scenario sce, out Investigator inv) {
-            if (!Global.Groups.TryGetValue(GroupId, out string sceName) 
-                || !Global.Scenarios.TryGetValue(sceName, out sce) 
-                || !sce.PlayerNames.TryGetValue(SelfId, out string invName) 
+            if (!Global.Groups.TryGetValue(GroupId, out string sceName)
+                || !Global.Scenarios.TryGetValue(sceName, out sce)
+                || !sce.PlayerNames.TryGetValue(SelfId, out string invName)
                 || !sce.TryGetInvestigator(invName, out inv)) {
                 sce = null;
                 inv = null;
@@ -33,18 +40,46 @@ namespace top.riverelder.arkham.Code.Model {
         }
 
         public void Save() {
-            if (TryGetSce(out Scenario sce)) {
-                SaveUtil.Save(sce);
+            SaveUtil.Save(Sce);
+        }
+
+        private Scenario SceCache;
+        private Investigator InvCache;
+
+        public void RefreshCache() {
+            SceCache = null;
+            InvCache = null;
+        }
+
+        public Scenario Sce {
+            get {
+                if (SceCache != null) {
+                    return SceCache;
+                }
+                if (!Global.Groups.TryGetValue(GroupId, out string sceName)) {
+                    throw new Exception("该群还未关联存档！");
+                }
+                if (!Global.Scenarios.TryGetValue(sceName, out Scenario sce)) {
+                    throw new Exception($"该群所关联的存档【{sceName}】还未载入！\n使用“读团”指令或者配置自动载入存档");
+                }
+                return SceCache = sce;
             }
         }
 
-        public Scenario Sce => TryGetSce(out Scenario sce) ? sce : null;
-
-        public Investigator Inv => TryGetInv(out Scenario sce, out Investigator inv) ? inv : null;
-
-        public DMEnv(long selfId, long groupId) {
-            SelfId = selfId;
-            GroupId = groupId;
+        public Investigator Inv {
+            get {
+                if (InvCache != null) {
+                    return InvCache;
+                }
+                Scenario sce = Sce;
+                if (!Sce.PlayerNames.TryGetValue(SelfId, out string invName)) {
+                    throw new Exception("你还未与人物卡关联");
+                }
+                if (!sce.Investigators.TryGetValue(invName, out Investigator inv)) {
+                    throw new Exception($"不存在名为【{invName}】的人物卡，该卡可能已经被删除！");
+                }
+                return InvCache = inv;
+            }
         }
     }
 }

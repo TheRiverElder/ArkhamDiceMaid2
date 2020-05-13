@@ -51,10 +51,11 @@ namespace top.riverelder.arkham.Code.Utils {
                 IniObject global = IniObject.Load(Global.ConfFile, Encoding.UTF8);
 
                 IniSection conf = global["Config"];
-                if (conf.TryGetValue("Prefix", out IniValue prefix)) Global.Prefix = prefix.ToString();
-                if (conf.TryGetValue("DoAt", out IniValue doAt)) Global.DoAt = doAt.ToInt32();
-                if (conf.TryGetValue("GreatSuccess", out IniValue gs)) Global.GreatSuccess = gs.ToInt32();
-                if (conf.TryGetValue("GreatFailure", out IniValue gf)) Global.GreatFailure = gf.ToInt32();
+                if (conf.TryGetValue(nameof(Global.Prefix), out IniValue prefix)) Global.Prefix = prefix.ToString();
+                if (conf.TryGetValue(nameof(Global.DoAt), out IniValue doAt)) Global.DoAt = doAt.ToBoolean();
+                if (conf.TryGetValue(nameof(Global.AutoLoad), out IniValue autoLoad)) Global.DoAt = doAt.ToBoolean();
+                if (conf.TryGetValue(nameof(Global.GreatSuccess), out IniValue gs)) Global.GreatSuccess = gs.ToInt32();
+                if (conf.TryGetValue(nameof(Global.GreatFailure), out IniValue gf)) Global.GreatFailure = gf.ToInt32();
 
                 IniSection defaultValues = global["DefaultValues"];
                 Global.DefaultValues.Clear();
@@ -87,10 +88,11 @@ namespace top.riverelder.arkham.Code.Utils {
 
         public static bool SaveGlobal() {
             IniSection conf = new IniSection("Config") {
-                ["Prefix"] = new IniValue(Global.Prefix),
-                ["DoAt"] = new IniValue(Global.DoAt),
-                ["GreatSuccess"] = new IniValue(Global.GreatSuccess.ToString()),
-                ["GreatFailure"] = new IniValue(Global.GreatFailure.ToString())
+                [nameof(Global.Prefix)] = new IniValue(Global.Prefix),
+                [nameof(Global.AutoLoad)] = new IniValue(Global.AutoLoad),
+                [nameof(Global.DoAt)] = new IniValue(Global.DoAt),
+                [nameof(Global.GreatSuccess)] = new IniValue(Global.GreatSuccess.ToString()),
+                [nameof(Global.GreatFailure)] = new IniValue(Global.GreatFailure.ToString())
             };
 
             IniSection defaultValues = new IniSection("DefaultValues");

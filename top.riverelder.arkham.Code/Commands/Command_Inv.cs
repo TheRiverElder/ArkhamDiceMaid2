@@ -11,6 +11,121 @@ namespace top.riverelder.arkham.Code.Commands {
         public string Usage => "人物卡 新建 <姓名> [描述]; {属性名:属性值}";
 
 
+        public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
+            DictMapper mapper = new DictMapper();
+            mapper.Rest(new ValueParser());
+
+            dispatcher.Register("人物卡")
+            .Handles(Extensions.ExistSce())
+            .Then(
+                PresetNodes.Literal<DMEnv>("新建").Then(
+                    PresetNodes.String<DMEnv>("名称")
+                    .MapDict(mapper)
+                    .Executes((env, args, dict) => CreateInv(env, args.GetStr("名称"), "", dict))
+                    .Then(
+                        PresetNodes.String<DMEnv>("描述")
+                        .MapDict(mapper)
+                        .Executes((env, args, dict) => CreateInv(env, args.GetStr("名称"), args.GetStr("描述"), dict))
+                    )
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("重命名").Then(
+                    PresetNodes.String<DMEnv>("新名称")
+                    .Executes((env, args, dict) => Rename(env, args.GetStr("新名称")))
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("销毁").Then(
+                    PresetNodes.String<DMEnv>("名称")
+                    .Executes((env, args, dict) => "销毁人物卡需要操作者是管理员，并且需要加上“强制”参数！")
+                    .Then(
+                        PresetNodes.Literal<DMEnv>("强制")
+                        .Executes((env, args, dict) => DestoryInv(env, args.GetStr("名称")))
+                    )
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("重算")
+                .Handles(Extensions.ExistSelfInv())
+                .Executes((env, args, dict) => ReCalc(env, env.Inv))
+                .Then(
+                    PresetNodes.String<DMEnv>("名称")
+                    .Handles(Extensions.ExistInv())
+                    .Executes((env, args, dict) => ReCalc(env, args.GetInv("名称")))
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("伤害加值")
+                .Handles(Extensions.ExistSelfInv())
+                .Then(
+                    Extensions.Dice("数值")
+                    .Executes((env, args, dict) => SetDB(env, env.Inv, args.GetDice("数值")))
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("标记")
+                .Handles(Extensions.ExistSelfInv())
+                .Then(
+                    PresetNodes.Literal<DMEnv>("添加")
+                    .Rest(
+                        PresetNodes.String<DMEnv>("标签")
+                        .Handles(Extensions.ConvertObjectArrayToStringArray())
+                        .Executes((env, args, dict) => AddTags(env, env.Inv, args.Get<string[]>("标签")))
+                    )
+                ).Then(
+                    PresetNodes.Literal<DMEnv>("移除")
+                    .Rest(
+                        PresetNodes.String<DMEnv>("标签")
+                        .Handles(Extensions.ConvertObjectArrayToStringArray())
+                        .Executes((env, args, dict) => RemoveTags(env, env.Inv, args.Get<string[]>("标签")))
+                    )
+                )
+            );
+
+            dispatcher.SetAlias("车卡", "人物卡 新建");
+            dispatcher.SetAlias("撕卡", "人物卡 销毁");
+            dispatcher.SetAlias("重算", "人物卡 重算");
+            dispatcher.SetAlias("标记", "人物卡 标记 添加");
+            dispatcher.SetAlias("反标", "人物卡 标记 移除");
+        }
+
+        public static HashSet<char> HardInputChars = new HashSet<char>("·、…—");
+        public static int HardInputCharCountLimit = 4;
+        public static bool CheckNameInputHardness(string name, out string hint) {
+            HashSet<char> appearedHardChars = new HashSet<char>();
+            foreach (char ch in name) {
+                if (HardInputChars.Contains(ch)) {
+                    appearedHardChars.Add(ch);
+                }
+            }
+            StringBuilder builder = new StringBuilder();
+            bool flag = false;
+            if (name.Length > HardInputCharCountLimit) {
+                builder.Append($"名字过长，不宜超过{HardInputCharCountLimit}");
+                flag = true;
+            }
+            if (appearedHardChars.Count > 0) {
+                if (flag) {
+                    builder.AppendLine().Append("且");
+                }
+                builder.Append("包含难打的字符：").Append(string.Join("", appearedHardChars));
+                flag = true;
+            }
+            hint = builder.ToString();
+            return flag;
+        }
+
+        public static string Rename(DMEnv env, string name) {
+            Investigator inv = env.Inv;
+            string oldName = inv.Name;
+            if (oldName == name) {
+                return "新旧名字相同，无需更改";
+            }
+            inv.Name = name;
+            
+            env.Sce.Investigators.Remove(oldName);
+            env.Sce.PutInvestigator(inv);
+            env.Sce.Control(env.SelfId, inv.Name);
+            env.Save();
+            return $"{oldName}被重命名为：{name}" + (CheckNameInputHardness(name, out string hint) ? "\n" + hint : "");
+        }
+
         public static string CreateInv(DMEnv env, string name, string desc, Args dict) {
             Scenario sce = env.Sce;
             Investigator inv = new Investigator(name, desc);
@@ -28,6 +143,9 @@ namespace top.riverelder.arkham.Code.Commands {
             builder.AppendFormat("名字：{0}", name).AppendLine();
             if (!string.IsNullOrEmpty(desc)) {
                 builder.AppendFormat("描述：{0}", desc).AppendLine();
+            }
+            if (CheckNameInputHardness(name, out string hint)) {
+                builder.AppendLine(hint);
             }
             builder
                 .Append("体格：").Append(inv.Build)
@@ -98,75 +216,6 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Append("体格：").Append(inv.Build).Append('，')
                 .Append("伤害加值：").Append(inv.DamageBonus)
                 .ToString();
-        }
-
-        public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            DictMapper mapper = new DictMapper();
-            mapper.Rest(new ValueParser());
-
-            dispatcher.Register("人物卡")
-            .Handles(Extensions.ExistSce())
-            .Then(
-                PresetNodes.Literal<DMEnv>("新建").Then(
-                    PresetNodes.String<DMEnv>("名称")
-                    .MapDict(mapper)
-                    .Executes((env, args, dict) => CreateInv(env, args.GetStr("名称"), "", dict))
-                    .Then(
-                        PresetNodes.String<DMEnv>("描述")
-                        .MapDict(mapper)
-                        .Executes((env, args, dict) => CreateInv(env, args.GetStr("名称"), args.GetStr("描述"), dict))
-                    )
-                )
-            ).Then(
-                PresetNodes.Literal<DMEnv>("销毁").Then(
-                    PresetNodes.String<DMEnv>("名称")
-                    .Executes((env, args, dict) => "销毁人物卡需要操作者是管理员，并且需要加上“强制”参数！")
-                    .Then(
-                        PresetNodes.Literal<DMEnv>("强制")
-                        .Executes((env, args, dict) => DestoryInv(env, args.GetStr("名称")))
-                    )
-                )
-            ).Then(
-                PresetNodes.Literal<DMEnv>("重算")
-                .Handles(Extensions.ExistSelfInv())
-                .Executes((env, args, dict) => ReCalc(env, env.Inv))
-                .Then(
-                    PresetNodes.String<DMEnv>("名称")
-                    .Handles(Extensions.ExistInv())
-                    .Executes((env, args, dict) => ReCalc(env, args.GetInv("名称")))
-                )
-            ).Then(
-                PresetNodes.Literal<DMEnv>("伤害加值")
-                .Handles(Extensions.ExistSelfInv())
-                .Then(
-                    Extensions.Dice("数值")
-                    .Executes((env, args, dict) => SetDB(env, env.Inv, args.GetDice("数值")))
-                )
-            ).Then(
-                PresetNodes.Literal<DMEnv>("标记")
-                .Handles(Extensions.ExistSelfInv())
-                .Then(
-                    PresetNodes.Literal<DMEnv>("添加")
-                    .Rest(
-                        PresetNodes.String<DMEnv>("标签")
-                        .Handles(Extensions.ConvertObjectArrayToStringArray())
-                        .Executes((env, args, dict) => AddTags(env, env.Inv, args.Get<string[]>("标签")))
-                    )
-                ).Then(
-                    PresetNodes.Literal<DMEnv>("移除")
-                    .Rest(
-                        PresetNodes.String<DMEnv>("标签")
-                        .Handles(Extensions.ConvertObjectArrayToStringArray())
-                        .Executes((env, args, dict) => RemoveTags(env, env.Inv, args.Get<string[]>("标签")))
-                    )
-                )
-            );
-
-            dispatcher.SetAlias("车卡", "人物卡 新建");
-            dispatcher.SetAlias("撕卡", "人物卡 销毁");
-            dispatcher.SetAlias("重算", "人物卡 重算");
-            dispatcher.SetAlias("标记", "人物卡 标记 添加");
-            dispatcher.SetAlias("反标", "人物卡 标记 移除");
         }
     }
 }
