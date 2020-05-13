@@ -56,7 +56,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Handles(Extensions.ExistSelfInv())
                 .Then(
                     Extensions.Dice("数值")
-                    .Executes((env, args, dict) => SetDB(env, env.Inv, args.GetDice("数值")))
+                    .Executes((env, args, dict) => SetDB(env, args.GetDice("数值")))
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("标记")
@@ -165,7 +165,7 @@ namespace top.riverelder.arkham.Code.Commands {
         public static string DestoryInv(DMEnv env, string name) {
             Scenario sce = env.Sce;
 
-            if (!sce.AdminList.Contains(env.SelfId)) {
+            if (env.IsAdmin) {
                 return "你不是管理员！";
             } else if (!sce.ExistInvestigator(name)) {
                 return "不存在调查员：" + name;
@@ -206,14 +206,14 @@ namespace top.riverelder.arkham.Code.Commands {
             return inv.Name + "移除了标签：" + string.Join("、", tags);
         }
 
-        public static string SetDB(DMEnv env, Investigator inv, Dice db) {
-            inv.DamageBonus = db.ToString();
+        public static string SetDB(DMEnv env, Dice db) {
+            env.Inv.DamageBonus = db.ToString();
             env.Save();
 
             return new StringBuilder()
-                .Append(inv.Name).AppendLine("的数据：")
-                .Append("体格：").Append(inv.Build).Append('，')
-                .Append("伤害加值：").Append(inv.DamageBonus)
+                .Append(env.Inv.Name).AppendLine("的数据：")
+                .Append("体格：").Append(env.Inv.Build).Append('，')
+                .Append("伤害加值：").Append(env.Inv.DamageBonus)
                 .ToString();
         }
     }
