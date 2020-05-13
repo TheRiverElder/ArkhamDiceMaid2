@@ -162,7 +162,6 @@ namespace top.riverelder.arkham.Code.Commands {
             return builder.ToString();
         }
 
-
         public static string DestoryInv(DMEnv env, string name) {
             Scenario sce = env.Sce;
 
