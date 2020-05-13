@@ -97,7 +97,7 @@ namespace top.riverelder.arkham.Code.Commands {
             StringBuilder builder = new StringBuilder();
             bool flag = false;
             if (name.Length > HardInputCharCountLimit) {
-                builder.Append($"名字过长，不宜超过{HardInputCharCountLimit}");
+                builder.Append($"名字过长，不宜超过{HardInputCharCountLimit}个字");
                 flag = true;
             }
             if (appearedHardChars.Count > 0) {
