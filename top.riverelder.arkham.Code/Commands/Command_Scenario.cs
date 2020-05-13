@@ -77,7 +77,6 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public static string StartScenario(long groupId, long selfId, string sceName) {
             Scenario s = new Scenario(sceName);
-            s.AdminList.Add(selfId);
             Global.Scenarios[sceName] = s;
             Global.Groups[groupId] = s.Name;
             SaveUtil.Save(s);

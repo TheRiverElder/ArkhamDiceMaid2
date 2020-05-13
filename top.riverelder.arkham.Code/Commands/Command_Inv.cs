@@ -102,12 +102,12 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             if (appearedHardChars.Count > 0) {
                 if (flag) {
-                    builder.AppendLine().Append("且");
+                    builder.Append("且");
                 }
                 builder.Append("包含难打的字符：").Append(string.Join("", appearedHardChars));
                 flag = true;
             }
-            hint = builder.ToString();
+            hint = "❗" + builder.ToString();
             return flag;
         }
 
@@ -145,7 +145,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 builder.AppendFormat("描述：{0}", desc).AppendLine();
             }
             if (CheckNameInputHardness(name, out string hint)) {
-                builder.AppendLine(hint);
+                builder.AppendLine(hint).AppendLine();
             }
             builder
                 .Append("体格：").Append(inv.Build)

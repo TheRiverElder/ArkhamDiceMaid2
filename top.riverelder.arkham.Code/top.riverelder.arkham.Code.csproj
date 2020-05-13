@@ -88,6 +88,7 @@
     <Compile Include="Commands\Command_Control.cs" />
     <Compile Include="Event_CqAppEnable.cs" />
     <Compile Include="Event_CqExit.cs" />
+    <Compile Include="Exceptions\DiceException.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Model\DMEnv.cs" />
     <Compile Include="Model\FightEvent.cs" />

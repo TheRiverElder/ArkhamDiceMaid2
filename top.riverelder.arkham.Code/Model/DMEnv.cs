@@ -63,7 +63,13 @@ namespace top.riverelder.arkham.Code.Model {
                     throw new Exception("该群还未关联存档！");
                 }
                 if (!Global.Scenarios.TryGetValue(sceName, out Scenario sce)) {
-                    throw new Exception($"该群所关联的存档【{sceName}】还未载入！\n使用“读团”指令或者配置自动载入存档");
+                    if (Global.AutoLoad) {
+                        if (!SaveUtil.TryLoad(sceName, out sce)) {
+                            throw new Exception($"该群所关联的存档【{sceName}】自动载入失败！");
+                        }
+                    } else {
+                        throw new Exception($"该群所关联的存档【{sceName}】还未载入！\n使用“读团”指令或者配置自动载入存档");
+                    }
                 }
                 return SceCache = sce;
             }

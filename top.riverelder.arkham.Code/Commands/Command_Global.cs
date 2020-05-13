@@ -35,9 +35,18 @@ namespace top.riverelder.arkham.Code.Commands {
                 PresetNodes.Literal<DMEnv>("回复").Then(
                     PresetNodes.Bool<DMEnv>("开关", "开", "关")
                     .Executes((env, args, dict) => {
-                        Global.DoAt = args.GetBool("开关") ? 1 : 0;
+                        Global.DoAt = args.GetBool("开关");
                         SaveUtil.SaveGlobal();
-                        return "回复：" + (Global.DoAt != 0 ? "开" : "关");
+                        return "回复：" + (Global.DoAt ? "开" : "关");
+                    })
+                )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("自动载入").Then(
+                    PresetNodes.Bool<DMEnv>("开关", "开", "关")
+                    .Executes((env, args, dict) => {
+                        Global.AutoLoad = args.GetBool("开关");
+                        SaveUtil.SaveGlobal();
+                        return "自动载入：" + (Global.AutoLoad ? "开" : "关");
                     })
                 )
             );
@@ -45,6 +54,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("配置", "全局 配置");
             dispatcher.SetAlias("调试", "全局 调试");
             dispatcher.SetAlias("回复", "全局 回复");
+            dispatcher.SetAlias("自动载入", "全局 自动载入");
         }
 
     }
