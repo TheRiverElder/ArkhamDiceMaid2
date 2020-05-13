@@ -90,6 +90,23 @@ namespace top.riverelder.arkham.Code.Commands {
             return $"{inv.Name}拾取了：{name}";
         }
 
+        string PassItem(DMEnv env, string name, Investigator targetInv, string newName) {
+            if (newName == null) {
+                newName = name;
+            }
+            if (!env.Inv.Inventory.TryGetValue(name, out Item item)) {
+                return $"{env.Inv.Name}的物品栏中不存在{name}";
+            }
+            if (targetInv.Inventory.ContainsKey(newName)) {
+                return $"{targetInv.Name}的物品栏中已经存在{newName}";
+            }
+            env.Inv.Inventory.Remove(name);
+            item.Name = newName;
+            targetInv.Inventory[item.Name] = item;
+            env.Save();
+            return $"{env.Inv.Name}把{item.Name}给了：{targetInv.Name}";
+        }
+
         string EditItem(DMEnv env, string name, string newName, Args dict) {
             if (newName == null) {
                 newName = name;
@@ -182,6 +199,20 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 )
             ).Then(
+                Literal<DMEnv>("传递")
+                .Then(
+                    String<DMEnv>("物品名")
+                    .Then(
+                        Literal<DMEnv>("目标名")
+                        .Handles(ExistInv())
+                        .Executes((env, args, dict) => PassItem(env, args.GetStr("物品名"), args.GetInv("目标名"), null))
+                        .Then(
+                            String<DMEnv>("新名")
+                            .Executes((env, args, dict) => PassItem(env, args.GetStr("物品名"), args.GetInv("目标名"), args.GetStr("新名")))
+                        )
+                    )
+                )
+            ).Then(
                 Literal<DMEnv>("编辑")
                 .Then(
                     String<DMEnv>("物品名")
@@ -207,6 +238,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("销毁", "物品 销毁");
             dispatcher.SetAlias("丢弃", "物品 丢弃");
             dispatcher.SetAlias("拾取", "物品 拾取");
+            dispatcher.SetAlias("传递", "物品 传递");
             dispatcher.SetAlias("装弹", "物品 装弹");
 
 
@@ -216,6 +248,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("th", "物品 丢弃");
             dispatcher.SetAlias("pu", "物品 拾取");
             dispatcher.SetAlias("ld", "物品 装弹");
+            dispatcher.SetAlias("ps", "物品 传递");
         }
     }
 }

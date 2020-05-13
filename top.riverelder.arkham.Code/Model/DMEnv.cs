@@ -8,8 +8,11 @@ using top.riverelder.arkham.Code.Utils;
 namespace top.riverelder.arkham.Code.Model {
     public class DMEnv {
 
+        // 自己的ID
         public long SelfId;
+        // 群ID
         public long GroupId;
+        // 是否是管理员
         public bool IsAdmin;
 
         public DMEnv(long selfId, long groupId, bool isAdmin) {
