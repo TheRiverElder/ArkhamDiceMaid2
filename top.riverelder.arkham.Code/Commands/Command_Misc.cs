@@ -165,11 +165,9 @@ namespace top.riverelder.arkham.Code.Commands {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("杂项").Then(
                 Literal<DMEnv>("今日幸运儿")
-                .Handles(Extensions.ExistSce())
                 .Executes((env, args, dict) => LuckyOneOfDay(env.Sce))
             ).Then(
                 Literal<DMEnv>("幸运儿")
-                .Handles(Extensions.ExistSce())
                 .Executes((env, args, dict) => ListLuck(env.Sce))
             ).Then(
                 Literal<DMEnv>("鼓掌")
@@ -192,7 +190,6 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 Literal<DMEnv>("说")
-                .Handles(Extensions.ExistSelfInv())
                 .Then(
                     String<DMEnv>("内容")
                     .Executes((env, args, dict) => env.Inv.Name + "：" + args.GetStr("内容"))

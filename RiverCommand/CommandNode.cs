@@ -18,7 +18,7 @@ namespace top.riverelder.RiverCommand {
         public DictMapper Mapper { get; set; } = null;
         public bool Spread { get; set; } = false;
 
-        private readonly IDictionary<string, CommandNode<TEnv>> certainChuldren = new Dictionary<string, CommandNode<TEnv>>();
+        private readonly IDictionary<string, CommandNode<TEnv>> certainChildren = new Dictionary<string, CommandNode<TEnv>>();
         private readonly IList<CommandNode<TEnv>> children = new List<CommandNode<TEnv>>();
 
         public PreProcess<TEnv> Process { get; set; } = null;
@@ -69,8 +69,13 @@ namespace top.riverelder.RiverCommand {
             }
 
             // 预处理得到的参数，包括参数的可行检测，以及转换
-            if (Process != null && !Process(env, args, arg, out arg, out err)) {
-                reply = err;
+            try {
+                if (Process != null && !Process(env, args, arg, out arg, out err)) {
+                    reply = err;
+                    return DispatchResult.MatchedSelf;
+                }
+            } catch (Exception e) {
+                reply = e.Message;
                 return DispatchResult.MatchedSelf;
             }
 
@@ -132,7 +137,7 @@ namespace top.riverelder.RiverCommand {
             reader.SkipWhiteSpace();
             string literal = reader.HasNext ? reader.ReadToWhiteSpaceOr(DictArgSeperators) : null;
             reader.Cursor = start;
-            if (!string.IsNullOrEmpty(literal) && certainChuldren.TryGetValue(literal, out CommandNode<TEnv> node)) {
+            if (!string.IsNullOrEmpty(literal) && certainChildren.TryGetValue(literal, out CommandNode<TEnv> node)) {
                 return new CommandNode<TEnv>[] { node };
             } else {
                 return children.ToArray();
@@ -143,7 +148,7 @@ namespace top.riverelder.RiverCommand {
             string[] certain = node.Parser.Certain;
             if (certain != null && certain.Length > 0) {
                 foreach (string c in certain) {
-                    certainChuldren[c] = node;
+                    certainChildren[c] = node;
                 }
             } else {
                 children.Add(node);
@@ -151,7 +156,7 @@ namespace top.riverelder.RiverCommand {
         }
 
         private HashSet<CommandNode<TEnv>> GetAllChildren() {
-            HashSet<CommandNode<TEnv>> ac = new HashSet<CommandNode<TEnv>>(certainChuldren.Values);
+            HashSet<CommandNode<TEnv>> ac = new HashSet<CommandNode<TEnv>>(certainChildren.Values);
             ac.UnionWith(children);
             return ac;
         }

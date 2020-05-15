@@ -11,7 +11,6 @@ namespace top.riverelder.arkham.Code.Commands {
     public class Command_Status : DiceCmdEntry {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("状态")
-            .Handles(Extensions.ExistSelfInv())
             .Executes((env, args, dict) => DrawMadness(env.Inv));
         }
 

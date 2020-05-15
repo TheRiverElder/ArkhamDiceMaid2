@@ -63,7 +63,6 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("排序")
-            .Handles(Extensions.ExistSce())
             .Then(
                 PresetNodes.String<DMEnv>("数值名").Rest(
                     PresetNodes.String<DMEnv>("调查员名")

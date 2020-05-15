@@ -15,7 +15,6 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("数值")
-            .Handles(Extensions.ExistSelfInv())
             .Then(
                 Literal<DMEnv>("增加").Then(
                     String<DMEnv>("数值名").Then(

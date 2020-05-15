@@ -16,7 +16,6 @@ namespace top.riverelder.arkham.Code.Commands {
             mapper.Rest(new DiceParser());
 
             dispatcher.Register("法术")
-            .Handles(Extensions.ExistSce())
             .Then(
                 Literal<DMEnv>("创造").Then(
                     String<DMEnv>("法术名")
@@ -30,21 +29,18 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 Literal<DMEnv>("学习")
-                .Handles(Extensions.ExistSelfInv())
                 .Then(
                     String<DMEnv>("法术名")
                     .Executes((env, args, dict) => LearnSpell(env, env.Inv, args.GetStr("法术名")))
                 )
             ).Then(
                 Literal<DMEnv>("忘记")
-                .Handles(Extensions.ExistSelfInv())
                 .Then(
                     String<DMEnv>("法术名")
                     .Executes((env, args, dict) => ForgetSpell(env, env.Inv, args.GetStr("法术名")))
                 )
             ).Then(
                 Literal<DMEnv>("使用")
-                .Handles(Extensions.ExistSelfInv())
                 .Then(
                     String<DMEnv>("法术名")
                     .Executes((env, args, dict) => UseSpell(env, env.Inv, args.GetStr("法术名")))

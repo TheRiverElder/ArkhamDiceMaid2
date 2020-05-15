@@ -157,11 +157,8 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Then("消耗", new IntParser())
                 .SkipRest();
 
-            dispatcher.Register("物品").Handles(ExistSelfInv())
-            .Handles(ExistSelfInv())
-            .Then(
+            dispatcher.Register("物品").Then(
                 Literal<DMEnv>("创造")
-                .Handles(ExistSelfInv())
                 .Then(
                     String<DMEnv>("物品名")
                     .MapDict(mapper)

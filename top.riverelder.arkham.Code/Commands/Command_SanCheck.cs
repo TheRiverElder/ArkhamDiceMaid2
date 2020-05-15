@@ -24,7 +24,6 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("SC")
-            .Handles(Extensions.ExistSelfInv())
             .Then(
                 Extensions.Dice("成功骰子").Then(
                     Extensions.Dice("失败骰子")

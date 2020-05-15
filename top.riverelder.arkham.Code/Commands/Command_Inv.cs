@@ -16,7 +16,6 @@ namespace top.riverelder.arkham.Code.Commands {
             mapper.Rest(new ValueParser());
 
             dispatcher.Register("人物卡")
-            .Handles(Extensions.ExistSce())
             .Then(
                 PresetNodes.Literal<DMEnv>("新建").Then(
                     PresetNodes.String<DMEnv>("名称")
@@ -44,7 +43,6 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("重算")
-                .Handles(Extensions.ExistSelfInv())
                 .Executes((env, args, dict) => ReCalc(env, env.Inv))
                 .Then(
                     PresetNodes.String<DMEnv>("名称")
@@ -53,14 +51,12 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("伤害加值")
-                .Handles(Extensions.ExistSelfInv())
                 .Then(
                     Extensions.Dice("数值")
                     .Executes((env, args, dict) => SetDB(env, args.GetDice("数值")))
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("标记")
-                .Handles(Extensions.ExistSelfInv())
                 .Then(
                     PresetNodes.Literal<DMEnv>("添加")
                     .Rest(

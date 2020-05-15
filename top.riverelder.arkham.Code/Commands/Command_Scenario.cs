@@ -11,9 +11,9 @@ namespace top.riverelder.arkham.Code.Commands {
         public string Usage => "读团 [团名]";
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            dispatcher.Register("团子").Then(
+            dispatcher.Register("存档").Then(
                 PresetNodes.Literal<DMEnv>("保存")
-                .Handles(Extensions.ExistSce())
+                
                 .Executes((env, args, dict) => SaveScenario(env.Sce))
                 .Then(
                     PresetNodes.String<DMEnv>("团名")
@@ -37,14 +37,14 @@ namespace top.riverelder.arkham.Code.Commands {
                     //)
                 )
             );
-            dispatcher.SetAlias("读团", "团子 读取");
-            dispatcher.SetAlias("存团", "团子 保存");
-            dispatcher.SetAlias("开团", "团子 开始");
+            dispatcher.SetAlias("读团", "存档 读取");
+            dispatcher.SetAlias("存团", "存档 保存");
+            dispatcher.SetAlias("开团", "存档 开始");
         }
 
         public static string LoadScenario(long groupId) {
             if (!Global.Groups.TryGetValue(groupId, out string sceName)) {
-                return "该群还未有团存在";
+                return "该群还未有存档存在";
             }
             return LoadScenario(groupId, sceName);
         }

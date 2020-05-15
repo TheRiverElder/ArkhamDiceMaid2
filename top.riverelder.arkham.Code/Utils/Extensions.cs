@@ -22,11 +22,8 @@ namespace top.riverelder.arkham.Code.Utils {
 
         public static PreProcess<DMEnv> ExistSce() {
             return (DMEnv env, Args args, object ori, out object arg, out string err) => {
+                arg = env.Sce;
                 arg = null;
-                if (!env.TryGetSce(out Scenario sce)) {
-                    err = "还未开团";
-                    return false;
-                }
                 err = null;
                 return true;
             };
@@ -34,15 +31,7 @@ namespace top.riverelder.arkham.Code.Utils {
 
         public static PreProcess<DMEnv> ExistSelfInv() {
             return (DMEnv env, Args args, object ori, out object arg, out string err) => {
-                arg = null;
-                if (!env.TryGetInv(out Scenario sce, out Investigator inv)) {
-                    if (sce == null) {
-                        err = "还未开团";
-                        return false;
-                    }
-                    err = "你还未车卡";
-                    return false;
-                }
+                arg = env.Inv;
                 err = null;
                 return true;
             };
@@ -55,10 +44,7 @@ namespace top.riverelder.arkham.Code.Utils {
                     err = "参数错误";
                     return false;
                 }
-                if (!env.TryGetSce(out Scenario sce)) {
-                    err = "还未开团";
-                    return false;
-                }
+                Scenario sce = env.Sce;
                 string invName = (string)ori;
                 if (!sce.TryGetInvestigator(invName, out Investigator inv)) {
                     err = "未找到调查员：" + invName;
@@ -77,14 +63,7 @@ namespace top.riverelder.arkham.Code.Utils {
                     err = "参数错误";
                     return false;
                 }
-                if (!env.TryGetInv(out Scenario sce, out Investigator inv)) {
-                    if (sce == null) {
-                        err = "还未开团";
-                        return false;
-                    }
-                    err = "你还未车卡";
-                    return false;
-                }
+                Investigator inv = env.Inv;
                 string valueName = (string)ori;
                 if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
                     err = $"未找到{inv.Name}的{valueName}";
@@ -104,14 +83,7 @@ namespace top.riverelder.arkham.Code.Utils {
                     err = "参数错误";
                     return false;
                 }
-                if (!env.TryGetInv(out Scenario sce, out Investigator inv)) {
-                    if (sce == null) {
-                        err = "还未开团";
-                        return false;
-                    }
-                    err = "你还未车卡";
-                    return false;
-                }
+                Investigator inv = env.Inv;
                 string valueName = (string)ori;
                 if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
                     err = $"未找到{inv.Name}的{valueName}";

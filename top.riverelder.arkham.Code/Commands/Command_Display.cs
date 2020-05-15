@@ -110,7 +110,6 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("显示")
-            .Handles(Extensions.ExistSelfInv())
             .Then(
                 Literal<DMEnv>("信息").Executes((env, args, dict) => DisplayInfo(env.Inv))
             ).Then(
