@@ -70,7 +70,7 @@ namespace top.riverelder.arkham.Code.Utils {
         public readonly string dice; //骰子表达式
         public readonly int value; //检定的普通数值，一直是普通难度
         public readonly int target; //检定的目标数值，根据难度而改变
-        public readonly int result; //检定结果
+        public readonly int points; //检定结果
         public readonly int type; //结果类型
         public readonly int level; //检定的难度等级
         public readonly bool succeed; //是否检定成功
@@ -89,7 +89,7 @@ namespace top.riverelder.arkham.Code.Utils {
             }
         }
 
-        public CheckResult(string dice, Value value, int result, int level) {
+        public CheckResult(string dice, Value value, int points, int level) {
             this.dice = dice;
             this.value = value.Val;
             switch (level) {
@@ -98,21 +98,21 @@ namespace top.riverelder.arkham.Code.Utils {
                 case ExtremeSuccess: target = value.ExtremeVal; break;
                 default: target = value.Val; break;
             }
-            this.result = result;
+            this.points = points;
             this.level = level;
-            if (result <= Global.GreatSuccess) {
+            if (points <= Global.GreatSuccess) {
                 type = GreatSuccess;
                 succeed = true;
-            } else if (result <= value.ExtremeVal) {
+            } else if (points <= value.ExtremeVal) {
                 type = ExtremeSuccess;
                 succeed = level == NormalSuccess || level == HardSuccess || level == ExtremeSuccess;
-            } else if (result <= value.HardVal) {
+            } else if (points <= value.HardVal) {
                 type = HardSuccess;
                 succeed = level == NormalSuccess || level == HardSuccess;
-            } else if (result <= value.Val) {
+            } else if (points <= value.Val) {
                 type = NormalSuccess;
                 succeed = level == NormalSuccess;
-            } else if (result <= Global.GreatFailure) {
+            } else if (points <= Global.GreatFailure) {
                 type = Failure;
                 succeed = false;
             } else {

@@ -34,7 +34,7 @@ namespace top.riverelder.arkham.Code.Commands {
             int p = (int)seed;
             string tlsn = GetTodayLuckySkillName(seed);
             foreach (Investigator inv in sce.Investigators.Values) {
-                if (!inv.Is("NPC")) {
+                if (!inv.Is("HIDE_VALUE")) {
                     lucks[inv.Name] = CalcLuck(inv, p, tlsn);
                 }
             }
@@ -64,7 +64,7 @@ namespace top.riverelder.arkham.Code.Commands {
             int p = (int)seed;
             string tlsn = GetTodayLuckySkillName(seed);
             foreach (Investigator inv in sce.Investigators.Values) {
-                if (inv.Is("NPC")) {
+                if (inv.Is("HIDE_VALUE")) {
                     continue;
                 }
                 int luck = CalcLuck(inv, p, tlsn);

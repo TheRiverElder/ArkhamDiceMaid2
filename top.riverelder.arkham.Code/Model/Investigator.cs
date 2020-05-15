@@ -84,6 +84,39 @@ namespace top.riverelder.arkham.Code.Model {
             return Tags.Contains(tag.ToUpper());
         }
 
-        public
+        /// <summary>
+        /// 检定数值，最主要的功能是方便隐藏HIDE_VALUE数值
+        /// </summary>
+        /// <param name="valueName">数值名</param>
+        /// <param name="hardness">难度</param>
+        /// <param name="result">检定结果</param>
+        /// <param name="str">字符串化</param>
+        /// <returns>是否存在该数值</returns>
+        public bool Check(string valueName, int hardness, out CheckResult result, out string str) {
+            if (!Values.TryWidelyGet(valueName, out Value value)) {
+                result = null;
+                str = $"未找到{Name}的【{valueName}】";
+                return false;
+            }
+            result = value.Check(hardness);
+            string valueStr = Is("HIDE_VALUE") ? "???" : $"{result.target}/{result.value}";
+            str = $"{Name}的{result.level}{valueName}：({valueStr}) => {result.points}，{result.ActualTypeString}";
+            return true;
+        }
+
+        public bool Check(string valueName, out CheckResult result, out string str) {
+            return Check(valueName, CheckResult.NormalSuccess, out result, out str);
+        }
+
+        public string Change(string valueName, int delta) {
+            if (!Values.TryWidelyGet(valueName, out Value value)) {
+                Values.Put(valueName, value = new Value(0));
+            }
+            string deltaStr = delta < 0 ? Convert.ToString(delta) : "+" + delta;
+            return $"{Name}的{valueName}：" + (
+                Is("HIDE_VALUE") ?
+                $"??? {deltaStr} => ???" :
+                $"{value.Val} {deltaStr} => {value.Add(delta)}");
+        }
     }
 }

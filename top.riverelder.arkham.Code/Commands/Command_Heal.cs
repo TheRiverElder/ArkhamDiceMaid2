@@ -22,7 +22,7 @@ namespace top.riverelder.arkham.Code.Commands {
             StringBuilder sb = new StringBuilder();
             int prev = health.Val;
             CheckResult cr = skill.Check();
-            sb.Append($"{inv.Name}的{valueName}({skill.Val}) => {cr.result}，{cr.ActualTypeString}");
+            sb.Append($"{inv.Name}的{valueName}({skill.Val}) => {cr.points}，{cr.ActualTypeString}");
             if (cr.succeed) {
                 int r = dice.Roll();
                 sb.AppendLine().Append($"{target.Name}的体力：{prev} + {r}({dice.ToString()}) => {health.Add(r)}");

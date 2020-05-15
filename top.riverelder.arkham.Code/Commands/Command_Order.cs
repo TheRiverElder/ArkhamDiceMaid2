@@ -48,7 +48,7 @@ namespace top.riverelder.arkham.Code.Commands {
                         sb.Append(" > ");
                     }
                     Investigator inv = list[i];
-                    sb.Append(inv.Name).Append('(').Append(inv.Is("NPC") ? "???" : Convert.ToString(map[inv])).Append(')');
+                    sb.Append(inv.Name).Append('(').Append(inv.Is("HIDE_VALUE") ? "???" : Convert.ToString(map[inv])).Append(')');
                 }
             }
             if (notFoundNames.Count > 0) {

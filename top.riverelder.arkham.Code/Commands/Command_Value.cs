@@ -143,9 +143,12 @@ namespace top.riverelder.arkham.Code.Commands {
         }
 
         public static string NewName(Scenario scenario, Investigator inv, string valueName, string newName) {
-            inv.Values.Set(valueName, newName);
-            SaveUtil.Save(scenario);
-            return $"{inv.Name}的{valueName}的新别名：{newName}";
+            if (inv.Values.SetAlias(newName, valueName)) {
+                SaveUtil.Save(scenario);
+                return $"{inv.Name}的{valueName}的新别名：{newName}";
+            } else {
+                return $"{inv.Name}不存在原本名为{valueName}的数值";
+            }
         }
 
         public static string FillWithDefaultValues(Scenario scenario, Investigator inv, bool force) {

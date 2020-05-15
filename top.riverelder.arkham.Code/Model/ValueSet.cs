@@ -68,6 +68,20 @@ namespace top.riverelder.arkham.Code.Model {
             }
             return false;
         }
+        
+        /// <summary>
+        /// 判断一个名字是否是别名，它首先不能是真名，其次必须是别名
+        /// </summary>
+        /// <param name="alias">名字</param>
+        /// <param name="name">真名</param>
+        /// <returns>是否是别名</returns>
+        public bool IsAlias(string alias, out string name) {
+            if (values.ContainsKey(alias)) {
+                name = alias;
+                return false;
+            }
+            return aliases.TryGetValue(alias, out name);
+        }
 
         /// <summary>
         /// 获取值
@@ -85,14 +99,17 @@ namespace top.riverelder.arkham.Code.Model {
         }
 
         /// <summary>
-        /// 设置别名
+        /// 设置别名，若原名不存在，则设置失败
         /// </summary>
-        /// <param name="name">主名</param>
-        /// <param name="als">别名</param>
-        public void Set(string name, params string[] als) {
-            foreach (string alias in als) {
-                aliases[alias] = name;
+        /// <param name="alias">别名</param>
+        /// <param name="name">原名</param>
+        /// <returns>是否设置成功</returns>
+        public bool SetAlias(string alias, string name) {
+            if (!values.ContainsKey(name)) {
+                return false;
             }
+            aliases[alias] = name;
+            return true;
         }
 
         /// <summary>

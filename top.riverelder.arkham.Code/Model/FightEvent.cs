@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using top.riverelder.arkham.Code.Utils;
 
 namespace top.riverelder.arkham.Code.Model {
     public class FightEvent {
@@ -18,6 +19,10 @@ namespace top.riverelder.arkham.Code.Model {
             WeaponName = weaponName;
             Points = points;
             ResultType = resultType;
+        }
+
+        public override string ToString() {
+            return $"来自{SourceName}使用{WeaponName ?? "身体"}的攻击({Points}，{CheckResult.TypeStrings[ResultType]})";
         }
     }
 

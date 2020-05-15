@@ -41,7 +41,7 @@ namespace top.riverelder.arkham.Code.Commands {
             StringBuilder builder = new StringBuilder();
             CheckResult result = value.Check();
             string typeStr = result.succeed ? "成功" : "失败";
-            builder.Append($"{inv.Name}的SC({value.Val}) => {result.result}：{typeStr}");
+            builder.Append($"{inv.Name}的SC({value.Val}) => {result.points}：{typeStr}");
 
             int v = result.succeed ? success.Roll() : failure.Roll();
             if (v > 0) {

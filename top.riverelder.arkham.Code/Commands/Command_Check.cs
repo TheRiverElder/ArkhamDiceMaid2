@@ -98,7 +98,7 @@ namespace top.riverelder.arkham.Code.Commands {
             Value value = inv.Values[valueName];
             CheckResult bigger = value.Check(hardness);
             CheckResult smaller = value.Check(hardness);
-            if (bigger.result < smaller.result) {
+            if (bigger.points < smaller.points) {
                 CheckResult tmp = bigger;
                 bigger = smaller;
                 smaller = tmp;
@@ -106,12 +106,12 @@ namespace top.riverelder.arkham.Code.Commands {
             if (isBonus) {
                 return new StringBuilder()
                     .AppendLine($"{inv.Name}的奖励{valueName}：")
-                    .Append(GenResultStr(inv, smaller, false) + $"({bigger.result})，" + smaller.ActualTypeString)
+                    .Append(GenResultStr(inv, smaller, false) + $"({bigger.points})，" + smaller.ActualTypeString)
                     .ToString();
             } else {
                 return new StringBuilder()
                     .AppendLine($"{inv.Name}的惩罚{valueName}：")
-                    .Append(GenResultStr(inv, bigger, false) + $"({smaller.result})，" + bigger.ActualTypeString)
+                    .Append(GenResultStr(inv, bigger, false) + $"({smaller.points})，" + bigger.ActualTypeString)
                     .ToString();
             }
         }
@@ -134,10 +134,10 @@ namespace top.riverelder.arkham.Code.Commands {
             } else {
                 if (!selfResult.succeed) {
                     resultStr = "失败";
-                } else if (selfResult.result == targetResult.result) {
+                } else if (selfResult.points == targetResult.points) {
                     resultStr = "平局";
                 } else {
-                    resultStr = selfResult.result < targetResult.result ? "胜利" : "失败";
+                    resultStr = selfResult.points < targetResult.points ? "胜利" : "失败";
                 }
             }
             
@@ -149,8 +149,8 @@ namespace top.riverelder.arkham.Code.Commands {
         }
 
         public static string GenResultStr(Investigator inv, CheckResult result, bool showResultTypeStr) {
-            return (inv.Is("NPC") ? "(???)" : $"({result.target}/{result.value})") +
-                $" => {result.result}" + 
+            return (inv.Is("HIDE_VALUE") ? "(???)" : $"({result.target}/{result.value})") +
+                $" => {result.points}" + 
                 (showResultTypeStr ? "，" + result.ActualTypeString : "");
         }
 

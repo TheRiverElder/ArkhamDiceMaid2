@@ -69,7 +69,7 @@ namespace top.riverelder.arkham.Code.Utils {
 
                 IniSection aliases = global["Aliases"];
                 foreach (string key in aliases.Keys) {
-                    Global.DefaultValues.Set(aliases[key].ToString(), key);
+                    Global.DefaultValues.SetAlias(key, aliases[key].ToString());
                 }
 
                 IniSection groups = global["Groups"];

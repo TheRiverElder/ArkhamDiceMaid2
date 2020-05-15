@@ -75,7 +75,7 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             StringBuilder sb = new StringBuilder().Append($"{inv.Name}的战斗事件：");
             foreach (FightEvent fight in inv.Fights) {
-                sb.AppendLine().Append($"来自{fight.SourceName}使用{fight.WeaponName ?? "肉体"}的攻击");
+                sb.AppendLine().Append($"来自{fight.SourceName}使用{fight.WeaponName ?? "身体"}的攻击");
             }
             return sb.ToString();
         }

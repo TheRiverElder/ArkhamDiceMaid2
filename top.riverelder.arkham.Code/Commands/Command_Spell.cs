@@ -112,7 +112,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 return "施法失败\n" + reply;
             } else { 
                 env.Save();
-                return inv.Name + "使用了" + name + (inv.Is("NPC") ? "" : reply);
+                return inv.Name + "使用了" + name + (inv.Is("HIDE_VALUE") ? "" : reply);
             }
         }
 

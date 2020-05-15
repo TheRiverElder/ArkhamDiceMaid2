@@ -26,7 +26,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public string Usage => "战斗 <攻击|闪避|跳过|放弃|射击> [目标] [武器名]";
 
-        private string GiveUp(DMEnv env, Investigator inv) {
+        private static string GiveUp(DMEnv env, Investigator inv) {
             if (inv.Fights.Count == 0) {
                 return "未找到打斗事件";
             }
@@ -39,7 +39,7 @@ namespace top.riverelder.arkham.Code.Commands {
             return CalculateDamage(env, source, inv, fight.WeaponName);
         }
 
-        private string Skip(DMEnv env, Investigator inv) {
+        private static string Skip(DMEnv env, Investigator inv) {
             if (inv.Fights.Count > 0) {
                 FightEvent fight = inv.Fights.Dequeue();
                 env.Save();
@@ -48,11 +48,11 @@ namespace top.riverelder.arkham.Code.Commands {
             return "没有需要跳过打斗";
         }
 
-        string Dodge(DMEnv env, Investigator inv) {
+        private static string Dodge(DMEnv env, Investigator inv) {
             if (inv.Fights.Count == 0) {
                 return "未找到打斗事件";
             }
-            FightEvent fight = inv.Fights.Dequeue();
+            FightEvent fight = inv.Fights.Peek();
 
             if (!env.Sce.TryGetInvestigator(fight.SourceName, out Investigator source)) {
                 return $"未找到打斗来源：{fight.SourceName}";
@@ -62,24 +62,27 @@ namespace top.riverelder.arkham.Code.Commands {
                 if (!inv.Values.TryGet("敏捷", out Value dex)) {
                     return $"未找到{inv.Name}的闪避或敏捷属性";
                 }
-                dodge = new Value(dex.Val / 2);
+                inv.Values.Put("闪避", dodge = new Value(dex.Val / 2));
             }
 
-            CheckResult result = dodge.Check();
+            if (!inv.Check("闪避", out CheckResult result, out string str)) {
+                return str;
+            }
+            inv.Fights.Dequeue();
+
+            string chkResultStr = str + "\n";
+            env.Save();
             if (result.succeed && result.type <= fight.ResultType) {
-                env.Save();
-                return $"{inv.Name}躲开了{source.Name}的攻击({result.ActualTypeString})！";
+                return chkResultStr + $"躲开了{fight}！";
             } else {
-                string r = $"{inv.Name}闪避失败\n" + CalculateDamage(env, source, inv, fight.WeaponName);
-                env.Save();
-                return r;
+                return chkResultStr + $"受到了{fight}\n" + CalculateDamage(env, source, inv, fight.WeaponName);
             }
         }
 
-        public static string Attack(DMEnv env, Investigator source, Investigator target, string weaponName) {
+        private static string Attack(DMEnv env, Investigator source, Investigator target, string weaponName) {
 
             Item w = null;
-            if (weaponName != null) {
+            if (weaponName != null && weaponName != "身体") {
                 if (!source.Inventory.TryGetValue(weaponName, out w)) {
                     return $"未找到{source.Name}武器：{weaponName}";
                 }
@@ -90,10 +93,12 @@ namespace top.riverelder.arkham.Code.Commands {
             if (!source.Values.TryGet(w.SkillName, out Value skill) && !Global.DefaultValues.TryGet(w.SkillName, out skill)) {
                 return $"未找到的{w.SkillName}技能及其默认值";
             }
-            CheckResult result = skill.Check();
+            if (!source.Check(w.SkillName, out CheckResult result, out string str)) {
+                return str;
+            }
 
             if (!result.succeed) {
-                return $"{source.Name}对{target.Name}的攻击失败";
+                return str + "\n攻击失败";
             }
 
             int mulfunctionCheckResult = Dice.Roll(100);
@@ -102,18 +107,18 @@ namespace top.riverelder.arkham.Code.Commands {
             }
 
             switch (w.Type) {
-                case "肉搏": return CommitFight(env, source, target, weaponName, result.result, result.type);
-                case "投掷": return CommitFight(env, source, target, weaponName, result.result, result.type);
+                case "肉搏": return CommitFight(env, source, target, weaponName, result.points, result.type);
+                case "投掷": return CommitFight(env, source, target, weaponName, result.points, result.type);
                 case "射击": return CalculateDamage(env, source, target, weaponName);
             }
             
             return $"未知的武器类型：{w.Type}，只能是：肉搏、投掷、射击";
         }
 
-        public static string FightBack(DMEnv env, Investigator target, string weaponName) {
+        private static string FightBack(DMEnv env, Investigator target, string weaponName) {
 
             Item selfWeapon = null;
-            if (weaponName != null) {
+            if (weaponName != null && weaponName != "身体") {
                 if (!target.Inventory.TryGetValue(weaponName, out selfWeapon)) {
                     return $"未找到{target.Name}的{weaponName}";
                 }
@@ -124,7 +129,7 @@ namespace top.riverelder.arkham.Code.Commands {
             if (target.Fights.Count == 0) {
                 return "未找到打斗事件";
             }
-            FightEvent fight = target.Fights.Dequeue();
+            FightEvent fight = target.Fights.Peek();
 
             if (!env.Sce.TryGetInvestigator(fight.SourceName, out Investigator source)) {
                 return $"未找到打斗来源：{fight.SourceName}";
@@ -143,32 +148,33 @@ namespace top.riverelder.arkham.Code.Commands {
                 return oppositeWeapon + "不是肉搏武器，仅肉搏可反击！";
             }
 
-            if (!target.Values.TryGet(oppositeWeapon.SkillName, out Value skill)) {
-                return $"未找到{target.Name}的{oppositeWeapon.SkillName}";
+            if (!target.Check(oppositeWeapon.SkillName, out CheckResult result, out string str)) {
+                return str;
             }
 
-            CheckResult result = skill.Check();
-            string r = "出现异常";
+            target.Fights.Dequeue();
+            
+            string r = str + "\n";
             if (result.succeed && result.type < fight.ResultType) {
                 int mulfunctionCheckResult = Dice.Roll(100);
                 if (mulfunctionCheckResult > selfWeapon.Mulfunction) {
                     return $"{target.Name}的{selfWeapon.Name}{(selfWeapon.Type == "射击" ? "炸膛" : "坏掉")}了！({mulfunctionCheckResult} > {selfWeapon.Mulfunction})";
                 }
-                r = $"{target.Name}反击成功{source.Name}({result.ActualTypeString})！\n" + CalculateDamage(env, target, source, weaponName);
+                r = $"反击了{fight}！\n" + CalculateDamage(env, target, source, weaponName);
             } else {
-                r = $"{target.Name}反击失败\n" + CalculateDamage(env, source, target, fight.WeaponName);
+                r = $"受到了{fight}！\n" + CalculateDamage(env, source, target, fight.WeaponName);
             }
             return r;
         }
 
-        static string CommitFight(DMEnv env, Investigator source, Investigator target, string weaponName, int points, int resultType) {
-            string wName = string.IsNullOrEmpty(weaponName) ? "肉体" : weaponName;
-            target.Fights.Enqueue(new FightEvent(source.Name, target.Name, weaponName, points, resultType));
+        private static string CommitFight(DMEnv env, Investigator source, Investigator target, string weaponName, int points, int resultType) {
+            FightEvent fight = new FightEvent(source.Name, target.Name, weaponName, points, resultType);
+            target.Fights.Enqueue(fight);
             env.Save();
-            return $"{source.Name}使用{wName}对{target.Name}发起了攻击({CheckResult.TypeStrings[resultType]}{points})";
+            return target.Name + "即将受到" + fight;
         }
 
-        static string CalculateDamage(DMEnv env, Investigator source, Investigator target, string weaponName) {
+        private static string CalculateDamage(DMEnv env, Investigator source, Investigator target, string weaponName) {
             Item w = null;
             if (weaponName != null) {
                 if (!source.Inventory.TryGetValue(weaponName, out w)) {
@@ -183,30 +189,40 @@ namespace top.riverelder.arkham.Code.Commands {
             }
 
             StringBuilder sb = new StringBuilder();
+            // 计算伤害值
             int r = Dice.RollWith(w.Damage, source.DamageBonus);
             int cost = Math.Min(w.Cost, w.CurrentLoad);
             w.CurrentLoad -= cost;
-            sb.AppendLine($"{source.Name}对{target.Name}造成伤害{r}，弹药消耗{cost}，弹药剩余{w.CurrentLoad}/{w.Capacity}");
-            if (target.Values.TryGet("护甲", out Value protect)) {
-                r = Math.Max(0, r - protect.Val);
-                sb.AppendLine("护甲阻挡部分伤害，最终伤害：" + r);
+            sb.Append($"{source.Name}对{target.Name}造成伤害{r}");
+            if (w.Cost == 0) {
+                sb.Append($"，弹药消耗{cost}，弹药剩余{w.CurrentLoad}/{w.Capacity}");
             }
+            sb.AppendLine();
+            // 计算护甲格挡
+            if (target.Values.TryGet("护甲", out Value protect) && protect.Val > 0) {
+                r = Math.Max(0, r - protect.Val);
+                sb.AppendLine("护甲阻挡部分伤害，最终实际伤害：" + r);
+            }
+            // 施加伤害
             if (r > 0) {
                 if (!target.Values.TryGet("体力", out Value th)) {
                     return sb.Append("而对方没有体力").ToString();
                 }
-                int prev = th.Val;
-                th.Sub(r);
-                sb.Append($"{target.Name}的体力：{(target.Is("NPC") ? "???" : Convert.ToString(prev))} - {r} => {(target.Is("NPC") ? "???" : Convert.ToString(th.Val))}");
-                if (r >= th.Max / 2 && th.Val > 0) {
+                // 真正减少体力
+                sb.Append(target.Change("体力", -r));
+                if (th.Val < r) { // 检定是否可急救
+                    sb.AppendLine().Append("受伤过重，无法治疗").ToString();
+                } else if (r >= (int)(th.Max / 2.0) && th.Val > 0) { // 检定昏迷
+                    sb.AppendLine().Append("一次失血过半，");
                     if (!target.Values.TryWidelyGet("意志", out Value san)) {
                         san = new Value(50);
                     }
-                    CheckResult cr = san.Check();
-                    sb.AppendLine().Append("失血过半，检定意志：");
-                    sb.Append($"结果：{cr.result}");
+                    if (!target.Check("意志", out CheckResult cr, out string str)) {
+                        return sb.Append(str).ToString();
+                    }
+                    sb.Append(str).Append("，");
                     if (cr.succeed) {
-                        sb.Append("成功挺住");
+                        sb.Append($"{target.Name}成功挺住");
                     } else {
                         sb.Append($"{target.Name}昏厥");
                     }
@@ -216,7 +232,7 @@ namespace top.riverelder.arkham.Code.Commands {
             return sb.ToString();
         }
 
-        public static readonly string NPCTag = "NPC";
+        public static readonly string HIDE_VALUETag = "HIDE_VALUE";
         public static readonly string UnkonwnValue = "???";
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
