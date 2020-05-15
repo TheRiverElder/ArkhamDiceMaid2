@@ -11,7 +11,8 @@ using top.riverelder.RiverCommand.Utils;
 namespace top.riverelder.RiverCommand {
     public class CommandNode<TEnv> {
 
-        public static readonly string DictArgSeperators = ";；\n";
+        public static readonly string ArgSep = " \t\n,，;；";
+        public static readonly string EOF = "/";
 
         public string ParamName { get; set; } = null;
         public ParamParser Parser { get; } = null;
@@ -39,7 +40,7 @@ namespace top.riverelder.RiverCommand {
         /// <summary>
         /// 调度参数解析
         /// </summary>
-        /// <param name="raw">原始字符串</param>
+        /// <param name="reader">原始字符流</param>
         /// <param name="env">环境</param>
         /// <param name="args">参数</param>
         /// <param name="reply">回复消息</param>
@@ -72,11 +73,11 @@ namespace top.riverelder.RiverCommand {
             try {
                 if (Process != null && !Process(env, args, arg, out arg, out err)) {
                     reply = err;
-                    return DispatchResult.MatchedSelf;
+                    return DispatchResult.Unmatched;
                 }
             } catch (Exception e) {
                 reply = e.Message;
-                return DispatchResult.MatchedSelf;
+                return DispatchResult.Unmatched;
             }
 
             // 如果有参数名，则将该值赋予参数
@@ -85,9 +86,9 @@ namespace top.riverelder.RiverCommand {
             }
 
             DispatchResult childResult = DispatchResult.Unmatched;
-            reader.SkipWhiteSpaceExcept(DictArgSeperators);
+            reader.SkipWhiteSpaceExcept(ArgSep);
             // 判断映射参数部分是否还未开始
-            if (reader.HasNext && DictArgSeperators.IndexOf(reader.Peek()) < 0) {
+            if (reader.HasNext && ArgSep.IndexOf(reader.Peek()) < 0) {
                 int start = reader.Cursor;
                 childResult = DispatchResult.MatchedAll;
                 // 优先匹配子节点，执行子节点的逻辑
@@ -113,7 +114,7 @@ namespace top.riverelder.RiverCommand {
                 // 解析映射参数
                 Args dict = new Args();
                 if (Mapper != null) {
-                    reader.SkipTo(DictArgSeperators);
+                    reader.SkipTo(ArgSep);
                     Mapper.Parse(reader, dict, out string dictErr);
                 }
                 reply = Executor(env, args, dict);
@@ -135,7 +136,7 @@ namespace top.riverelder.RiverCommand {
         private CommandNode<TEnv>[] GetRevelentNodes(StringReader reader) {
             int start = reader.Cursor;
             reader.SkipWhiteSpace();
-            string literal = reader.HasNext ? reader.ReadToWhiteSpaceOr(DictArgSeperators) : null;
+            string literal = reader.HasNext ? reader.ReadToWhiteSpaceOr(ArgSep) : null;
             reader.Cursor = start;
             if (!string.IsNullOrEmpty(literal) && certainChildren.TryGetValue(literal, out CommandNode<TEnv> node)) {
                 return new CommandNode<TEnv>[] { node };
@@ -223,6 +224,9 @@ namespace top.riverelder.RiverCommand {
         /// <summary>
         /// 获取帮助信息
         /// </summary>
-        public virtual string Help => string.IsNullOrEmpty(ParamName) ? Parser.Tip : ParamName;
+        public virtual string Help => 
+            string.IsNullOrEmpty(ParamName) ? 
+            (Parser.IsLiteral ? Parser.Tip : $"<{Parser.Tip}>") :
+            $"<{ParamName}:{Parser.Tip}>";
     }
 }

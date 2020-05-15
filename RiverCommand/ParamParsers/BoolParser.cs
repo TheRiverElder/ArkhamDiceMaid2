@@ -15,7 +15,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
         public BoolParser(string trueValue, string falseValue) {
             TrueValue = trueValue;
             FalseValue = falseValue;
-            Tip = TrueValue + '/' + FalseValue;
+            Tip = $"{TrueValue}|{FalseValue}";
         }
 
         public override string[] Certain => new string[] { TrueValue, FalseValue };

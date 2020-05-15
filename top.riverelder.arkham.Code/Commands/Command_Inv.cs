@@ -50,6 +50,9 @@ namespace top.riverelder.arkham.Code.Commands {
                     .Executes((env, args, dict) => ReCalc(env, args.GetInv("名称")))
                 )
             ).Then(
+                PresetNodes.Literal<DMEnv>("检查")
+                .Executes((env, args, dict) => Check(env.Inv))
+            ).Then(
                 PresetNodes.Literal<DMEnv>("伤害加值")
                 .Then(
                     Extensions.Dice("数值")
@@ -182,6 +185,76 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Append("体格：").Append(inv.Build).Append('，')
                 .Append("伤害加值：").Append(inv.DamageBonus)
                 .ToString();
+        }
+
+        private static string[] BasicNine = new string[] {
+            "力量", "体型", "体质", "智力", "教育", "敏捷", "意志", "外貌", "幸运",
+        };
+
+        public static string Check(Investigator inv) {
+            HashSet<string> missingValueNames = new HashSet<string>();
+            ValueSet values = inv.Values;
+            foreach (string name in BasicNine) {
+                if (!values.Has(name)) {
+                    missingValueNames.Add(name);
+                }
+            }
+            int maxHealth, maxMagic, calcDodge;
+            List<string> warnings = new List<string>();
+            // 通过体质与体型检查体力数值
+            if (!values.TryGet("体力", out Value health)) {
+                missingValueNames.Add("体力");
+            } else if (health.Max <= 0) {
+                warnings.Add("【体力】未设上限");
+            } else if (
+                !values.TryGet("体型", out Value siz) &&
+                !values.TryGet("体质", out Value con) &&
+                health.Max != (maxHealth = (int)((siz.Val + con.Val) / 10.0))) {
+                warnings.Add($"【体力】上限不等于[体型]与[体质]之和的十分之一({maxHealth})");
+            }
+            // 通过意志检查魔法数值
+            if (!values.TryGet("魔法", out Value magic)) {
+                missingValueNames.Add("魔法");
+            } else if (health.Max <= 0) {
+                warnings.Add("【魔法】未设上限");
+            } else if (
+                !values.TryGet("意志", out Value pow) &&
+                magic.Max != (maxMagic = (int)(pow.Val / 5.0))) {
+                warnings.Add($"【魔法】上限不等于[意志]的五分之一({maxMagic})");
+            }
+            // 通过意志检查理智数值
+            if (!values.TryGet("理智", out Value sannity)) {
+                missingValueNames.Add("理智");
+            } else if (
+                !values.TryGet("意志", out Value pow) &&
+                magic.Max != pow.Val) {
+                warnings.Add($"【魔法】上限不等于[意志]的值({pow.Val})");
+            }
+            // 通过敏捷检查闪避数值
+            if (!values.TryGet("闪避", out Value dodge)) {
+                missingValueNames.Add("闪避");
+            } else if (
+                !values.TryGet("敏捷", out Value dex) &&
+                dodge.Max != (calcDodge = (int)(dex.Val / 2.0))) {
+                warnings.Add($"【闪避】不等于[敏捷]的一半({calcDodge})");
+            }
+
+            if (missingValueNames.Count == 0 && warnings.Count == 0) {
+                return "未发现数据错误（不包括体格、伤害加值）";
+            }
+
+            StringBuilder builder = new StringBuilder();
+            if (missingValueNames.Count > 0) {
+                builder.Append("缺失数据：" + string.Join("、", missingValueNames));
+                if (warnings.Count > 0) {
+                    builder.AppendLine();
+                }
+            }
+            if (warnings.Count > 0) {
+                builder.Append(string.Join("\n", warnings));
+            }
+
+            return builder.ToString();
         }
 
         public static string AddTags(DMEnv env, Investigator inv, string[] tags) {

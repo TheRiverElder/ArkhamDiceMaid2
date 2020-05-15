@@ -9,6 +9,11 @@ namespace top.riverelder.RiverCommand.ParamParsers {
     public abstract class ParamParser {
 
         /// <summary>
+        /// 是否是字面量，用于提示
+        /// </summary>
+        public virtual bool IsLiteral => false;
+
+        /// <summary>
         /// 如果出现该字符串则能确定调用此参数的节点
         /// </summary>
         public virtual string[] Certain { get; } = null;

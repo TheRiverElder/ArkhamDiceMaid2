@@ -75,8 +75,15 @@ namespace top.riverelder.arkham.Code.Model {
             return true;
         }
 
+        /// <summary>
+        /// 判断该调查员是否带了某标签
+        /// </summary>
+        /// <param name="tag">标签</param>
+        /// <returns>检查结果</returns>
         public bool Is(string tag) {
-            return Tags.Contains(tag);
+            return Tags.Contains(tag.ToUpper());
         }
+
+        public
     }
 }

@@ -12,7 +12,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
 
         public OrParser(string[] validValues) {
             ValidValues = validValues;
-            Tip = string.Join("，", ValidValues);
+            Tip = string.Join("|", ValidValues);
         }
         
         public override string Tip { get; }

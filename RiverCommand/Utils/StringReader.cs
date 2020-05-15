@@ -7,9 +7,18 @@ using System.Threading.Tasks;
 namespace top.riverelder.RiverCommand.Utils {
     public class StringReader {
 
+        //private HashSet<char> SepSet;
+        //private HashSet<char> EofSet;
+
         public int Cursor { get; set; } = 0;
 
         public string Data { get; }
+
+        //public StringReader(IEnumerable<char> sepSet, IEnumerable<char> eofSet, string data) {
+        //    SepSet = new HashSet<char>(sepSet);
+        //    EofSet = new HashSet<char>(eofSet);
+        //    Data = data;
+        //}
 
         public StringReader(string data, int cursor) {
             Cursor = cursor;

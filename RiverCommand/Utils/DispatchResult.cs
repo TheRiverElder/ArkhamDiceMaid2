@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace top.riverelder.RiverCommand.Utils {
     public enum DispatchResult {
         /// <summary>
-        /// 仅仅匹配成功自身节点
+        /// 仅仅匹配成功自身节点，后续还有内容但是并未匹配
         /// </summary>
         MatchedSelf,
 
