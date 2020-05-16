@@ -47,17 +47,17 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public static string WithTranslatorTone(string dice, string result, string name) {
             StringBuilder pb = new StringBuilder().Append(Dice.Roll(Starts));
-            int rand = Dice.Roll(3);
+            int rand = Dice.Roll(2);
             for (int i = 0; i < rand; i++) {
                 pb.Append(OddsAndEnds());
             }
             pb.Append(Dice.Roll(Rolls));
-            rand = Dice.Roll(3);
+            rand = Dice.Roll(2);
             for (int i = 0; i < rand; i++) {
                 pb.Append(OddsAndEnds());
             }
             pb.Append(Dice.Roll(Results));
-            rand = Dice.Roll(3);
+            rand = Dice.Roll(2);
             for (int i = 0; i < rand; i++) {
                 pb.Append(OddsAndEnds());
             }
@@ -78,7 +78,7 @@ namespace top.riverelder.arkham.Code.Commands {
             "但还是得到了一个{1}。",
             "可是它却给了我们一个{1}！",
             "虽然{1}不能是相当令人满意的，但是生活还是要继续不是吗？",
-            "俗话说塞凡的父亲失去了马，可能不是不幸运的，正如这个{1}你刚刚投的。",
+            "俗话说塞凡的父亲失去了马，可能不是不幸运的，正如这个{1}你刚刚投的一样。",
             "可能你期待的是一个1，但是{1}也是个不错的选择不是么？",
             "好的，现在，让我们揭晓一下答案吧！是{1}，我说是{1}！真是不可思议！是{1}！",
         };
@@ -99,15 +99,16 @@ namespace top.riverelder.arkham.Code.Commands {
         private static string OddsAndEnds() {
             string pattern = Dice.Roll(Patterns);
             StringBuilder builder = new StringBuilder();
-            Match m = Regex.Match(pattern, @"[(.+)]");
+            Match m = Regex.Match(pattern, @"\[([^\[\]]+)\]");
             int prev = 0;
             while (m.Success) {
                 string key = m.Groups[1].Value;
                 string replacement = Tags.TryGetValue(key, out var list) ? Dice.Roll(list) : key;
-                builder.Append(pattern, prev, m.Index - prev);
+                builder.Append(pattern, prev, m.Index - prev).Append(replacement);
                 prev = m.Index + m.Length;
                 m = m.NextMatch();
             }
+            builder.Append(pattern, prev, pattern.Length - prev);
             return builder.ToString();
         }
 
