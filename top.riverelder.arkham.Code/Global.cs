@@ -34,6 +34,11 @@ namespace top.riverelder.arkham.Code {
         }
 
         /// <summary>
+        /// 翻译腔，这并不会被保存
+        /// </summary>
+        public static bool TranslatorTone = false;
+
+        /// <summary>
         /// 召唤骰娘的前缀
         /// </summary>
         public static string Prefix = "/";

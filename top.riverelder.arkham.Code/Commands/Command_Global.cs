@@ -49,12 +49,22 @@ namespace top.riverelder.arkham.Code.Commands {
                         return "自动载入：" + (Global.AutoLoad ? "开" : "关");
                     })
                 )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("翻译腔").Then(
+                    PresetNodes.Bool<DMEnv>("开关", "开", "关")
+                    .Executes((env, args, dict) => {
+                        Global.TranslatorTone = args.GetBool("开关");
+                        //SaveUtil.SaveGlobal();
+                        return "翻译腔：" + (Global.TranslatorTone ? "开" : "关");
+                    })
+                )
             );
 
             dispatcher.SetAlias("配置", "全局 配置");
             dispatcher.SetAlias("调试", "全局 调试");
             dispatcher.SetAlias("回复", "全局 回复");
             dispatcher.SetAlias("自动载入", "全局 自动载入");
+            dispatcher.SetAlias("翻译腔", "全局 翻译腔");
         }
 
     }

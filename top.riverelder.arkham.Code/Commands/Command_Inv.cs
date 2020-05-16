@@ -215,7 +215,7 @@ namespace top.riverelder.arkham.Code.Commands {
             // 通过意志检查魔法数值
             if (!values.TryGet("魔法", out Value magic)) {
                 missingValueNames.Add("魔法");
-            } else if (health.Max <= 0) {
+            } else if (magic.Max <= 0) {
                 warnings.Add("【魔法】未设上限");
             } else if (
                 !values.TryGet("意志", out Value pow) &&
@@ -228,7 +228,7 @@ namespace top.riverelder.arkham.Code.Commands {
             } else if (
                 !values.TryGet("意志", out Value pow) &&
                 magic.Max != pow.Val) {
-                warnings.Add($"【魔法】上限不等于[意志]的值({pow.Val})");
+                warnings.Add($"【理智】不等于[意志]的值({pow.Val})");
             }
             // 通过敏捷检查闪避数值
             if (!values.TryGet("闪避", out Value dodge)) {

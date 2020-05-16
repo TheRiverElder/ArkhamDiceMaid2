@@ -14,6 +14,10 @@ namespace top.riverelder.arkham.Code.Utils {
             return DiceItem.random.Next(Math.Max(1, max));
         }
 
+        public static T Roll<T>(T[] array) {
+            return array.Length > 0 ? array[DiceItem.random.Next(array.Length)] : default(T);
+        }
+
         public static int Roll(string s) => RollWith(s, null);
 
         public static int RollWith(string s, string db) {

@@ -73,11 +73,11 @@ namespace top.riverelder.RiverCommand {
             try {
                 if (Process != null && !Process(env, args, arg, out arg, out err)) {
                     reply = err;
-                    return DispatchResult.Unmatched;
+                    return DispatchResult.MatchedSelf;
                 }
             } catch (Exception e) {
                 reply = e.Message;
-                return DispatchResult.Unmatched;
+                return DispatchResult.MatchedSelf;
             }
 
             // 如果有参数名，则将该值赋予参数
@@ -86,7 +86,7 @@ namespace top.riverelder.RiverCommand {
             }
 
             DispatchResult childResult = DispatchResult.Unmatched;
-            reader.SkipWhiteSpaceExcept(ArgSep);
+            reader.SkipWhiteSpaceAnd(ArgSep);
             // 判断映射参数部分是否还未开始
             if (reader.HasNext && ArgSep.IndexOf(reader.Peek()) < 0) {
                 int start = reader.Cursor;

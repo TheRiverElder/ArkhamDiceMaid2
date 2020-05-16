@@ -100,7 +100,7 @@ namespace top.riverelder.arkham.Code.Model {
             }
             result = value.Check(hardness);
             string valueStr = Is("HIDE_VALUE") ? "???" : $"{result.target}/{result.value}";
-            str = $"{Name}的{result.level}{valueName}：({valueStr}) => {result.points}，{result.ActualTypeString}";
+            str = $"{Name}的{CheckResult.TypeStrings[result.level]}{valueName}：({valueStr}) => {result.points}，{result.ActualTypeString}";
             return true;
         }
 

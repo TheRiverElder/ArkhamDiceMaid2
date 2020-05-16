@@ -160,9 +160,9 @@ namespace top.riverelder.arkham.Code.Commands {
                 if (mulfunctionCheckResult > selfWeapon.Mulfunction) {
                     return $"{target.Name}的{selfWeapon.Name}{(selfWeapon.Type == "射击" ? "炸膛" : "坏掉")}了！({mulfunctionCheckResult} > {selfWeapon.Mulfunction})";
                 }
-                r = $"反击了{fight}！\n" + CalculateDamage(env, target, source, weaponName);
+                r += $"反击了{fight}！\n" + CalculateDamage(env, target, source, weaponName);
             } else {
-                r = $"受到了{fight}！\n" + CalculateDamage(env, source, target, fight.WeaponName);
+                r += $"受到了{fight}！\n" + CalculateDamage(env, source, target, fight.WeaponName);
             }
             return r;
         }
@@ -209,8 +209,9 @@ namespace top.riverelder.arkham.Code.Commands {
                     return sb.Append("而对方没有体力").ToString();
                 }
                 // 真正减少体力
+                int prev = th.Val;
                 sb.Append(target.Change("体力", -r));
-                if (th.Val < r) { // 检定是否可急救
+                if (prev < r) { // 检定是否可急救
                     sb.AppendLine().Append("受伤过重，无法治疗").ToString();
                 } else if (r >= (int)(th.Max / 2.0) && th.Val > 0) { // 检定昏迷
                     sb.AppendLine().Append("一次失血过半，");
