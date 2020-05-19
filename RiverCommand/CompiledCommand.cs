@@ -38,11 +38,11 @@ namespace RiverCommand {
 
         public object Execute(out string reply) {
             try {
-                reply = (string)Executor(Env, Args, Dict);
+                return Executor(Env, Args, Dict, out reply);
             } catch (Exception e) {
                 reply = e.Message;
+                return false;
             }
-            return reply;
         }
 
     }
