@@ -28,16 +28,16 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), CheckResult.NormalSuccess))
                 .Then(
                     PresetNodes.Or<DMEnv>("难度", "普通", "困难", "极难")
-                    .Handles(PreProcesses.Mapper<DMEnv>(hardnessMap))
+                    .Handles(PreProcesses.MapArg<DMEnv>(hardnessMap))
                     .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), args.GetInt("难度")))
                     .Then(
                         PresetNodes.Or<DMEnv>("奖惩", "奖励", "惩罚")
-                        .Handles(PreProcesses.Mapper<DMEnv>(twiceMap))
+                        .Handles(PreProcesses.MapArg<DMEnv>(twiceMap))
                         .Executes((env, args, dict) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩"), args.GetInt("难度")))
                     )
                 ).Then(
                     PresetNodes.Or<DMEnv>("奖惩", "奖励", "惩罚")
-                    .Handles(PreProcesses.Mapper<DMEnv>(twiceMap))
+                    .Handles(PreProcesses.MapArg<DMEnv>(twiceMap))
                     .Executes((env, args, dict) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩"), CheckResult.NormalSuccess))
                 ).Then(
                     PresetNodes.Literal<DMEnv>("对抗").Then(
