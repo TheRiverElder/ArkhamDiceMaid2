@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RiverCommand;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,38 +47,32 @@ namespace top.riverelder.RiverCommand {
             aliases[alias] = replacement;
         }
 
-        public bool Dispatch(string raw, TEnv env, out string reply) {
+        public bool Dispatch(string raw, TEnv env, out CommandNode<TEnv> ccmd) {
             raw = raw.TrimStart();
             StringReader reader = new StringReader(raw);
             reader.SkipWhiteSpace();
-            string alias = reader.ReadToWhiteSpace();
+            string alias = reader.Read(ArgUtil.IsNameChar);
             if (aliases.TryGetValue(alias, out string act)) {
-                reader = new StringReader(act + reader.ReadRest());
+                reader = new StringReader(act + " " + reader.ReadRest());
             }
             reader.Cursor = 0;
-            string head = reader.ReadToWhiteSpace();
-            reader.Cursor = 0;
-            string err = null;
-            try {
-                if (commands.TryGetValue(head, out CommandNode<TEnv> node)) {
-                    if (node.Dispatch(reader, env, new Args(), out string rp) == DispatchResult.MatchedAll) {
-                        reply = rp;
-                        return true;
-                    } else {
-                        err = rp;
-                    }
+            List<CompiledCommand<TEnv>> res = new List<CompiledCommand<TEnv>>();
+            if (commands.TryGetValue(head, out CommandNode<TEnv> node)) {
+                if (node.Dispatch(reader, env, new Args(), 1, res)) {
+                    reply = rp;
+                    return true;
+                } else {
+                    err = rp;
                 }
-                foreach (var n in customActions) {
-                    if (n.Dispatch(reader, env, new Args(), out reply) == DispatchResult.MatchedAll) {
-                        return true;
-                    }
-                }
-                reply = err;
-                return false;
-            } catch (Exception e) {
-                reply = e.Message;
-                return false;
             }
+            foreach (var n in customActions) {
+                if (n.Dispatch(reader, env, new Args(), out reply)) {
+                    return true;
+                }
+            }
+            reply = err;
+            return false;
+
         }
     }
 }

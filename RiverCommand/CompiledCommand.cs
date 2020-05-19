@@ -9,11 +9,14 @@ namespace RiverCommand {
     public class CompiledCommand<TEnv> {
 
         public int Length { get; }
+        public string Error { get; }
 
         private CmdExecutor<TEnv> Executor;
         private TEnv Env;
         private Args Args;
         private Args Dict;
+
+        public bool IsErr => !string.IsNullOrEmpty(Error);
 
         public CompiledCommand(int length, CmdExecutor<TEnv> executor, TEnv env, Args args, Args dict) {
             Length = length;
@@ -23,8 +26,18 @@ namespace RiverCommand {
             Dict = dict;
         }
 
-        public object Execute() {
-            return Executor(Env, Args, Dict);
+        public CompiledCommand(int length, string error) {
+            Length = length;
+            Error = error;
+        }
+
+        public object Execute(out string reply) {
+            try {
+                reply = (string)Executor(Env, Args, Dict);
+            } catch (Exception e) {
+                reply = e.Message;
+            }
+            return reply;
         }
 
     }

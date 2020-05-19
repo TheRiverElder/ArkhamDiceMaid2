@@ -18,8 +18,8 @@ namespace top.riverelder.RiverCommand {
         public DictMapper Mapper { get; set; } = null;
         public bool Spread { get; set; } = false;
 
-        private readonly IDictionary<string, CommandNode<TEnv>> certainChildren = new Dictionary<string, CommandNode<TEnv>>();
-        private readonly IList<CommandNode<TEnv>> children = new List<CommandNode<TEnv>>();
+        protected readonly IDictionary<string, CommandNode<TEnv>> certainChildren = new Dictionary<string, CommandNode<TEnv>>();
+        protected readonly IList<CommandNode<TEnv>> children = new List<CommandNode<TEnv>>();
 
         public PreHandler<TEnv> Process { get; set; } = null;
         public CmdExecutor<TEnv> Executor { get; set; } = null;
@@ -49,16 +49,14 @@ namespace top.riverelder.RiverCommand {
             TEnv env,
             Args args,
             int level,
-            List<CompiledCommand<TEnv>> res,
-            out string err
+            List<CompiledCommand<TEnv>> res
         ) {
-            err = null;
-
-            reader.SkipWhiteSpace();
+            reader.Skip(Config.ListSeps);
             int start = reader.Cursor;
             // 匹配参数
-            if (!MatchSelfListArg(reader, env, args, out err)) {
+            if (!MatchSelfListArg(reader, env, args, out string err)) {
                 reader.Cursor = start;
+                res.Add(MakeErr(level, err));
                 return false;
             }
 
@@ -73,35 +71,23 @@ namespace top.riverelder.RiverCommand {
                         res.Add(CompileWith(env, args, dict, level));
                         return true;
                     } else {
-                        err = $"层级{level}，该节点不应该是终结节点";
+                        res.Add(MakeErr(level, "该节点不应该是终结节点"));
                         return false;
                     }
                 } else {
-                    err = $"层级{level}，命令本应结束，却读取到未知字符：" +
-                        reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip);
+                    res.Add(MakeErr(level, 
+                        "命令本应结束，却读取到未知字符：" +
+                        reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip))
+                    );
                     return false;
                 }
             }
 
             // 开始匹配子节点
-            start = reader.Cursor;
-            bool hasChildMatched = false;
-            foreach (CommandNode<TEnv> child in GetRevelentNodes(reader)) {
-                // 执行子节点的调度
-                hasChildMatched |= child.Dispatch(reader, env, args.Derives(), level + 1, res, out err);
-                reader.Cursor = start;
-            }
-            if (!hasChildMatched) {
-                err = new StringBuilder()
-                    .AppendLine($"层级{level}，")
-                    .AppendLine("期待：" + string.Join("，", GetTips()))
-                    .Append("得到：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip))
-                    .ToString();
-            }
-            return hasChildMatched;
+            return MatchChildren(reader, env, args, level + 1, res);
         }
 
-        private bool MatchSelfListArg(StringReader reader, TEnv env, Args args, out string err) {
+        protected bool MatchSelfListArg(StringReader reader, TEnv env, Args args, out string err) {
             // 匹配参数
             object ori = null;
             if (Spread) { // 收集所有剩下的参数
@@ -136,11 +122,27 @@ namespace top.riverelder.RiverCommand {
             return true;
         }
 
-
-        private CommandNode<TEnv>[] GetRevelentNodes(StringReader reader) {
+        protected bool MatchChildren(StringReader reader, TEnv env, Args args, int childLevel, List<CompiledCommand<TEnv>> res) {
+            // 开始匹配子节点
             int start = reader.Cursor;
-            reader.SkipWhiteSpace();
-            string literal = reader.HasNext ? reader.ReadToWhiteSpaceOr(ArgSep) : null;
+            bool hasChildMatched = false;
+            foreach (CommandNode<TEnv> child in GetRevelentNodes(reader)) {
+                // 执行子节点的调度
+                hasChildMatched |= child.Dispatch(reader, env, args.Derives(), childLevel, res);
+                reader.Cursor = start;
+            }
+            if (!hasChildMatched) {
+                res.Add(MakeErr(childLevel, new StringBuilder()
+                    .AppendLine("期待：" + string.Join("，", GetTips()))
+                    .Append("得到：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip))
+                    .ToString()));
+            }
+            return hasChildMatched;
+        }
+
+        protected CommandNode<TEnv>[] GetRevelentNodes(StringReader reader) {
+            int start = reader.Cursor;
+            string literal = reader.Read(ArgUtil.IsNameChar);
             reader.Cursor = start;
             if (!string.IsNullOrEmpty(literal) && certainChildren.TryGetValue(literal, out CommandNode<TEnv> node)) {
                 return new CommandNode<TEnv>[] { node };
@@ -148,6 +150,24 @@ namespace top.riverelder.RiverCommand {
                 return children.ToArray();
             }
         }
+
+        protected HashSet<CommandNode<TEnv>> GetAllChildren() {
+            HashSet<CommandNode<TEnv>> ac = new HashSet<CommandNode<TEnv>>(certainChildren.Values);
+            ac.UnionWith(children);
+            return ac;
+        }
+
+        protected CompiledCommand<TEnv> CompileWith(TEnv env, Args args, Args dict, int len) {
+            return new CompiledCommand<TEnv>(len, Executor, env, args, dict);
+        }
+
+        protected CompiledCommand<TEnv> MakeErr(int len, string err) {
+            return new CompiledCommand<TEnv>(len, err);
+        }
+
+        #endregion
+
+        #region 构造相关
 
         public void AddChild(CommandNode<TEnv> node) {
             string[] certain = node.Parser.Certain;
@@ -159,20 +179,6 @@ namespace top.riverelder.RiverCommand {
                 children.Add(node);
             }
         }
-
-        private HashSet<CommandNode<TEnv>> GetAllChildren() {
-            HashSet<CommandNode<TEnv>> ac = new HashSet<CommandNode<TEnv>>(certainChildren.Values);
-            ac.UnionWith(children);
-            return ac;
-        }
-
-        private CompiledCommand<TEnv> CompileWith(TEnv env, Args args, Args dict, int len) {
-            return new CompiledCommand<TEnv>(len, Executor, env, args, dict);
-        }
-
-        #endregion
-
-        #region 构造相关
 
         public CommandNode<TEnv> Then(CommandNode<TEnv> node) {
             AddChild(node);
