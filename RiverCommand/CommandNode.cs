@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RiverCommand;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand {
     public class CommandNode<TEnv> {
-        
+
 
         public string ParamName { get; set; } = null;
         public ParamParser Parser { get; } = null;
@@ -28,12 +29,11 @@ namespace top.riverelder.RiverCommand {
             Parser = parser;
         }
 
-        public CommandNode() {
-        }
-
         public CommandNode(ParamParser parser) {
             Parser = parser;
         }
+
+        #region 解析相关
 
         /// <summary>
         /// 调度参数解析
@@ -41,93 +41,99 @@ namespace top.riverelder.RiverCommand {
         /// <param name="reader">原始字符流</param>
         /// <param name="env">环境</param>
         /// <param name="args">参数</param>
-        /// <param name="reply">回复消息</param>
+        /// <param name="res">解析出来的编译命令</param>
+        /// <param name="err">错误</param>
         /// <returns>是否符合该节点</returns>
-        public DispatchResult Dispatch(StringReader reader, TEnv env, Args args, out string reply) {
-            string err = "参数匹配错误";
+        public bool Dispatch(
+            StringReader reader,
+            TEnv env,
+            Args args,
+            int level,
+            List<CompiledCommand<TEnv>> res,
+            out string err
+        ) {
+            err = null;
+
             reader.SkipWhiteSpace();
             int start = reader.Cursor;
+            // 匹配参数
+            if (!MatchSelfListArg(reader, env, args, out err)) {
+                reader.Cursor = start;
+                return false;
+            }
+
+            // 判断映射参数部分开始
+            if (ArgUtil.IsListArgEnd(reader)) {
+                Args dict = new Args();
+                // 若映射参数不为空，则开始解析映射参数
+                if (Mapper != null && !Mapper.Parse(reader, dict, out err)) {
+                    return false;
+                } else if (ArgUtil.IsCommandEnd(reader)) {
+                    if (Executor != null) {
+                        res.Add(CompileWith(env, args, dict, level));
+                        return true;
+                    } else {
+                        err = $"层级{level}，该节点不应该是终结节点";
+                        return false;
+                    }
+                } else {
+                    err = $"层级{level}，命令本应结束，却读取到未知字符：" +
+                        reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip);
+                    return false;
+                }
+            }
+
+            // 开始匹配子节点
+            start = reader.Cursor;
+            bool hasChildMatched = false;
+            foreach (CommandNode<TEnv> child in GetRevelentNodes(reader)) {
+                // 执行子节点的调度
+                hasChildMatched |= child.Dispatch(reader, env, args.Derives(), level + 1, res, out err);
+                reader.Cursor = start;
+            }
+            if (!hasChildMatched) {
+                err = new StringBuilder()
+                    .AppendLine($"层级{level}，")
+                    .AppendLine("期待：" + string.Join("，", GetTips()))
+                    .Append("得到：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip))
+                    .ToString();
+            }
+            return hasChildMatched;
+        }
+
+        private bool MatchSelfListArg(StringReader reader, TEnv env, Args args, out string err) {
             // 匹配参数
             object ori = null;
             if (Spread) { // 收集所有剩下的参数
                 List<object> list = new List<object>();
-                int s = start;
-                while (Parser.TryParse(reader, out ori)) {
+                int s = reader.Cursor;
+                while (reader.Skip(Config.ListSeps) && Parser.TryParse(reader, out ori)) {
                     list.Add(ori);
                     s = reader.Cursor;
-                    reader.SkipWhiteSpace();
                 }
                 reader.Cursor = s;
                 if (list.Count == 0) {
-                    reply = err;
-                    reader.Cursor = start;
-                    return DispatchResult.Unmatched;
+                    err = "参数不匹配";
+                    return false;
                 }
                 ori = list.ToArray();
             } else { // 仅检测一个参数
                 if (!Parser.TryParse(reader, out ori)) {
-                    reader.Cursor = start;
-                    reply = err;
-                    return DispatchResult.Unmatched;
+                    err = "参数不匹配";
+                    return false;
                 }
             }
 
             // 预处理得到的参数，包括参数的可行检测，以及转换
             if (!ArgUtil.HandleArg(Process, env, args, ori, out object arg, out err)) {
-                reader.Cursor = start;
-                reply = err;
-                return DispatchResult.Unmatched;
+                return false;
             }
 
             // 如果有参数名，则将该值赋予参数
             if (!string.IsNullOrEmpty(ParamName) && arg != null) {
                 args[ParamName] = arg;
             }
-
-            DispatchResult childResult = DispatchResult.Unmatched;
-            // 判断映射参数部分是否还未开始
-            if (reader.HasNext) {
-                start = reader.Cursor;
-                childResult = DispatchResult.MatchedAll;
-                // 优先匹配子节点，执行子节点的逻辑
-                foreach (CommandNode<TEnv> child in GetRevelentNodes(reader)) {
-                    // 执行子节点的调度
-                    childResult = child.Dispatch(reader, env, args.Derives(), out reply);
-                    if (childResult == DispatchResult.MatchedAll) {
-                        // 如果某个子节点全部匹配则完美收官，返回结果
-                        return childResult;
-                    } else if (childResult == DispatchResult.MatchedSelf) {
-                        // 如果某个子节点只匹配了自身，则结束遍历，但是暂不返回结果
-                        err = reply;
-                        reader.Cursor = start;
-                        break;
-                    }
-                    // 如果某个子节点也根本不匹配，则继续遍历下一个节点
-                    reader.Cursor = start;
-                }
-            }
-            // 执行到这里，说明子节点没有一个是完美匹配的
-            // 如果自身节点本来有执行逻辑的话，则忽略后续参数，执行自身节点的执行逻辑，并判定为参数匹配成功
-            if (Executor != null) {
-                // 解析映射参数
-                Args dict = new Args();
-                if (Mapper != null) {
-                    reader.SkipTo(ArgSep);
-                    Mapper.Parse(reader, dict, out string dictErr);
-                }
-                reply = Executor(env, args, dict);
-                return DispatchResult.MatchedAll;
-            } else if (childResult == DispatchResult.MatchedSelf) {
-                reply = err;
-                return childResult;
-            }
-            // 到这里说明自己没有执行逻辑，而子节点也一个都没有匹配成功，则视为只匹配了自身
-            reader.SkipWhiteSpace();
-            reply = new StringBuilder()
-                .AppendLine("期待：" + string.Join("，", GetTips()))
-                .Append("得到：" + (reader.HasNext ? reader.PeekRest() : "<空>"))
-                .ToString();
-            return DispatchResult.MatchedSelf;
+            return true;
         }
 
 
@@ -160,6 +166,14 @@ namespace top.riverelder.RiverCommand {
             return ac;
         }
 
+        private CompiledCommand<TEnv> CompileWith(TEnv env, Args args, Args dict, int len) {
+            return new CompiledCommand<TEnv>(len, Executor, env, args, dict);
+        }
+
+        #endregion
+
+        #region 构造相关
+
         public CommandNode<TEnv> Then(CommandNode<TEnv> node) {
             AddChild(node);
             return this;
@@ -190,6 +204,10 @@ namespace top.riverelder.RiverCommand {
             Mapper = mapper;
             return this;
         }
+
+        #endregion
+
+        #region 提示相关
 
         public string[] GetTips() {
             HashSet<CommandNode<TEnv>> allChildren = GetAllChildren();
@@ -222,9 +240,11 @@ namespace top.riverelder.RiverCommand {
         /// <summary>
         /// 获取帮助信息
         /// </summary>
-        public virtual string Help => 
-            string.IsNullOrEmpty(ParamName) ? 
+        public virtual string Help =>
+            string.IsNullOrEmpty(ParamName) ?
             (Parser.IsLiteral ? Parser.Tip : $"<{Parser.Tip}>") :
             $"<{ParamName}:{Parser.Tip}>";
+
+        #endregion
     }
 }

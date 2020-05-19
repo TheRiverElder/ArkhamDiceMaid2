@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RiverCommand;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -56,6 +57,14 @@ namespace top.riverelder.RiverCommand.Utils {
             arg = ori;
             err = null;
             return true;
+        }
+
+        public static bool IsListArgEnd(StringReader reader) {
+            return IsCommandEnd(reader) || Config.DictSeps.Contains(reader.Peek());
+        }
+
+        public static bool IsCommandEnd(StringReader reader) {
+            return !reader.Skip(Config.ListSeps) || Config.CmdPrefix.Contains(reader.Peek());
         }
 
         public static bool IsNameChar(char ch) {

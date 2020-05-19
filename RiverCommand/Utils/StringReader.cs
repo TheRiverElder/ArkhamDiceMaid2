@@ -62,10 +62,11 @@ namespace top.riverelder.RiverCommand.Utils {
 
         public void Skip() => Cursor++;
 
-        public void SkipWhiteSpace() {
+        public bool SkipWhiteSpace() {
             while (HasNext && char.IsWhiteSpace(Data[Cursor])) {
                 Cursor++;
             }
+            return HasNext;
         }
 
         public void SkipWhiteSpaceExcept(string chs) {

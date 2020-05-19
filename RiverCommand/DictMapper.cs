@@ -50,11 +50,12 @@ namespace top.riverelder.RiverCommand {
 
         // 识别映射参数的分隔符，并确保在读取后依然有内容
         private bool SkipSep(StringReader reader) {
-            return
-                reader.Skip(Config.ListSeps) &&
-                Config.DictSeps.Contains(reader.Peek()) &&
-                reader.Skip(Config.DictSeps) &&
-                reader.Skip(Config.ListSeps);
+            bool hasSep = false;
+            while (!ArgUtil.IsCommandEnd(reader) && Config.DictSeps.Contains(reader.Peek())) {
+                reader.Skip(Config.DictSeps);
+                hasSep = true;
+            }
+            return hasSep && !ArgUtil.IsCommandEnd(reader);
         }
 
         public bool ParseNext(StringReader reader, Args dict, out string err) {
