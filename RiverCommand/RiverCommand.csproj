@@ -50,6 +50,7 @@
     <Compile Include="Handler.cs" />
     <Compile Include="ICmdEntry.cs" />
     <Compile Include="ParamParsers\BoolParser.cs" />
+    <Compile Include="ParamParsers\CmdParser.cs" />
     <Compile Include="ParamParsers\IntParser.cs" />
     <Compile Include="ParamParsers\LiteralParser.cs" />
     <Compile Include="ParamParsers\OrParser.cs" />

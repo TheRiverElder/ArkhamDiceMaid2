@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand.ParamParsers {
-    class RestParser : ParamParser {
+    class RestParser<TEnv> : ParamParser<TEnv> {
 
         public override string Tip => "剩余字符串";
 
-        protected override bool Parse(StringReader reader, out object result) {
+        protected override bool Parse(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, out object result) {
             if (reader.HasNext) {
                 result = reader.ReadToEnd();
                 return true;

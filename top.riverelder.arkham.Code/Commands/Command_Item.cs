@@ -58,7 +58,8 @@ namespace top.riverelder.arkham.Code.Commands {
             if (newName == null) {
                 newName = name;
             }
-            env.TryGetInv(out Scenario sce, out Investigator inv);
+            Scenario sce = env.Sce;
+            Investigator inv = env.Inv;
             if (sce.Desk.ContainsKey(newName)) {
                 return $"桌子上已有物品：{newName}，请重命名";
             }
@@ -76,7 +77,8 @@ namespace top.riverelder.arkham.Code.Commands {
             if (newName == null) {
                 newName = name;
             }
-            env.TryGetInv(out Scenario sce, out Investigator inv);
+            Scenario sce = env.Sce;
+            Investigator inv = env.Inv;
             if (!sce.Desk.TryGetValue(name, out Item item)) {
                 return $"桌子上没有物品：{name}";
             }
@@ -145,16 +147,16 @@ namespace top.riverelder.arkham.Code.Commands {
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            DictMapper mapper = new DictMapper()
-                .Then("技能名", new StringParser())
-                .Then("类型", new OrParser(new string[] { "肉搏", "投掷", "射击" }))
+            DictMapper<DMEnv> mapper = new DictMapper<DMEnv>()
+                .Then("技能名", new StringParser<DMEnv>())
+                .Then("类型", new OrParser<DMEnv>(new string[] { "肉搏", "投掷", "射击" }))
                 .Then("伤害", new DiceParser())
-                .Then("贯穿", new BoolParser("是", "否"))
-                .Then("连发数", new IntParser())
-                .Then("弹匣", new IntParser())
-                .Then("故障值", new IntParser())
-                .Then("弹药", new IntParser())
-                .Then("消耗", new IntParser());
+                .Then("贯穿", new BoolParser<DMEnv>("是", "否"))
+                .Then("连发数", new IntParser<DMEnv>())
+                .Then("弹匣", new IntParser<DMEnv>())
+                .Then("故障值", new IntParser<DMEnv>())
+                .Then("弹药", new IntParser<DMEnv>())
+                .Then("消耗", new IntParser<DMEnv>());
 
             dispatcher.Register("物品").Then(
                 Literal<DMEnv>("创造")
@@ -199,7 +201,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Then(
                     String<DMEnv>("物品名")
                     .Then(
-                        Literal<DMEnv>("目标名")
+                        String<DMEnv>("目标名")
                         .Handles(ExistInv)
                         .Executes((env, args, dict) => PassItem(env, args.GetStr("物品名"), args.GetInv("目标名"), null))
                         .Then(

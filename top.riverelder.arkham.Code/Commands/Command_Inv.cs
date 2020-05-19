@@ -12,7 +12,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            DictMapper mapper = new DictMapper();
+            DictMapper<DMEnv> mapper = new DictMapper<DMEnv>();
             mapper.Rest(new ValueParser());
 
             dispatcher.Register("人物卡")

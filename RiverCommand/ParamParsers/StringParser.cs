@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand.ParamParsers {
-    public class StringParser : ParamParser {
+    public class StringParser<TEnv> : ParamParser<TEnv> {
 
         public static readonly char EscapeChar = '\\';
 
@@ -23,7 +23,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
 
         public override string[] Certain => null;
 
-        protected override bool Parse(StringReader reader, out object result) {
+        protected override bool Parse(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, out object result) {
             if (!reader.HasNext) {
                 result = null;
                 return false;
@@ -32,7 +32,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
             StringBuilder sb = new StringBuilder();
             
             if (!pairs.TryGetValue(reader.Peek(), out char end)) {
-                string res = reader.Read(ArgUtil.IsNameChar);
+                string res = reader.Read(IsValidNakeChar);
                 if (string.IsNullOrEmpty(res)) {
                     result = null;
                     return false;
@@ -65,6 +65,10 @@ namespace top.riverelder.RiverCommand.ParamParsers {
 
             result = sb.ToString();
             return true;
+        }
+        
+        public static bool IsValidNakeChar(char ch) {
+            return ArgUtil.IsNameChar(ch) || ch == '_' || ch == '-';
         }
     }
 }

@@ -12,7 +12,7 @@ namespace top.riverelder.arkham.Code.Commands {
     public class Command_Spell : DiceCmdEntry {
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            DictMapper mapper = new DictMapper();
+            DictMapper<DMEnv> mapper = new DictMapper<DMEnv>();
             mapper.Rest(new DiceParser());
 
             dispatcher.Register("法术")

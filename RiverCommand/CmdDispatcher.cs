@@ -59,7 +59,7 @@ namespace top.riverelder.RiverCommand {
         }
 
         /// <summary>
-        /// 调度命令
+        /// 调度命令，必须是完整命令，不能多，也不能少
         /// </summary>
         /// <param name="raw">原始字符串</param>
         /// <param name="env">环境</param>
@@ -68,17 +68,41 @@ namespace top.riverelder.RiverCommand {
         public bool Dispatch(string raw, TEnv env, out CompiledCommand<TEnv> result) {
             raw = raw.TrimStart();
             StringReader reader = new StringReader(raw);
-            reader.SkipWhiteSpace();
-            // 读取命令头，或者别名
-            string alias = reader.Read(ArgUtil.IsNameChar);
-            // 查找真名
-            if (aliases.TryGetValue(alias, out string act)) {
-                reader = new StringReader(act + " " + reader.ReadRest());
+            if (!Dispatch(reader, env, out result)) {
+                return false;
+            } else if (reader.SkipWhiteSpace()) {
+                result = new CompiledCommand<TEnv>(result.ReaderCursor, 0, "未能识别的部分：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip));
+                return false;
             }
-            reader.Cursor = 0;
+            return true;
+        }
+
+        /// <summary>
+        /// 调度命令，可以是命令的一部分
+        /// </summary>
+        /// <param name="stringReader">原始字符流</param>
+        /// <param name="env">环境</param>
+        /// <param name="result">调度结果</param>
+        /// <returns>是否调度成功</returns>
+        public bool Dispatch(StringReader stringReader, TEnv env, out CompiledCommand<TEnv> result) {
+            StringReader reader = stringReader;
+            // 跳过空白
+            reader.Skip(Config.ListSeps);
+            // 记录位置，应为之后可能会读取别名，也用于解析失败，恢复用
+            int start = reader.Cursor;
+            // 读取命令头，或者别名
+            string alias = stringReader.Read(ArgUtil.IsNameChar);
+            int? offset = null;
+            // 查找替换项，并计算偏移
+            if (!string.IsNullOrEmpty(alias) && aliases.TryGetValue(alias, out string replacement)) {
+                reader = new StringReader(replacement + reader.ReadRest());
+                offset = alias.Length - replacement.Length;
+            }
+            // 恢复原始字符流
+            stringReader.Cursor = start;
             List<CompiledCommand<TEnv>> res = new List<CompiledCommand<TEnv>>();
             // 开始调度
-            bool ret = Root.Dispatch(reader, env, new Args(), 0, res);
+            bool ret = Root.Dispatch(this, reader, env, new Args(), 0, res);
             // 查找匹配成功的最长命令
             List<CompiledCommand<TEnv>> matched = new List<CompiledCommand<TEnv>>();
             List<CompiledCommand<TEnv>> errors = new List<CompiledCommand<TEnv>>();
@@ -95,7 +119,13 @@ namespace top.riverelder.RiverCommand {
             } else {
                 // 否则出错
                 result = null;
+                reader.Cursor = start;
                 return false;
+            }
+            reader.Skip(result.ReaderCursor);
+            if (offset != null) {
+                // 此时reader已经不是原来的reader了，这样一来就要重新计算原始字符流的读取长度
+                stringReader.Skip(reader.Cursor + offset.Value);
             }
             return ret;
         }

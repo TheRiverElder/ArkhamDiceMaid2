@@ -8,6 +8,7 @@ using top.riverelder.RiverCommand;
 namespace RiverCommand {
     public class CompiledCommand<TEnv> {
 
+        public int ReaderCursor { get; }
         public int Length { get; }
         public string Error { get; }
 
@@ -20,7 +21,8 @@ namespace RiverCommand {
 
         public string ErrorStr => $"解析错误：第{Length}个参数\n" + Error;
 
-        public CompiledCommand(int length, CmdExecutor<TEnv> executor, TEnv env, Args args, Args dict) {
+        public CompiledCommand(int readerCursor, int length, CmdExecutor<TEnv> executor, TEnv env, Args args, Args dict) {
+            ReaderCursor = readerCursor;
             Length = length;
             Executor = executor;
             Env = env;
@@ -28,7 +30,8 @@ namespace RiverCommand {
             Dict = dict;
         }
 
-        public CompiledCommand(int length, string error) {
+        public CompiledCommand(int readerCursor, int length, string error) {
+            ReaderCursor = readerCursor;
             Length = length;
             Error = error;
         }

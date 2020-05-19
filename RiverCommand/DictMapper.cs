@@ -9,11 +9,11 @@ using top.riverelder.RiverCommand.ParamParsers;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand {
-    public class DictMapper {
+    public class DictMapper<TEnv> {
 
-        private ParamParser RestParser = null;
+        private ParamParser<TEnv> RestParser = null;
         private bool AcceptRest => RestParser != null;
-        private readonly Dictionary<string, ParamParser> Parsers = new Dictionary<string, ParamParser>();
+        private readonly Dictionary<string, ParamParser<TEnv>> Parsers = new Dictionary<string, ParamParser<TEnv>>();
         //private readonly Dictionary<string, object> markedValues = new Dictionary<string, object>();
 
         //public DictMapper Then(string key, ParamParser parser, object markedValue) {
@@ -22,12 +22,12 @@ namespace top.riverelder.RiverCommand {
         //    return this;
         //}
 
-        public DictMapper Then(string key, ParamParser parser) {
+        public DictMapper<TEnv> Then(string key, ParamParser<TEnv> parser) {
             Parsers[key] = parser;
             return this;
         }
 
-        public DictMapper Rest(ParamParser parser) {
+        public DictMapper<TEnv> Rest(ParamParser<TEnv> parser) {
             RestParser = parser;
             return this;
         }
@@ -37,9 +37,9 @@ namespace top.riverelder.RiverCommand {
         //    return this;
         //}
 
-        public bool Parse(StringReader reader, Args dict, out string err) {
+        public bool Parse(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, Args dict, out string err) {
             while (SkipSep(reader)) {
-                if (!ParseNext(reader, dict, out err)) {
+                if (!ParseNext(dispatcher, env, reader, dict, out err)) {
                     return false;
                 }
             }
@@ -58,7 +58,7 @@ namespace top.riverelder.RiverCommand {
             return hasSep && !ArgUtil.IsCommandEnd(reader);
         }
 
-        public bool ParseNext(StringReader reader, Args dict, out string err) {
+        public bool ParseNext(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, Args dict, out string err) {
             // 识别映射参数名
             string key = reader.Read(ArgUtil.IsNameChar);
             if (string.IsNullOrEmpty(key)) {
@@ -66,7 +66,7 @@ namespace top.riverelder.RiverCommand {
                 return false;
             }
             // 获取值解析器
-            if (!Parsers.TryGetValue(key, out ParamParser parser)) {
+            if (!Parsers.TryGetValue(key, out ParamParser<TEnv> parser)) {
                 if (AcceptRest) {
                     parser = RestParser;
                 } else {
@@ -93,7 +93,7 @@ namespace top.riverelder.RiverCommand {
             }
 
 
-            if (parser.TryParse(reader, out object result)) {
+            if (parser.TryParse(dispatcher, env, reader, out object result)) {
                 dict[key] = result;
             } else {
                 err = $"映射参数[{key}]应为{parser.Tip}，却得到：{reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip)}";

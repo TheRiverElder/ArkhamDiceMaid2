@@ -16,8 +16,8 @@ namespace top.riverelder.arkham.Code.Utils {
             return new CommandNode<DMEnv>(name, new DiceParser());
         }
 
-        public static CommandNode<TEnv> Value<TEnv>(string name) {
-            return new CommandNode<TEnv>(name, new ValueParser());
+        public static CommandNode<DMEnv> Value(string name) {
+            return new CommandNode<DMEnv>(name, new ValueParser());
         }
 
         #endregion

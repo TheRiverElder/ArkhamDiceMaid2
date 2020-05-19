@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand.ParamParsers {
-    public class LiteralParser : ParamParser {
+    public class LiteralParser<TEnv> : ParamParser<TEnv> {
 
         public string Literal { get; }
 
@@ -18,7 +18,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
             Literal = literal;
         }
 
-        protected override bool Parse(StringReader reader, out object result) {
+        protected override bool Parse(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, out object result) {
             if (reader.Read(Literal)) {
                 result = Literal;
                 return true;

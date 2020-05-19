@@ -10,7 +10,7 @@ using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand {
     public class RootCommandNode<TEnv> : CommandNode<TEnv> {
-        public RootCommandNode(ParamParser parser) : base(null) {
+        public RootCommandNode(ParamParser<TEnv> parser) : base(null) {
         }
 
         public RootCommandNode() : base(null) {
@@ -25,6 +25,7 @@ namespace top.riverelder.RiverCommand {
         }
 
         public new bool Dispatch(
+            CmdDispatcher<TEnv> dispatcher,
             StringReader reader,
             TEnv env,
             Args args,
@@ -32,7 +33,7 @@ namespace top.riverelder.RiverCommand {
             List<CompiledCommand<TEnv>> res
         ) {
             // 直接匹配子节点
-            return MatchChildren(reader, env, args, level + 1, res);
+            return MatchChildren(dispatcher, reader, env, args, level + 1, res);
         }
     }
 }

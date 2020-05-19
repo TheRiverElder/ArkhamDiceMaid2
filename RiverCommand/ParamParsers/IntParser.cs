@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand.ParamParsers {
-    public class IntParser : ParamParser {
+    public class IntParser<TEnv> : ParamParser<TEnv> {
 
         //public NumberType Type;
         
@@ -17,7 +17,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
 
         public override string[] Certain => null;
 
-        protected override bool Parse(StringReader reader, out object result) {
+        protected override bool Parse(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, out object result) {
             if (!reader.HasNext) {
                 result = 0;
                 return false;

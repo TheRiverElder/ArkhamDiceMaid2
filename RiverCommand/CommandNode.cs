@@ -14,8 +14,8 @@ namespace top.riverelder.RiverCommand {
 
 
         public string ParamName { get; set; } = null;
-        public ParamParser Parser { get; } = null;
-        public DictMapper Mapper { get; set; } = null;
+        public ParamParser<TEnv> Parser { get; } = null;
+        public DictMapper<TEnv> Mapper { get; set; } = null;
         public bool Spread { get; set; } = false;
 
         protected readonly Dictionary<string, CommandNode<TEnv>> certainChildren = new Dictionary<string, CommandNode<TEnv>>();
@@ -24,12 +24,12 @@ namespace top.riverelder.RiverCommand {
         public PreHandler<TEnv> Process { get; set; } = null;
         public CmdExecutor<TEnv> Executor { get; set; } = null;
 
-        public CommandNode(string paramName, ParamParser parser) {
+        public CommandNode(string paramName, ParamParser<TEnv> parser) {
             ParamName = paramName;
             Parser = parser;
         }
 
-        public CommandNode(ParamParser parser) {
+        public CommandNode(ParamParser<TEnv> parser) {
             Parser = parser;
         }
 
@@ -45,6 +45,7 @@ namespace top.riverelder.RiverCommand {
         /// <param name="err">错误</param>
         /// <returns>是否符合该节点</returns>
         public bool Dispatch(
+            CmdDispatcher<TEnv> dispatcher,
             StringReader reader,
             TEnv env,
             Args args,
@@ -54,9 +55,9 @@ namespace top.riverelder.RiverCommand {
             reader.Skip(Config.ListSeps);
             int start = reader.Cursor;
             // 匹配参数
-            if (!MatchSelfListArg(reader, env, args, out string err)) {
+            if (!MatchSelfListArg(dispatcher, reader, env, args, out string err)) {
                 reader.Cursor = start;
-                res.Add(MakeErr(level, err));
+                res.Add(MakeErr(err, level, reader.Cursor));
                 return false;
             }
 
@@ -64,36 +65,41 @@ namespace top.riverelder.RiverCommand {
             if (ArgUtil.IsListArgEnd(reader)) {
                 Args dict = new Args();
                 // 若映射参数不为空，则开始解析映射参数
-                if (Mapper != null && !Mapper.Parse(reader, dict, out err)) {
+                if (Mapper != null && !Mapper.Parse(dispatcher, env, reader, dict, out err)) {
                     return false;
                 } else if (ArgUtil.IsCommandEnd(reader)) {
                     if (Executor != null) {
-                        res.Add(CompileWith(env, args, dict, level));
+                        res.Add(CompileWith(env, args, dict, level, reader.Cursor));
                         return true;
                     } else {
-                        res.Add(MakeErr(level, "该节点不应该是终结节点"));
+                        res.Add(MakeErr(
+                            "该节点不应该是终结节点",
+                            level,
+                            reader.Cursor));
                         return false;
                     }
                 } else {
-                    res.Add(MakeErr(level, 
+                    res.Add(MakeErr(
                         "命令本应结束，却读取到未知字符：" +
-                        reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip))
+                        reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip),
+                        level,
+                        reader.Cursor)
                     );
                     return false;
                 }
             }
 
             // 开始匹配子节点
-            return MatchChildren(reader, env, args, level + 1, res);
+            return MatchChildren(dispatcher, reader, env, args, level + 1, res);
         }
 
-        protected bool MatchSelfListArg(StringReader reader, TEnv env, Args args, out string err) {
+        protected bool MatchSelfListArg(CmdDispatcher<TEnv> dispatcher, StringReader reader, TEnv env, Args args, out string err) {
             // 匹配参数
             object ori = null;
             if (Spread) { // 收集所有剩下的参数
                 List<object> list = new List<object>();
                 int s = reader.Cursor;
-                while (reader.Skip(Config.ListSeps) && Parser.TryParse(reader, out ori)) {
+                while (reader.Skip(Config.ListSeps) && Parser.TryParse(dispatcher, env, reader, out ori)) {
                     list.Add(ori);
                     s = reader.Cursor;
                 }
@@ -104,7 +110,7 @@ namespace top.riverelder.RiverCommand {
                 }
                 ori = list.ToArray();
             } else { // 仅检测一个参数
-                if (!Parser.TryParse(reader, out ori)) {
+                if (!Parser.TryParse(dispatcher, env, reader, out ori)) {
                     err = "参数不匹配";
                     return false;
                 }
@@ -122,9 +128,9 @@ namespace top.riverelder.RiverCommand {
             return true;
         }
 
-        protected bool MatchChildren(StringReader reader, TEnv env, Args args, int childLevel, List<CompiledCommand<TEnv>> res) {
+        protected bool MatchChildren(CmdDispatcher<TEnv> dispatcher, StringReader reader, TEnv env, Args args, int childLevel, List<CompiledCommand<TEnv>> res) {
             if (certainChildren.Count == 0 && children.Count == 0 && !ArgUtil.IsListArgEnd(reader)) {
-                res.Add(MakeErr(childLevel, "多余的参数：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip)));
+                res.Add(MakeErr("多余的参数：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip), childLevel, reader.Cursor));
                 return false;
             }
             
@@ -133,14 +139,14 @@ namespace top.riverelder.RiverCommand {
             bool hasChildMatched = false;
             foreach (CommandNode<TEnv> child in GetRevelentNodes(reader)) {
                 // 执行子节点的调度
-                hasChildMatched |= child.Dispatch(reader, env, args.Derives(), childLevel, res);
+                hasChildMatched |= child.Dispatch(dispatcher, reader, env, args.Derives(), childLevel, res);
                 reader.Cursor = start;
             }
             if (!hasChildMatched) {
-                res.Add(MakeErr(childLevel, new StringBuilder()
+                res.Add(MakeErr(new StringBuilder()
                     .AppendLine("期待：" + string.Join("，", GetTips()))
                     .Append("得到：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip))
-                    .ToString()));
+                    .ToString(), childLevel, reader.Cursor));
             }
             return hasChildMatched;
         }
@@ -162,12 +168,12 @@ namespace top.riverelder.RiverCommand {
             return ac;
         }
 
-        protected CompiledCommand<TEnv> CompileWith(TEnv env, Args args, Args dict, int len) {
-            return new CompiledCommand<TEnv>(len, Executor, env, args, dict);
+        protected CompiledCommand<TEnv> CompileWith(TEnv env, Args args, Args dict, int len, int readerCursor) {
+            return new CompiledCommand<TEnv>(readerCursor, len, Executor, env, args, dict);
         }
 
-        protected CompiledCommand<TEnv> MakeErr(int len, string err) {
-            return new CompiledCommand<TEnv>(len, err);
+        protected CompiledCommand<TEnv> MakeErr(string err, int len, int readerCursor) {
+            return new CompiledCommand<TEnv>(readerCursor, len, err);
         }
 
         #endregion
@@ -211,7 +217,7 @@ namespace top.riverelder.RiverCommand {
             return this;
         }
 
-        public CommandNode<TEnv> MapDict(DictMapper mapper) {
+        public CommandNode<TEnv> MapDict(DictMapper<TEnv> mapper) {
             Mapper = mapper;
             return this;
         }

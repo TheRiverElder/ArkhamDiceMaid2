@@ -62,6 +62,8 @@ namespace top.riverelder.RiverCommand.Utils {
 
         public void Skip() => Cursor++;
 
+        public void Skip(int incresement) => Cursor += incresement;
+
         public bool SkipWhiteSpace() {
             while (HasNext && char.IsWhiteSpace(Data[Cursor])) {
                 Cursor++;

@@ -11,7 +11,6 @@ namespace top.riverelder.RiverCommand.Utils {
         
         public static HashSet<char> DictSeps = new HashSet<char>("\r\n,，;；");
         public static HashSet<char> Linkers = new HashSet<char>(":：=");
-        public static StringParser DefaultParser = new StringParser();
         
 
         public static bool HandleArg<TEnv>(PreHandler<TEnv> handler, TEnv env, Args args, object ori, out object arg, out string err) {
@@ -35,7 +34,9 @@ namespace top.riverelder.RiverCommand.Utils {
         }
 
         public static bool IsCommandEnd(StringReader reader) {
-            return !reader.Skip(Config.ListSeps) || Config.CmdPrefix.Contains(reader.Peek());
+            return !reader.Skip(Config.ListSeps) || 
+                Config.CmdPrefix.Contains(reader.Peek()) || 
+                Config.CloseParen.Contains(reader.Peek());
         }
 
         public static bool IsNameChar(char ch) {

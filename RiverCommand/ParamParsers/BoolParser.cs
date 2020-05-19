@@ -7,7 +7,7 @@ using top.riverelder.RiverCommand.ParamParsers;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand.ParamParsers {
-    public class BoolParser : ParamParser {
+    public class BoolParser<TEnv> : ParamParser<TEnv> {
 
         public string TrueValue = "true";
         public string FalseValue = "false";
@@ -22,7 +22,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
 
         public override string Tip { get; }
 
-        protected override bool Parse(StringReader reader, out object result) {
+        protected override bool Parse(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, out object result) {
             if (reader.Read(TrueValue)) {
                 result = true;
                 return true;

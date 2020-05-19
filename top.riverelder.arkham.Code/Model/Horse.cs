@@ -8,7 +8,7 @@ namespace top.riverelder.arkham.Code.Model {
     public class Horse {
         public static Random Rand = new Random();
 
-        public static int TotalProgress = 16;
+        public static int TotalProgress = 20;
         public static int MaxHealth = 30;
         
         public int Health = MaxHealth;

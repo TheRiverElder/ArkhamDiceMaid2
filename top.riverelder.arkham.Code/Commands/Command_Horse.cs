@@ -21,9 +21,9 @@ namespace top.riverelder.arkham.Code.Commands {
             .AppendLine("1. 每匹🐎都有自己的隐藏潜力值，调查员可以通过自己的账户给对应的🐎下注，可以下注多只；")
             .AppendLine("2. 每个调查员，在一回合中只能杀同一匹🐎一次，无论成败，武器可以自选或者肉搏；")
             .AppendLine("3. 若杀🐎的调查员检定成功，且等级对抗赢了目标🐎，则造成伤害；")
-            .AppendLine("4. 若一匹🐎的体力归零，则死亡，下注该马的调查员一无所获；")
+            .AppendLine("4. 若一匹🐎的体力归零，则死亡，下注该马的调查员一无所获，而杀🐎者将获得该马身上的所有筹码；")
             .AppendLine("5. 当一批🐎（可能有多匹）冲过终点后，比赛结束，这些🐎视为胜利；")
-            .AppendLine($"6. 每匹胜利的🐎，将会为它的下注者带来{BonusMin}到{BonusMax}倍与本金的奖金（包括本金）。")
+            .AppendLine($"6. 每匹胜利的🐎，将会为它的下注者带来{BonusMin}到{BonusMax}倍于本金的奖金（包括本金）。")
             .ToString();
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
@@ -167,8 +167,11 @@ namespace top.riverelder.arkham.Code.Commands {
                 return $"{source.Name}本轮已经杀过此🐎了！";
             }
 
-            if (weaponName != null && !source.Inventory.TryGetValue(weaponName, out Item w)) {
-                return $"未找到{source.Name}武器：{weaponName}";
+            Item w;
+            if (weaponName != null) {
+                if (!source.Inventory.TryGetValue(weaponName, out w)) {
+                    return $"未找到{source.Name}武器：{weaponName}";
+                }
             } else {
                 w = new Item("肉体") {
                     SkillName = "斗殴",
@@ -198,7 +201,7 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             // 检定🐎的闪避
             CheckResult hr = new Value(horse.Ponential).Check();
-            sb.Append($"{horseName}飞奔(???) => {hr.points}，{hr.ActualTypeString}");
+            sb.AppendLine($"{horseName}飞奔(???) => {hr.points}，{hr.ActualTypeString}");
             if (hr.succeed && hr.type <= sr.type) {
                 env.Save();
                 return $"{source.Name}没有打中飞速移动中的{horseName}";
@@ -210,6 +213,15 @@ namespace top.riverelder.arkham.Code.Commands {
                 int prev = horse.Health;
                 horse.Health = Math.Min(Math.Max(0, prev - r), Horse.MaxHealth);
                 sb.AppendLine().Append($"{horseName}的体力：{prev} - {r} => {horse.Health}");
+                if (horse.Health <= 0) {
+                    int totalBets = 0;
+                    foreach (int bet in horse.Bets.Values) {
+                        totalBets += bet;
+                    }
+                    horse.Bets.Clear();
+                    sb.AppendLine($"{source.Name}获得{horseName}身上的所有筹码({totalBets})");
+                    sb.Append(source.Change("账户", totalBets));
+                }
             }
             env.Save();
             return sb.ToString();

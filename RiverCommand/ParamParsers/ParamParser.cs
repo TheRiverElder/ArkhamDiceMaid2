@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand.ParamParsers {
-    public abstract class ParamParser {
+    public abstract class ParamParser<TEnv> {
 
         /// <summary>
         /// 是否是字面量，用于提示
@@ -29,7 +29,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
         /// <param name="reader">字符流</param>
         /// <param name="result">解析结果</param>
         /// <returns>是否解析成功</returns>
-        protected abstract bool Parse(StringReader reader, out object result);
+        protected abstract bool Parse(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, out object result);
 
         /// <summary>
         /// 尝试解析自身节点参数
@@ -37,9 +37,9 @@ namespace top.riverelder.RiverCommand.ParamParsers {
         /// <param name="reader">字符流</param>
         /// <param name="result">解析结果</param>
         /// <returns>是否解析成功</returns>
-        public bool TryParse(StringReader reader, out object result) {
+        public bool TryParse(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, out object result) {
             int start = reader.Cursor;
-            if (Parse(reader, out result)) {
+            if (Parse(dispatcher, env, reader, out result)) {
                 return true;
             } else {
                 reader.Cursor = start;

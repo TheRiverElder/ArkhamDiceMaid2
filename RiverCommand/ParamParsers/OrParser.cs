@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand.ParamParsers {
-    public class OrParser : ParamParser {
+    public class OrParser<TEnv> : ParamParser<TEnv> {
 
         public string[] ValidValues;
 
@@ -19,7 +19,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
 
         public override string[] Certain => ValidValues;
 
-        protected override bool Parse(StringReader reader, out object result) {
+        protected override bool Parse(CmdDispatcher<TEnv> dispatcher, TEnv env, StringReader reader, out object result) {
             int start = reader.Cursor;
             foreach (string s in ValidValues) {
                 if (reader.Read(s)) {

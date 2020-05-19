@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
+using top.riverelder.RiverCommand;
 using top.riverelder.RiverCommand.ParamParsers;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.arkham.Code.Utils {
-    public class ValueParser : ParamParser {
+    public class ValueParser : ParamParser<DMEnv> {
 
         public override string Tip => "数值";
 
-        protected override bool Parse(StringReader reader, out object result) {
+        protected override bool Parse(CmdDispatcher<DMEnv> dispatcher, DMEnv env, StringReader reader, out object result) {
             if (!reader.HasNext || !char.IsDigit(reader.Peek())) {
                 result = null;
                 return false;
