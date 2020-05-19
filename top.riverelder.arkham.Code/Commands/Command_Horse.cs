@@ -19,10 +19,11 @@ namespace top.riverelder.arkham.Code.Commands {
         public static string Rule = new StringBuilder()
             .AppendLine("    🏇 赛 马 规 则 🏇").AppendLine()
             .AppendLine("1. 每匹🐎都有自己的隐藏潜力值，调查员可以通过自己的账户给对应的🐎下注，可以下注多只；")
-            .AppendLine("2. 每个调查员，在一回合中只能杀同一匹🐎一次，无论成败，武器可以自选或者肉搏，若调查员检定成功，且等级对抗赢了🐎，则造成伤害；")
-            .AppendLine("3. 若一匹🐎的体力归零，则死亡，下注该马的调查员一无所获；")
-            .AppendLine("4. 当一批🐎（可能有多匹）冲过终点后，比赛结束，这些🐎视为胜利；")
-            .AppendLine($"5. 每匹胜利的🐎，将会为它的下注者带来{BonusMin}到{BonusMax}倍与本金的奖金（包括本金）。")
+            .AppendLine("2. 每个调查员，在一回合中只能杀同一匹🐎一次，无论成败，武器可以自选或者肉搏；")
+            .AppendLine("3. 若杀🐎的调查员检定成功，且等级对抗赢了目标🐎，则造成伤害；")
+            .AppendLine("4. 若一匹🐎的体力归零，则死亡，下注该马的调查员一无所获；")
+            .AppendLine("5. 当一批🐎（可能有多匹）冲过终点后，比赛结束，这些🐎视为胜利；")
+            .AppendLine($"6. 每匹胜利的🐎，将会为它的下注者带来{BonusMin}到{BonusMax}倍与本金的奖金（包括本金）。")
             .ToString();
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
