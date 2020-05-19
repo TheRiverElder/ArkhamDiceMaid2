@@ -101,5 +101,22 @@ namespace top.riverelder.RiverCommand {
             }
             return ret;
         }
+
+        /// <summary>
+        /// 直接执行命令
+        /// </summary>
+        /// <param name="raw">原始字符串</param>
+        /// <param name="env">环境</param>
+        /// <param name="reply">回复</param>
+        /// <returns>是否解析成功</returns>
+        public bool Execute(string raw, TEnv env, out object ret, out string reply) {
+            if (Dispatch(raw, env, out var ccmd)) {
+                ret = ccmd.Execute(out reply);
+                return true;
+            }
+            ret = null;
+            reply = ccmd.ErrorStr;
+            return false;
+        }
     }
 }

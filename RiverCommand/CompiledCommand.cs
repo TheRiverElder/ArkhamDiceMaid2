@@ -18,6 +18,8 @@ namespace RiverCommand {
 
         public bool IsErr => !string.IsNullOrEmpty(Error);
 
+        public string ErrorStr => $"层级{Length}，" + Error;
+
         public CompiledCommand(int length, CmdExecutor<TEnv> executor, TEnv env, Args args, Args dict) {
             Length = length;
             Executor = executor;
