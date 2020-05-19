@@ -13,9 +13,16 @@ namespace top.riverelder.RiverCommand {
         public RootCommandNode(ParamParser parser) : base(null) {
         }
 
+        public RootCommandNode() : base(null) {
+        }
+
         public bool TryGetCommand(string head, out CommandNode<TEnv> cmd) {
             return certainChildren.TryGetValue(head, out cmd);
-        } 
+        }
+
+        public ICollection<CommandNode<TEnv>> GetAllCommand() {
+            return certainChildren.Values;
+        }
 
         public new bool Dispatch(
             StringReader reader,

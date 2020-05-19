@@ -18,8 +18,8 @@ namespace top.riverelder.RiverCommand {
         public DictMapper Mapper { get; set; } = null;
         public bool Spread { get; set; } = false;
 
-        protected readonly IDictionary<string, CommandNode<TEnv>> certainChildren = new Dictionary<string, CommandNode<TEnv>>();
-        protected readonly IList<CommandNode<TEnv>> children = new List<CommandNode<TEnv>>();
+        protected readonly Dictionary<string, CommandNode<TEnv>> certainChildren = new Dictionary<string, CommandNode<TEnv>>();
+        protected readonly List<CommandNode<TEnv>> children = new List<CommandNode<TEnv>>();
 
         public PreHandler<TEnv> Process { get; set; } = null;
         public CmdExecutor<TEnv> Executor { get; set; } = null;
