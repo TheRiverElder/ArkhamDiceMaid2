@@ -74,8 +74,8 @@ namespace top.riverelder.RiverCommand.Utils {
             }
         }
 
-        public void SkipWhiteSpaceAnd(string chs) {
-            while (HasNext && (char.IsWhiteSpace(Data[Cursor]) || chs.IndexOf(Data[Cursor]) >= 0)) {
+        public void SkipWhiteSpaceAnd(IEnumerable<char> chs) {
+            while (HasNext && (char.IsWhiteSpace(Data[Cursor]) || chs.Contains(Data[Cursor]))) {
                 Cursor++;
             }
         }
@@ -86,9 +86,47 @@ namespace top.riverelder.RiverCommand.Utils {
             }
         }
 
+        public bool Skip(IEnumerable<char> chs) {
+            while (HasNext && chs.Contains(Data[Cursor])) {
+                Cursor++;
+            }
+            return HasNext;
+        }
+
+        public bool SkipTo(IEnumerable<char> chs) {
+            while (HasNext && !chs.Contains(Data[Cursor])) {
+                Cursor++;
+            }
+            return HasNext;
+        }
+
         public string ReadToWhiteSpaceOr(string chs) {
             int start = Cursor;
             while (HasNext && !char.IsWhiteSpace(Data[Cursor]) && chs.IndexOf(Data[Cursor]) < 0) {
+                Cursor++;
+            }
+            return Data.Substring(start, Cursor - start);
+        }
+
+        public string Read(IEnumerable<char> chs) {
+            int start = Cursor;
+            while (HasNext && chs.Contains(Data[Cursor])) {
+                Cursor++;
+            }
+            return Data.Substring(start, Cursor - start);
+        }
+
+        public string Read(Func<char, bool> pred) {
+            int start = Cursor;
+            while (HasNext && pred(Data[Cursor])) {
+                Cursor++;
+            }
+            return Data.Substring(start, Cursor - start);
+        }
+
+        public string ReadTo(IEnumerable<char> chs) {
+            int start = Cursor;
+            while (HasNext && !chs.Contains(Data[Cursor])) {
                 Cursor++;
             }
             return Data.Substring(start, Cursor - start);
@@ -112,6 +150,11 @@ namespace top.riverelder.RiverCommand.Utils {
             int start = Cursor;
             Cursor = Data.Length;
             return Data.Substring(start);
+        }
+
+        public string ReadToEndOrMaxOrEmpty(int max, string empty) {
+            int len = Math.Min(Data.Length - Cursor, max);
+            return len == 0 ? empty : Data.Substring(Cursor, len);
         }
 
         public string Slice(int index) {

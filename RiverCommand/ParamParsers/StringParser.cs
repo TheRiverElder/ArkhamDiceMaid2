@@ -32,7 +32,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
             StringBuilder sb = new StringBuilder();
             
             if (!pairs.TryGetValue(reader.Peek(), out char end)) {
-                string res = reader.ReadToWhiteSpaceOr(";；\n");
+                string res = reader.Read(ArgUtil.IsNameChar);
                 if (string.IsNullOrEmpty(res)) {
                     result = null;
                     return false;

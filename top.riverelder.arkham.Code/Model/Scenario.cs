@@ -1,16 +1,14 @@
-ï»¿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace top.riverelder.arkham.Code.Model
-{
-    public class Scenario
-    {
+namespace top.riverelder.arkham.Code.Model {
+    public class Scenario {
         public List<Horse> Horses = new List<Horse>();
 
-        public string Name { get; set; } = "æœªå‘½åæ¨¡ç»„";
+        public string Name { get; set; } = "Î´ÃüÃûÄ£×é";
 
         public Dictionary<long, string> PlayerNames = new Dictionary<long, string>();
 
@@ -19,90 +17,80 @@ namespace top.riverelder.arkham.Code.Model
         public Dictionary<string, Item> Desk = new Dictionary<string, Item>();
 
         public Dictionary<string, Spell> Spells = new Dictionary<string, Spell>();
-        
 
-        public Scenario(string name)
-        {
+
+        public Scenario(string name) {
             Name = name;
         }
 
-        #region å¡æ“ä½œ
+        #region ¿¨²Ù×÷
 
-        #region ä»¥åå­—ä¸ºé”®
+        #region ÒÔÃû×ÖÎª¼ü
 
 
         /// <summary>
-        /// é€šè¿‡è°ƒæŸ¥å‘˜åå­—è·å–è°ƒæŸ¥å‘˜
+        /// Í¨¹ıµ÷²éÔ±Ãû×Ö»ñÈ¡µ÷²éÔ±
         /// </summary>
-        /// <param name="name">è°ƒæŸ¥å‘˜å</param>
-        /// <param name="investigator">è°ƒæŸ¥å‘˜</param>
-        /// <returns>æ˜¯å¦æˆåŠŸ</returns>
-        public bool TryGetInvestigator(string name, out Investigator investigator)
-        {
+        /// <param name="name">µ÷²éÔ±Ãû</param>
+        /// <param name="investigator">µ÷²éÔ±</param>
+        /// <returns>ÊÇ·ñ³É¹¦</returns>
+        public bool TryGetInvestigator(string name, out Investigator investigator) {
             return Investigators.TryGetValue(name, out investigator);
         }
         /// <summary>
-        /// æŸ¥çœ‹çš„æˆå‘˜æ˜¯å¦å­˜åœ¨
+        /// ²é¿´µÄ³ÉÔ±ÊÇ·ñ´æÔÚ
         /// </summary>
-        /// <param name="name">è°ƒæŸ¥å‘˜å</param>
-        /// <returns>æ˜¯å¦å­˜åœ¨</returns>
-        public bool ExistInvestigator(string name)
-        {
+        /// <param name="name">µ÷²éÔ±Ãû</param>
+        /// <returns>ÊÇ·ñ´æÔÚ</returns>
+        public bool ExistInvestigator(string name) {
             return Investigators.ContainsKey(name);
         }
 
         /// <summary>
-        /// é€šè¿‡è°ƒæŸ¥å‘˜åå­—è·å–è°ƒæŸ¥å‘˜
+        /// Í¨¹ıµ÷²éÔ±Ãû×Ö»ñÈ¡µ÷²éÔ±
         /// </summary>
-        /// <param name="name">è°ƒæŸ¥å‘˜å</param>
-        /// <returns>è°ƒæŸ¥å‘˜ï¼Œè‹¥æ²¡æ‰¾åˆ°åˆ™è¿”å›null</returns>
-        public Investigator GetInvestigator(string name)
-        {
-            if (Investigators.TryGetValue(name, out Investigator inv))
-            {
+        /// <param name="name">µ÷²éÔ±Ãû</param>
+        /// <returns>µ÷²éÔ±£¬ÈôÃ»ÕÒµ½Ôò·µ»Ønull</returns>
+        public Investigator GetInvestigator(string name) {
+            if (Investigators.TryGetValue(name, out Investigator inv)) {
                 return inv;
             }
             return null;
         }
         #endregion
 
-        #region ä»¥userä¸ºé”®
+        #region ÒÔuserÎª¼ü
 
 
         /// <summary>
-        /// æŸ¥çœ‹çš„æˆå‘˜æ˜¯å¦å­˜åœ¨
+        /// ²é¿´µÄ³ÉÔ±ÊÇ·ñ´æÔÚ
         /// </summary>
-        /// <param name="name">è°ƒæŸ¥å‘˜å</param>
-        /// <returns>æ˜¯å¦å­˜åœ¨</returns>
-        public bool ExistInvestigator(long user)
-        {
+        /// <param name="name">µ÷²éÔ±Ãû</param>
+        /// <returns>ÊÇ·ñ´æÔÚ</returns>
+        public bool ExistInvestigator(long user) {
             return PlayerNames.TryGetValue(user, out string name) && Investigators.ContainsKey(name);
         }
 
         /// <summary>
-        /// é€šè¿‡è°ƒæŸ¥å‘˜åå­—è·å–è°ƒæŸ¥å‘˜
+        /// Í¨¹ıµ÷²éÔ±Ãû×Ö»ñÈ¡µ÷²éÔ±
         /// </summary>
-        /// <param name="name">è°ƒæŸ¥å‘˜å</param>
-        /// <returns>è°ƒæŸ¥å‘˜ï¼Œè‹¥æ²¡æ‰¾åˆ°åˆ™è¿”å›null</returns>
-        public Investigator GetInvestigator(long user)
-        {
-            if (PlayerNames.TryGetValue(user, out string name) && Investigators.TryGetValue(name, out Investigator inv))
-            {
+        /// <param name="name">µ÷²éÔ±Ãû</param>
+        /// <returns>µ÷²éÔ±£¬ÈôÃ»ÕÒµ½Ôò·µ»Ønull</returns>
+        public Investigator GetInvestigator(long user) {
+            if (PlayerNames.TryGetValue(user, out string name) && Investigators.TryGetValue(name, out Investigator inv)) {
                 return inv;
             }
             return null;
         }
 
         /// <summary>
-        /// é€šè¿‡ç©å®¶IDè·å–è°ƒæŸ¥å‘˜
+        /// Í¨¹ıÍæ¼ÒID»ñÈ¡µ÷²éÔ±
         /// </summary>
-        /// <param name="qq">ç©å®¶id</param>
-        /// <param name="investigator">è°ƒæŸ¥å‘˜</param>
-        /// <returns>æ˜¯å¦æˆåŠŸ</returns>
-        public bool TryGetInvestigator(long user, out Investigator investigator)
-        {
-            if (!PlayerNames.TryGetValue(user, out string name))
-            {
+        /// <param name="qq">Íæ¼Òid</param>
+        /// <param name="investigator">µ÷²éÔ±</param>
+        /// <returns>ÊÇ·ñ³É¹¦</returns>
+        public bool TryGetInvestigator(long user, out Investigator investigator) {
+            if (!PlayerNames.TryGetValue(user, out string name)) {
                 investigator = null;
                 return false;
             }
@@ -112,25 +100,23 @@ namespace top.riverelder.arkham.Code.Model
         #endregion
 
         /// <summary>
-        /// åŠ å…¥æ–°çš„è°ƒæŸ¥å‘˜
+        /// ¼ÓÈëĞÂµÄµ÷²éÔ±
         /// </summary>
-        /// <param name="inv">è°ƒæŸ¥å‘˜</param>
-        public void PutInvestigator(Investigator inv)
-        {
+        /// <param name="inv">µ÷²éÔ±</param>
+        public void PutInvestigator(Investigator inv) {
             Investigators[inv.Name] = inv;
         }
 
         /// <summary>
-        /// è®©ç©å®¶è·å–å¯¹è°ƒæŸ¥å‘˜çš„æ§åˆ¶æƒ
+        /// ÈÃÍæ¼Ò»ñÈ¡¶Ôµ÷²éÔ±µÄ¿ØÖÆÈ¨
         /// </summary>
-        /// <param name="qq">ç©å®¶id</param>
-        /// <param name="name">è°ƒæŸ¥å‘˜å</param>
-        public void Control(long qq, string name)
-        {
+        /// <param name="qq">Íæ¼Òid</param>
+        /// <param name="name">µ÷²éÔ±Ãû</param>
+        public void Control(long qq, string name) {
             PlayerNames[qq] = name;
         }
 
         #endregion
-        
+
     }
 }

@@ -20,7 +20,7 @@ namespace top.riverelder.arkham.Code.Utils {
 
 
 
-        public static PreProcess<DMEnv> ExistSce() {
+        public static PreHandler<DMEnv> ExistSce() {
             return (DMEnv env, Args args, object ori, out object arg, out string err) => {
                 arg = env.Sce;
                 arg = null;
@@ -29,7 +29,7 @@ namespace top.riverelder.arkham.Code.Utils {
             };
         }
 
-        public static PreProcess<DMEnv> ExistSelfInv() {
+        public static PreHandler<DMEnv> ExistSelfInv() {
             return (DMEnv env, Args args, object ori, out object arg, out string err) => {
                 arg = env.Inv;
                 err = null;
@@ -37,7 +37,7 @@ namespace top.riverelder.arkham.Code.Utils {
             };
         }
 
-        public static PreProcess<DMEnv> ExistInv() {
+        public static PreHandler<DMEnv> ExistInv() {
             return (DMEnv env, Args args, object ori, out object arg, out string err) => {
                 arg = null;
                 if (ori == null || !(ori is string)) {
@@ -56,7 +56,7 @@ namespace top.riverelder.arkham.Code.Utils {
             };
         }
 
-        public static PreProcess<DMEnv> GetSelfValue() {
+        public static PreHandler<DMEnv> GetSelfValue() {
             return (DMEnv env, Args args, object ori, out object arg, out string err) => {
                 arg = null;
                 if (ori == null || !(ori is string)) {
@@ -76,7 +76,7 @@ namespace top.riverelder.arkham.Code.Utils {
             };
         }
 
-        public static PreProcess<DMEnv> ExistSelfValue() {
+        public static PreHandler<DMEnv> ExistSelfValue() {
             return (DMEnv env, Args args, object ori, out object arg, out string err) => {
                 arg = null;
                 if (ori == null || !(ori is string)) {
@@ -96,7 +96,7 @@ namespace top.riverelder.arkham.Code.Utils {
             };
         }
 
-        public static PreProcess<DMEnv> ConvertObjectArrayToStringArray() {
+        public static PreHandler<DMEnv> ConvertObjectArrayToStringArray() {
             return (DMEnv env, Args args, object ori, out object arg, out string err) => {
                 arg = null;
                 if (ori == null || !(ori is object[])) {

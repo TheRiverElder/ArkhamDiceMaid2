@@ -10,9 +10,7 @@ using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand {
     public class CommandNode<TEnv> {
-
-        public static readonly string ArgSep = " \t\n,，;；";
-        public static readonly string EOF = "/";
+        
 
         public string ParamName { get; set; } = null;
         public ParamParser Parser { get; } = null;
@@ -22,7 +20,7 @@ namespace top.riverelder.RiverCommand {
         private readonly IDictionary<string, CommandNode<TEnv>> certainChildren = new Dictionary<string, CommandNode<TEnv>>();
         private readonly IList<CommandNode<TEnv>> children = new List<CommandNode<TEnv>>();
 
-        public PreProcess<TEnv> Process { get; set; } = null;
+        public PreHandler<TEnv> Process { get; set; } = null;
         public CmdExecutor<TEnv> Executor { get; set; } = null;
 
         public CommandNode(string paramName, ParamParser parser) {
@@ -48,36 +46,37 @@ namespace top.riverelder.RiverCommand {
         public DispatchResult Dispatch(StringReader reader, TEnv env, Args args, out string reply) {
             string err = "参数匹配错误";
             reader.SkipWhiteSpace();
-
+            int start = reader.Cursor;
             // 匹配参数
-            object arg = null;
+            object ori = null;
             if (Spread) { // 收集所有剩下的参数
                 List<object> list = new List<object>();
-                while (reader.HasNext && Parser.TryParse(reader, out arg)) {
-                    list.Add(arg);
+                int s = start;
+                while (Parser.TryParse(reader, out ori)) {
+                    list.Add(ori);
+                    s = reader.Cursor;
                     reader.SkipWhiteSpace();
                 }
+                reader.Cursor = s;
                 if (list.Count == 0) {
                     reply = err;
+                    reader.Cursor = start;
                     return DispatchResult.Unmatched;
                 }
-                arg = list.ToArray();
+                ori = list.ToArray();
             } else { // 仅检测一个参数
-                if (!Parser.TryParse(reader, out arg)) {
+                if (!Parser.TryParse(reader, out ori)) {
+                    reader.Cursor = start;
                     reply = err;
                     return DispatchResult.Unmatched;
                 }
             }
 
             // 预处理得到的参数，包括参数的可行检测，以及转换
-            try {
-                if (Process != null && !Process(env, args, arg, out arg, out err)) {
-                    reply = err;
-                    return DispatchResult.MatchedSelf;
-                }
-            } catch (Exception e) {
-                reply = e.Message;
-                return DispatchResult.MatchedSelf;
+            if (!ArgUtil.HandleArg(Process, env, args, ori, out object arg, out err)) {
+                reader.Cursor = start;
+                reply = err;
+                return DispatchResult.Unmatched;
             }
 
             // 如果有参数名，则将该值赋予参数
@@ -86,10 +85,9 @@ namespace top.riverelder.RiverCommand {
             }
 
             DispatchResult childResult = DispatchResult.Unmatched;
-            reader.SkipWhiteSpaceAnd(ArgSep);
             // 判断映射参数部分是否还未开始
-            if (reader.HasNext && ArgSep.IndexOf(reader.Peek()) < 0) {
-                int start = reader.Cursor;
+            if (reader.HasNext) {
+                start = reader.Cursor;
                 childResult = DispatchResult.MatchedAll;
                 // 优先匹配子节点，执行子节点的逻辑
                 foreach (CommandNode<TEnv> child in GetRevelentNodes(reader)) {
@@ -183,7 +181,7 @@ namespace top.riverelder.RiverCommand {
             return this;
         }
 
-        public CommandNode<TEnv> Handles(PreProcess<TEnv> process) {
+        public CommandNode<TEnv> Handles(PreHandler<TEnv> process) {
             Process = process;
             return this;
         }

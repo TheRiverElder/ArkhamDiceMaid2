@@ -98,7 +98,6 @@
     <Compile Include="Utils\CheckResult.cs" />
     <Compile Include="Utils\Dice.cs" />
     <Compile Include="Event_GroupMessage.cs" />
-    <Compile Include="Model\Inventory.cs" />
     <Compile Include="Model\Investigator.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
