@@ -28,7 +28,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 if (i != 0) {
                     sb.AppendLine();
                 }
-                Global.Dispatcher.Dispatch(rawCmd, env, out reply);
+                Global.Dispatcher.Execute(rawCmd, env, out object ret, out reply);
                 sb.Append(reply);
             }
             return sb.ToString();

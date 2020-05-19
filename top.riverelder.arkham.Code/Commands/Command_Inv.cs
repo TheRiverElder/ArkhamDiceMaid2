@@ -46,7 +46,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Executes((env, args, dict) => ReCalc(env, env.Inv))
                 .Then(
                     PresetNodes.String<DMEnv>("名称")
-                    .Handles(Extensions.ExistInv())
+                    .Handles(Extensions.ExistInv)
                     .Executes((env, args, dict) => ReCalc(env, args.GetInv("名称")))
                 )
             ).Then(
@@ -64,14 +64,14 @@ namespace top.riverelder.arkham.Code.Commands {
                     PresetNodes.Literal<DMEnv>("添加")
                     .Rest(
                         PresetNodes.String<DMEnv>("标签")
-                        .Handles(Extensions.ConvertObjectArrayToStringArray())
+                        .Handles(PreProcesses.ConvertObjectArrayToStringArray)
                         .Executes((env, args, dict) => AddTags(env, env.Inv, args.Get<string[]>("标签")))
                     )
                 ).Then(
                     PresetNodes.Literal<DMEnv>("移除")
                     .Rest(
                         PresetNodes.String<DMEnv>("标签")
-                        .Handles(Extensions.ConvertObjectArrayToStringArray())
+                        .Handles(PreProcesses.ConvertObjectArrayToStringArray)
                         .Executes((env, args, dict) => RemoveTags(env, env.Inv, args.Get<string[]>("标签")))
                     )
                 )

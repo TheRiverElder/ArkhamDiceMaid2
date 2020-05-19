@@ -24,7 +24,7 @@ namespace top.riverelder.arkham.Code.Commands {
             };
             dispatcher.Register("检定").Then(
                 MainAction = PresetNodes.String<DMEnv>("数值名")
-                .Handles(Extensions.ExistSelfValue())
+                .Handles(Extensions.ExistSelfValue)
                 .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), CheckResult.NormalSuccess))
                 .Then(
                     PresetNodes.Or<DMEnv>("难度", "普通", "困难", "极难")
@@ -42,7 +42,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 ).Then(
                     PresetNodes.Literal<DMEnv>("对抗").Then(
                         PresetNodes.String<DMEnv>("对手名")
-                        .Handles(Extensions.ExistInv())
+                        .Handles(Extensions.ExistInv)
                         .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名"), false))
                         .Then(
                             PresetNodes.String<DMEnv>("对抗数值名")
@@ -52,7 +52,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 ).Then(
                     PresetNodes.Literal<DMEnv>("等级对抗").Then(
                         PresetNodes.String<DMEnv>("对手名")
-                        .Handles(Extensions.ExistInv())
+                        .Handles(Extensions.ExistInv)
                         .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名"), true))
                         .Then(
                             PresetNodes.String<DMEnv>("对抗数值名")

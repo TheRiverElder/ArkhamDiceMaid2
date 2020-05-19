@@ -41,10 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Arg.cs" />
     <Compile Include="Args.cs" />
     <Compile Include="CmdDispatcher.cs" />
     <Compile Include="CommandNode.cs" />
+    <Compile Include="CompiledCommand.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="DictMapper.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="ICmdEntry.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="PreProcesses.cs" />
     <Compile Include="PresetNodes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RootCommandNode.cs" />
     <Compile Include="Utils\ArgUtil.cs" />
     <Compile Include="Utils\ArgReader.cs" />
     <Compile Include="Utils\DispatchResult.cs" />

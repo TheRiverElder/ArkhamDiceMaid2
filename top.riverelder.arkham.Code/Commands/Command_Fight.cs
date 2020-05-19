@@ -241,7 +241,7 @@ namespace top.riverelder.arkham.Code.Commands {
             .Then(
                 Literal<DMEnv>("攻击").Then(
                     String<DMEnv>("目标")
-                    .Handles(Extensions.ExistInv())
+                    .Handles(Extensions.ExistInv)
                     .Executes((env, args, dict) => Attack(env, env.Inv, args.GetInv("目标"), null))
                     .Then(
                         String<DMEnv>("武器名").Executes((env, args, dict) => Attack(env, env.Inv, args.GetInv("目标"), args.GetStr("武器名")))

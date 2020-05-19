@@ -149,13 +149,12 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Then("技能名", new StringParser())
                 .Then("类型", new OrParser(new string[] { "肉搏", "投掷", "射击" }))
                 .Then("伤害", new DiceParser())
-                .Then("贯穿", new BoolParser("是", "否"), true)
+                .Then("贯穿", new BoolParser("是", "否"))
                 .Then("连发数", new IntParser())
                 .Then("弹匣", new IntParser())
                 .Then("故障值", new IntParser())
                 .Then("弹药", new IntParser())
-                .Then("消耗", new IntParser())
-                .SkipRest();
+                .Then("消耗", new IntParser());
 
             dispatcher.Register("物品").Then(
                 Literal<DMEnv>("创造")
@@ -201,7 +200,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     String<DMEnv>("物品名")
                     .Then(
                         Literal<DMEnv>("目标名")
-                        .Handles(ExistInv())
+                        .Handles(ExistInv)
                         .Executes((env, args, dict) => PassItem(env, args.GetStr("物品名"), args.GetInv("目标名"), null))
                         .Then(
                             String<DMEnv>("新名")

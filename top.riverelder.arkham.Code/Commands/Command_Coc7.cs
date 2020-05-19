@@ -12,8 +12,7 @@ namespace top.riverelder.arkham.Code.Commands {
     public class Command_Coc7 : DiceCmdEntry {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             DictMapper mapper = new DictMapper()
-                .Then("年龄", new IntParser())
-                .SkipRest();
+                .Then("年龄", new IntParser());
 
             dispatcher.Register("coc7").Then(
                 PresetNodes.Int<DMEnv>("数量")

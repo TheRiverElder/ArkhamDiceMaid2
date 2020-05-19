@@ -34,7 +34,7 @@ namespace top.riverelder.arkham.Code {
                 foreach (string c in cmds) {
                     e.CQLog.InfoReceive("DiceCommand", c);
                     try {
-                        if (Global.Dispatcher.Dispatch(c, env, out string reply) || Global.Debug) {
+                        if (Global.Dispatcher.Execute(c, env, out object ret, out string reply) || Global.Debug) {
                             sb.AppendLine().Append(reply);
                             flag = true;
                         }

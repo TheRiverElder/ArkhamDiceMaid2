@@ -18,7 +18,7 @@ namespace top.riverelder.arkham.Code.Commands {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("控制").Then(
                 PresetNodes.String<DMEnv>("卡名")
-                .Handles(Extensions.ExistInv())
+                .Handles(Extensions.ExistInv)
                 .Executes((env, args, dict) => Control(env.SelfId, env.Sce, args.GetInv("卡名")))
                 .Then(
                     PresetNodes.Rest<DMEnv>("行动").Executes((env, args, dict) => ControlAndAct(env, args.GetInv("卡名"), args.GetStr("行动")))
@@ -34,7 +34,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 selfName = null;
             }
             sce.Control(env.SelfId, inv.Name);
-            Global.Dispatcher.Dispatch(action, env, out string reply);
+            Global.Dispatcher.Execute(action, env, out object ret, out string reply);
             if (selfName != null) {
                 sce.Control(env.SelfId, selfName);
             }

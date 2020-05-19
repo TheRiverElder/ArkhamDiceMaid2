@@ -38,7 +38,8 @@ namespace top.riverelder.arkham.Code.Commands {
         }
 
         public static string PrintHelp(string head) {
-            if (Global.Dispatcher.CommandMap.TryGetValue(head, out CommandNode<DMEnv> node)) {
+            CommandNode<DMEnv> node = null;
+            if ((node = Global.Dispatcher[head]) != null) {
                 return string.Join("\n", node.GetHelp());
             }
             return $"未找到指令：{head}";

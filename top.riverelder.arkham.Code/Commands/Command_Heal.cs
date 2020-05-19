@@ -35,10 +35,10 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("治疗")
             .Then(
                 PresetNodes.String<DMEnv>("技能名")
-                .Handles(Extensions.ExistSelfValue())
+                .Handles(Extensions.ExistSelfValue)
                 .Then(
                     PresetNodes.String<DMEnv>("目标")
-                    .Handles(Extensions.ExistInv())
+                    .Handles(Extensions.ExistInv)
                     .Executes((env, args, dict) => Heal(env, env.Inv, args.GetInv("目标"), args.GetStr("技能名"), Dice.Of("1d3")))
                     .Then(
                         Extensions.Dice("增量")

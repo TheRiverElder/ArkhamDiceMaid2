@@ -14,8 +14,6 @@ namespace top.riverelder.RiverCommand {
         private Dictionary<string, string> aliases = new Dictionary<string, string>();
         private readonly RootCommandNode<TEnv> Root = new RootCommandNode<TEnv>();
 
-        public Dictionary<string, CommandNode<TEnv>> CommandMap => new Dictionary<string, CommandNode<TEnv>>(commands);
-
 
         public ICollection<CommandNode<TEnv>> Commands => Root.GetAllCommand();
 

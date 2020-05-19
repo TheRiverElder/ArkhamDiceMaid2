@@ -43,7 +43,7 @@ namespace top.riverelder.arkham.Code.Commands {
             ).Then(
                 Literal<DMEnv>("删除").Then(
                     String<DMEnv>("数值名")
-                    .Handles(Extensions.ExistSelfValue())
+                    .Handles(Extensions.ExistSelfValue)
                     .Executes((env, args, dict) => RemoveVal(env.Sce, env.Inv, args.GetStr("数值名")))
                 )
             ).Then(
@@ -57,7 +57,7 @@ namespace top.riverelder.arkham.Code.Commands {
             ).Then(
                 Literal<DMEnv>("别名").Then(
                     String<DMEnv>("数值名")
-                    .Handles(Extensions.ExistSelfValue())
+                    .Handles(Extensions.ExistSelfValue)
                     .Then(
                         String<DMEnv>("新名")
                         .Executes((env, args, dict) => NewName(env.Sce, env.Inv, args.GetStr("数值名"), args.GetStr("新名")))

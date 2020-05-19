@@ -22,7 +22,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 Extensions.Dice("骰子").Executes((env, args, dict) => Roll(env, args.GetDice("骰子")))
             ).Rest(
                 PresetNodes.String<DMEnv>("选项组")
-                .Handles(Extensions.ConvertObjectArrayToStringArray())
+                .Handles(PreProcesses.ConvertObjectArrayToStringArray)
                 .Executes((env, args, dict) => Choose(args.Get<string[]>("选项组")))
             );
 
