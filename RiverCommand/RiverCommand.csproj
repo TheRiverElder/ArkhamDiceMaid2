@@ -61,9 +61,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RootCommandNode.cs" />
     <Compile Include="Utils\ArgUtil.cs" />
-    <Compile Include="Utils\ArgReader.cs" />
-    <Compile Include="Utils\DispatchResult.cs" />
-    <Compile Include="Utils\NumberType.cs" />
     <Compile Include="Utils\StringReader.cs" />
   </ItemGroup>
   <ItemGroup />

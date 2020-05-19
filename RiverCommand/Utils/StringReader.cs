@@ -154,8 +154,13 @@ namespace top.riverelder.RiverCommand.Utils {
         }
 
         public string ReadToEndOrMaxOrEmpty(int max, string empty) {
-            int len = Math.Min(Data.Length - Cursor, max);
-            return len == 0 ? empty : Data.Substring(Cursor, len);
+            int left = Data.Length - Cursor;
+            if (left == 0) {
+                return empty;
+            } else if (left > max) {
+                return Data.Substring(Cursor, max) + '…';
+            }
+            return Data.Substring(Cursor);
         }
 
         public string Slice(int index) {

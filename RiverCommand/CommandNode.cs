@@ -123,6 +123,11 @@ namespace top.riverelder.RiverCommand {
         }
 
         protected bool MatchChildren(StringReader reader, TEnv env, Args args, int childLevel, List<CompiledCommand<TEnv>> res) {
+            if (certainChildren.Count == 0 && children.Count == 0 && !ArgUtil.IsListArgEnd(reader)) {
+                res.Add(MakeErr(childLevel, "多余的参数：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip)));
+                return false;
+            }
+            
             // 开始匹配子节点
             int start = reader.Cursor;
             bool hasChildMatched = false;

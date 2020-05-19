@@ -91,7 +91,7 @@ namespace top.riverelder.RiverCommand {
             } else if (!ret && errors.Count > 0) {
                 // 如果没有最长成功命令，则返回最长错误
                 errors.Sort((a, b) => b.Length - a.Length);
-                result = matched[0];
+                result = errors[0];
             } else {
                 // 否则出错
                 result = null;
