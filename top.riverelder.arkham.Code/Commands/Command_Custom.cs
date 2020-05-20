@@ -23,6 +23,14 @@ namespace top.riverelder.arkham.Code.Commands {
                 })
             );
             dispatcher.RegisterCustom(Command_Check.MainAction);
+            dispatcher.RegisterCustom(
+                PresetNodes.String<DMEnv>("卡名")
+                .Handles(Extensions.ExistInv)
+                .Then(
+                    PresetNodes.Cmd<DMEnv>("行动")
+                    .Executes((env, args, dict) => Command_Control.ControlAndAct(env, args.GetInv("卡名"), args.GetCmd("行动")))
+                )
+            );
         }
     }
 }
