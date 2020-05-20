@@ -42,13 +42,13 @@ namespace top.riverelder.arkham.Code.Utils {
         public static bool TryParse(StringReader reader, out Dice dice) {
             dice = new Dice();
             bool needSign = false;
-            while (reader.HasNext && !char.IsWhiteSpace(reader.Peek())) {
-                if (TryParseItem(reader, out DiceItem item, needSign)) {
-                    dice.items.Add(item);
-                } else {
-                    return false;
-                }
+            while (reader.HasNext && TryParseItem(reader, out DiceItem item, needSign)) {
+                dice.items.Add(item);
                 needSign = true;
+            }
+            if (dice.items.Count == 0) {
+                dice = null;
+                return false;
             }
             return true;
         }
