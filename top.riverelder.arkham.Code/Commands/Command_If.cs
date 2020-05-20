@@ -23,6 +23,9 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 )
             );
+
+            dispatcher.SetAlias("若", "如果");
+            dispatcher.SetAlias("if", "如果");
         }
 
         public static string If(
