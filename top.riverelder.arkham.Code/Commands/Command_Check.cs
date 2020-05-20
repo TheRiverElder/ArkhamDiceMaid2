@@ -25,60 +25,50 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("检定").Then(
                 MainAction = PresetNodes.String<DMEnv>("数值名")
                 .Handles(Extensions.ExistSelfValue)
-                .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), CheckResult.NormalSuccess))
+                .Executes((DMEnv env, Args args, Args dict, out string reply) => SimpleCheck(env.Inv, args.GetStr("数值名"), CheckResult.NormalSuccess, out reply))
                 .Then(
                     PresetNodes.Or<DMEnv>("难度", "普通", "困难", "极难")
                     .Handles(PreProcesses.MapArg<DMEnv>(hardnessMap))
-                    .Executes((env, args, dict) => SimpleCheck(env.Inv, args.GetStr("数值名"), args.GetInt("难度")))
+                    .Executes((DMEnv env, Args args, Args dict, out string reply) => SimpleCheck(env.Inv, args.GetStr("数值名"), args.GetInt("难度"), out reply))
                     .Then(
                         PresetNodes.Or<DMEnv>("奖惩", "奖励", "惩罚")
                         .Handles(PreProcesses.MapArg<DMEnv>(twiceMap))
-                        .Executes((env, args, dict) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩"), args.GetInt("难度")))
+                        .Executes((DMEnv env, Args args, Args dict, out string reply) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩"), args.GetInt("难度"), out reply))
                     )
                 ).Then(
                     PresetNodes.Or<DMEnv>("奖惩", "奖励", "惩罚")
                     .Handles(PreProcesses.MapArg<DMEnv>(twiceMap))
-                    .Executes((env, args, dict) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩"), CheckResult.NormalSuccess))
+                    .Executes((DMEnv env, Args args, Args dict, out string reply) => TwiceCheck(env.Inv, args.GetStr("数值名"), args.GetBool("奖惩"), CheckResult.NormalSuccess, out reply))
                 ).Then(
                     PresetNodes.Literal<DMEnv>("对抗").Then(
                         PresetNodes.String<DMEnv>("对手名")
                         .Handles(Extensions.ExistInv)
-                        .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名"), false))
+                        .Executes((DMEnv env, Args args, Args dict, out string reply) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名"), false, out reply))
                         .Then(
                             PresetNodes.String<DMEnv>("对抗数值名")
-                            .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("对抗数值名"), false))
+                            .Executes((DMEnv env, Args args, Args dict, out string reply) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("对抗数值名"), false, out reply))
                         )
                     )
                 ).Then(
                     PresetNodes.Literal<DMEnv>("等级对抗").Then(
                         PresetNodes.String<DMEnv>("对手名")
                         .Handles(Extensions.ExistInv)
-                        .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名"), true))
+                        .Executes((DMEnv env, Args args, Args dict, out string reply) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("数值名"), true, out reply))
                         .Then(
                             PresetNodes.String<DMEnv>("对抗数值名")
-                            .Executes((env, args, dict) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("对抗数值名"), true))
+                            .Executes((DMEnv env, Args args, Args dict, out string reply) => CheckAgainst(env.Inv, args.GetStr("数值名"), args.GetInv("对手名"), args.GetStr("对抗数值名"), true, out reply))
                         )
                     )
                 ).Then(
                     PresetNodes.String<DMEnv>("目标")
-                    .Executes((env, args, dict) => SimpleCheckTo(env.Inv, args.GetStr("数值名"), args.GetStr("目标")))
+                    .Executes((DMEnv env, Args args, Args dict, out string reply) => SimpleCheckTo(env.Inv, args.GetStr("数值名"), args.GetStr("目标"), out reply))
                 )
             );
 
             dispatcher.SetAlias("ch", "检定");
         }
 
-        public static string SimpleCheckTo(Investigator inv, string valueName, string target) {
-            CheckResult result = inv.Values[valueName].Check();
-
-            return new StringBuilder()
-                .AppendLine($"{inv.Name}的{valueName}：")
-                .AppendLine(GenResultStr(inv, result, true))
-                .Append(result.succeed ? $"{inv.Name}把{target}给{valueName}了！" : "")
-                .ToString();
-        }
-
-        public static string SimpleCheck(Investigator inv, string valueName, int hardness) {
+        public static bool SimpleCheck(Investigator inv, string valueName, int hardness, out string reply) {
             CheckResult result = inv.Values[valueName].Check(hardness);
             string hardnessStr;
             switch (hardness) {
@@ -88,13 +78,23 @@ namespace top.riverelder.arkham.Code.Commands {
                 default: hardnessStr = "普通"; break;
             }
 
-            return new StringBuilder()
+            reply = new StringBuilder()
                 .AppendLine($"{inv.Name}的{hardnessStr}{valueName}：")
                 .Append(GenResultStr(inv, result, true))
                 .ToString();
+            return result.succeed;
         }
 
-        public static string TwiceCheck(Investigator inv, string valueName, bool isBonus, int hardness) {
+        public static bool SimpleCheckTo(Investigator inv, string valueName, string target, out string reply) {
+            if (!inv.Check(valueName, out CheckResult result, out string str)) {
+                reply = str;
+                return false;
+            }
+            reply = str + (result.succeed ? $"{inv.Name}把{target}给{valueName}了！" : "");
+            return result.succeed;
+        }
+
+        public static bool TwiceCheck(Investigator inv, string valueName, bool isBonus, int hardness, out string reply) {
             Value value = inv.Values[valueName];
             CheckResult bigger = value.Check(hardness);
             CheckResult smaller = value.Check(hardness);
@@ -104,54 +104,64 @@ namespace top.riverelder.arkham.Code.Commands {
                 smaller = tmp;
             }
             if (isBonus) {
-                return new StringBuilder()
+                reply = new StringBuilder()
                     .AppendLine($"{inv.Name}的奖励{valueName}：")
                     .Append(GenResultStr(inv, smaller, false) + $"({bigger.points})，" + smaller.ActualTypeString)
                     .ToString();
+                return smaller.succeed;
             } else {
-                return new StringBuilder()
+                reply = new StringBuilder()
                     .AppendLine($"{inv.Name}的惩罚{valueName}：")
                     .Append(GenResultStr(inv, bigger, false) + $"({smaller.points})，" + bigger.ActualTypeString)
                     .ToString();
+                return bigger.succeed;
             }
         }
 
-        public static string CheckAgainst(Investigator inv, string valueName, Investigator target, string againstValueName, bool byLevel) {
+        public static bool CheckAgainst(Investigator inv, string valueName, Investigator target, string againstValueName, bool byLevel, out string reply) {
             CheckResult selfResult = inv.Values[valueName].Check();
             if (!target.Values.TryWidelyGet(againstValueName, out Value againstValue)) {
-                return $"{target.Name}没有{againstValueName}";
+                reply = $"{target.Name}没有{againstValueName}";
+                return false;
             }
             CheckResult targetResult = againstValue.Check();
             string resultStr = null;
+            bool r = false;
             if (byLevel) {
                 if (!selfResult.succeed) {
                     resultStr = "完败";
+                    r = false;
                 } else if (selfResult.type == targetResult.type) {
                     resultStr = "平分秋色";
+                    r = true;
                 } else {
-                    resultStr = selfResult.type < targetResult.type ? "完胜" : "完败";
+                    resultStr = (r = selfResult.type < targetResult.type) ? "完胜" : "完败";
                 }
             } else {
                 if (!selfResult.succeed) {
                     resultStr = "失败";
+                    r = false;
                 } else if (selfResult.points == targetResult.points) {
                     resultStr = "平局";
+                    r = true;
                 } else {
-                    resultStr = selfResult.points < targetResult.points ? "胜利" : "失败";
+                    resultStr = (r = selfResult.points < targetResult.points) ? "胜利" : "失败";
                 }
             }
-            
-            return new StringBuilder()
+
+            reply = new StringBuilder()
                 .AppendLine($"{inv.Name}的{valueName}：" + GenResultStr(inv, selfResult, false))
                 .AppendLine($"{target.Name}的{againstValueName}：" + GenResultStr(target, targetResult, false))
                 .Append(inv.Name).Append('：').Append(resultStr)
                 .ToString();
+            return r;
         }
-
-        public static string GenResultStr(Investigator inv, CheckResult result, bool showResultTypeStr) {
-            return (inv.Is("HIDE_VALUE") ? "(???)" : $"({result.target}/{result.value})") +
-                $" => {result.points}" + 
-                (showResultTypeStr ? "，" + result.ActualTypeString : "");
+        
+        public static string GenResultStr(Investigator inv, CheckResult result, bool showTypeString) {
+            return 
+                (inv.Is("HIDE_VALUE") ? "(???)" : $"({result.target}/{result.value})") +
+                $" => {result.points}" +
+                (showTypeString ? $"，{result.ActualTypeString}" : "");
         }
 
     }

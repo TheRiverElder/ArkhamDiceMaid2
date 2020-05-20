@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RiverCommand;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -107,6 +108,10 @@ namespace top.riverelder.arkham.Code.Utils {
 
         public static string GetStr(this Args args, string name) {
             return args.Get<string>(name);
+        }
+
+        public static CompiledCommand<DMEnv> GetCmd(this Args args, string name) {
+            return args.Get<CompiledCommand<DMEnv>>(name);
         }
 
         public static Dice GetDice(this Args args, string name) {

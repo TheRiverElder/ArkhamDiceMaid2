@@ -92,11 +92,15 @@ namespace top.riverelder.RiverCommand {
             int start = reader.Cursor;
             // 读取命令头，或者别名
             string alias = stringReader.Read(ArgUtil.IsNameChar);
-            int? offset = null;
+            int offset = 0;
             // 查找替换项，并计算偏移
             if (!string.IsNullOrEmpty(alias) && aliases.TryGetValue(alias, out string replacement)) {
                 reader = new StringReader(replacement + reader.ReadRest());
                 offset = alias.Length - replacement.Length;
+            } else {
+                // 恢复原始字符流
+                stringReader.Cursor = start;
+                reader = new StringReader(reader.ReadRest());
             }
             // 恢复原始字符流
             stringReader.Cursor = start;
@@ -123,10 +127,8 @@ namespace top.riverelder.RiverCommand {
                 return false;
             }
             reader.Skip(result.ReaderCursor);
-            if (offset != null) {
-                // 此时reader已经不是原来的reader了，这样一来就要重新计算原始字符流的读取长度
-                stringReader.Skip(reader.Cursor + offset.Value);
-            }
+            // 此时reader已经不是原来的reader了，这样一来就要重新计算原始字符流的读取长度
+            stringReader.Skip(reader.Cursor + offset);
             return ret;
         }
 

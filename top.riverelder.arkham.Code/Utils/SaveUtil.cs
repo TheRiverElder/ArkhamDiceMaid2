@@ -19,7 +19,7 @@ namespace top.riverelder.arkham.Code.Utils {
             }
 
             string json = File.ReadAllText(path);
-            scenario = JsonConvert.DeserializeObject<Scenario>(json, options);
+            Global.Scenarios[scenarioName] = scenario = JsonConvert.DeserializeObject<Scenario>(json, options);
             return true;
         }
 

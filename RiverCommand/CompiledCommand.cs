@@ -12,10 +12,10 @@ namespace RiverCommand {
         public int Length { get; }
         public string Error { get; }
 
-        private CmdExecutor<TEnv> Executor;
-        private TEnv Env;
-        private Args Args;
-        private Args Dict;
+        public CmdExecutor<TEnv> Executor;
+        public TEnv Env { get; set; }
+        public Args Args { get; set; }
+        public Args Dict { get; set; }
 
         public bool IsErr => !string.IsNullOrEmpty(Error);
 
@@ -37,12 +37,7 @@ namespace RiverCommand {
         }
 
         public object Execute(out string reply) {
-            try {
-                return Executor(Env, Args, Dict, out reply);
-            } catch (Exception e) {
-                reply = e.Message;
-                return false;
-            }
+            return Executor(Env, Args, Dict, out reply);
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using RiverCommand;
+using System.Collections.Generic;
 
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
@@ -21,20 +22,22 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Handles(Extensions.ExistInv)
                 .Executes((env, args, dict) => Control(env.SelfId, env.Sce, args.GetInv("卡名")))
                 .Then(
-                    PresetNodes.Rest<DMEnv>("行动").Executes((env, args, dict) => ControlAndAct(env, args.GetInv("卡名"), args.GetStr("行动")))
+                    PresetNodes.Cmd<DMEnv>("行动").Executes((env, args, dict) => ControlAndAct(env, args.GetInv("卡名"), args.GetCmd("行动")))
                 )
             );
 
             dispatcher.SetAlias("ct", "控制");
         }
 
-        public static string ControlAndAct(DMEnv env, Investigator inv, string action) {
+        public static string ControlAndAct(DMEnv env, Investigator inv, CompiledCommand<DMEnv> action) {
             Scenario sce = env.Sce;
             if (!sce.PlayerNames.TryGetValue(env.SelfId, out string selfName)) {
                 selfName = null;
             }
             sce.Control(env.SelfId, inv.Name);
-            Global.Dispatcher.Execute(action, env, out object ret, out string reply);
+            env.ClearCache();
+            action.Env = env;
+            action.Execute(out string reply);
             if (selfName != null) {
                 sce.Control(env.SelfId, selfName);
             }

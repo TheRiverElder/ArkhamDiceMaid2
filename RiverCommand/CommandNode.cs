@@ -212,6 +212,11 @@ namespace top.riverelder.RiverCommand {
             return this;
         }
 
+        public CommandNode<TEnv> Executes(CmdReplyer<TEnv> replyer) {
+            Executor = ArgUtil.Rep2Exe<TEnv>(replyer);
+            return this;
+        }
+
         public CommandNode<TEnv> Handles(PreHandler<TEnv> process) {
             Process = process;
             return this;

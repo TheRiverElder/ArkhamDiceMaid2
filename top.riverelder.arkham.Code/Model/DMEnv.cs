@@ -50,8 +50,31 @@ namespace top.riverelder.arkham.Code.Model {
         private Investigator InvCache;
 
         public void RefreshCache() {
-            SceCache = null;
-            InvCache = null;
+            if (Global.Groups.TryGetValue(GroupId, out string sceName)) {
+                if (Global.Scenarios.TryGetValue(sceName, out Scenario sce)) {
+                    this.SceCache = sce;
+                    if (sce != null &&
+                        sce.PlayerNames.TryGetValue(SelfId, out string invName) &&
+                        sce.Investigators.TryGetValue(invName, out Investigator inv)) {
+                        this.InvCache = inv;
+                    } else {
+                        this.InvCache = null;
+                    }
+                } else {
+                    this.SceCache = null;
+                    this.InvCache = null;
+                }
+            }
+        }
+
+        public void ClearCache() {
+            this.SceCache = null;
+            this.InvCache = null;
+        }
+
+        public void SetCache(Scenario sce, Investigator inv) {
+            this.SceCache = sce;
+            this.InvCache = inv;
         }
 
         public Scenario Sce {

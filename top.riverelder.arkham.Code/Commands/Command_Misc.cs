@@ -45,7 +45,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 if (i > 0) {
                     sb.AppendLine();
                 }
-                string indexStr = Convert.ToString(i + 1) + '.';
+                string indexStr = Convert.ToString(i + 1) + ".  ";
                 switch (i + 1) {
                     case 1: indexStr = "🥇"; break;
                     case 2: indexStr = "🥈"; break;

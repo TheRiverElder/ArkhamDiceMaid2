@@ -43,5 +43,10 @@ namespace top.riverelder.RiverCommand.Utils {
             return ch == '_' || char.IsLetter(ch) || char.IsDigit(ch);
         }
         
+        public static CmdExecutor<TEnv> Rep2Exe<TEnv>(CmdReplyer<TEnv> replyer) {
+            return (TEnv env, Args args, Args dict, out string reply) => {
+                return reply = replyer(env, args, dict);
+            };
+        }
     }
 }

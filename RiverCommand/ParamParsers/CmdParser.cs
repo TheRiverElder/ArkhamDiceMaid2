@@ -20,7 +20,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
                 hasParen = true;
             }
             dispatcher.Dispatch(reader, env, out CompiledCommand<TEnv> res);
-            if (hasParen && !(reader.HasNext || Config.CloseParen.Contains(reader.Read()))) {
+            if (hasParen && !(reader.HasNext && Config.CloseParen.Contains(reader.Read()))) {
                 result = null;
                 return false;
             }
