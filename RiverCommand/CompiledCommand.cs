@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using top.riverelder.RiverCommand;
 
-namespace RiverCommand {
+namespace top.riverelder.RiverCommand {
     public class CompiledCommand<TEnv> {
 
         public int ReaderCursor { get; }

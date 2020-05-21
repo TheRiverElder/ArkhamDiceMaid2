@@ -61,6 +61,10 @@ namespace top.riverelder.arkham.Code.Commands {
                     )
                 )
             );
+
+            dispatcher.SetAlias("杀马", "赛马 杀马");
+            dispatcher.SetAlias("下注", "赛马 下注");
+            dispatcher.SetAlias("步进", "赛马 步进");
         }
         
 

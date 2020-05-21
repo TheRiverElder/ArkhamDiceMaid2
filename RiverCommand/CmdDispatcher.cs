@@ -114,12 +114,10 @@ namespace top.riverelder.RiverCommand {
                 (cc.IsErr ? errors : matched).Add(cc);
             }
             if (ret && matched.Count > 0) {
-                matched.Sort((a, b) => b.Length - a.Length);
-                result = matched[0];
+                result = GetLongestCmd(matched);
             } else if (!ret && errors.Count > 0) {
                 // 如果没有最长成功命令，则返回最长错误
-                errors.Sort((a, b) => b.Length - a.Length);
-                result = errors[0];
+                result = GetLongestCmd(errors);
             } else {
                 // 否则出错
                 result = null;
@@ -147,6 +145,16 @@ namespace top.riverelder.RiverCommand {
             ret = null;
             reply = ccmd.ErrorStr;
             return false;
+        }
+
+        private CompiledCommand<TEnv> GetLongestCmd(List<CompiledCommand<TEnv>> list) {
+            CompiledCommand<TEnv> result = list[0];
+            foreach (var cc in list) {
+                if (cc != result && cc.Length > result.Length) {
+                    result = cc;
+                }
+            }
+            return result;
         }
     }
 }
