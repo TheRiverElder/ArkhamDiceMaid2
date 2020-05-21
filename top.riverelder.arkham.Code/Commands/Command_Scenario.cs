@@ -37,6 +37,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     //)
                 )
             );
+
             dispatcher.SetAlias("读团", "存档 读取");
             dispatcher.SetAlias("存团", "存档 保存");
             dispatcher.SetAlias("开团", "存档 开始");

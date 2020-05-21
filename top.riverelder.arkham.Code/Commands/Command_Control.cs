@@ -17,7 +17,12 @@ namespace top.riverelder.arkham.Code.Commands {
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            dispatcher.Register("控制").Then(
+            dispatcher.Register("控制")
+            .Then(
+                PresetNodes.Literal<DMEnv>("关联")
+                .Executes((env, args, dict) => Relate(env))
+            )
+            .Then(
                 PresetNodes.String<DMEnv>("卡名")
                 .Handles(Extensions.ExistInv)
                 .Executes((env, args, dict) => Control(env.SelfId, env.Sce, args.GetInv("卡名")))
@@ -27,6 +32,7 @@ namespace top.riverelder.arkham.Code.Commands {
             );
 
             dispatcher.SetAlias("ct", "控制");
+            dispatcher.SetAlias("关联到此", "控制 关联");
         }
 
         public static string ControlAndAct(DMEnv env, Investigator inv, CompiledCommand<DMEnv> action) {
@@ -43,6 +49,15 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             env.Save();
             return /*$"以{inv.Name}的身份：\n" +*/ reply;
+        }
+
+        public static string Relate(DMEnv env) {
+            if (env.GroupId <= 10000) {
+                return "泥确定是在群里执行这条指令的？";
+            }
+            Global.Users[env.SelfId] = env.GroupId;
+            SaveUtil.SaveGlobal();
+            return "已将泥关联到该羣！现在可以在小窗操作我了哦~";
         }
     }
 }

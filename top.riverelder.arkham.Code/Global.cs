@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Commands;
+using top.riverelder.arkham.Code.Exceptions;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
@@ -20,7 +22,7 @@ namespace top.riverelder.arkham.Code {
         public static string ConfFile = AppDir + RelConfFile;
         public static string LogFile = AppDir + RelLogFile;
 
-        public static void  SetAppDir(string appDir) {
+        public static void SetAppDir(string appDir) {
             AppDir = appDir;
             ConfFile = Path.Combine(appDir, RelConfFile);
             DataDir = Path.Combine(appDir, RelDataDir);
@@ -73,6 +75,10 @@ namespace top.riverelder.arkham.Code {
         /// </summary>
         public static IDictionary<long, string> Groups = new Dictionary<long, string>();
         /// <summary>
+        /// 用户ID到群ID的映射
+        /// </summary>
+        public static IDictionary<long, long> Users = new Dictionary<long, long>();
+        /// <summary>
         /// 模组
         /// </summary>
         public static IDictionary<string, Scenario> Scenarios = new Dictionary<string, Scenario>();
@@ -120,6 +126,30 @@ namespace top.riverelder.arkham.Code {
             Dispatcher.Register(new Command_Value());
 
             Dispatcher.Register(new Command_Custom());
+        }
+
+        /// <summary>
+        /// 回复内容
+        /// </summary>
+        /// <param name="msg">接受的信息</param>
+        /// <param name="env">环境</param>
+        /// <param name="sb">输出字符流</param>
+        /// <returns>是否有信息输出</returns>
+        public static bool Reply(string msg, DMEnv env, StringBuilder sb) {
+            string raw = msg.Substring(Prefix.Length);
+            string[] cmds = Regex.Split(raw, @"[ \t\n\r；;]+" + Prefix);
+            bool flag = false;
+            foreach (string c in cmds) {
+                try {
+                    if (Dispatcher.Execute(c, env, out object ret, out string reply) || Debug) {
+                        sb.AppendLine().Append(reply);
+                        flag = true;
+                    }
+                } catch (DiceException ex) {
+                    sb.AppendLine().Append(ex.Message);
+                }
+            }
+            return flag;
         }
     }
 }

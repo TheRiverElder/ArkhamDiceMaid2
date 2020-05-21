@@ -79,6 +79,14 @@ namespace top.riverelder.arkham.Code.Utils {
                         Global.Groups[g] = groups[key].ToString();
                     }
                 }
+                
+                IniSection users = global["Users"];
+                Global.Users.Clear();
+                foreach (string key in users.Keys) {
+                    if (long.TryParse(key, out long u)) {
+                        Global.Users[u] = users[key].ToInt64();
+                    }
+                }
             } catch (Exception e) {
                 Global.Log(e.Message);
                 return false;
@@ -110,12 +118,18 @@ namespace top.riverelder.arkham.Code.Utils {
                 groups[g.ToString()] = new IniValue(Global.Groups[g]);
             }
 
+            IniSection users = new IniSection("Users");
+            foreach (long u in Global.Users.Keys) {
+                users[u.ToString()] = new IniValue(Global.Users[u]);
+            }
+
             IniObject global = new IniObject
             {
                 conf,
                 defaultValues,
                 aliases,
-                groups
+                groups,
+                users,
             };
             global.Encoding = Encoding.UTF8;
 
