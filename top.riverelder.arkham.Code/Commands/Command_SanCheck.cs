@@ -52,7 +52,7 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             int prev = value.Val;
             value.Sub(v);
-            builder.Append($"{inv.Name}的理智：{prev} - {v} => {value.Val}");
+            builder.AppendLine().Append($"{inv.Name}的理智：{prev} - {v} => {value.Val}");
             SaveUtil.Save(sce);
 
             return builder.ToString();

@@ -90,7 +90,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 reply = str;
                 return false;
             }
-            reply = str + (result.succeed ? $"{inv.Name}把{target}给{valueName}了！" : "");
+            reply = str + (result.succeed ? $"，{inv.Name}把{target}给{valueName}了！" : "");
             return result.succeed;
         }
 
