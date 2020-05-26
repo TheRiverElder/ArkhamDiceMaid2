@@ -4,6 +4,7 @@ using System.Text;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     class Command_Help : DiceCmdEntry {
@@ -12,7 +13,7 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("帮助")
-            .Executes((env, args, dict) => PrintAllHelp())
+            .Executes((env, args, dict) => PrintAllHelp(env))
             .Then(
                 PresetNodes.Literal<DMEnv>("模板")
                 .Executes((env, args, dict) => "可用的模板：\n" + string.Join("、", Temepletes.Keys))
@@ -22,27 +23,26 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 PresetNodes.String<DMEnv>("指令名")
-                .Executes((env, args, dict) => PrintHelp(args.GetStr("指令名")))
+                .Executes((env, args, dict) => PrintHelp(env, args.GetStr("指令名")))
             );
 
             dispatcher.SetAlias("模板", "帮助 模板");
         }
 
-        public static string PrintAllHelp() {
-            StringBuilder builder = new StringBuilder().AppendLine("可用的命令集：");
+        public static void PrintAllHelp(DMEnv env) {
+            env.AppendLine("可用的命令集：");
             foreach (CommandNode<DMEnv> node in Global.Dispatcher.Commands) {
-                builder.AppendLine("----------------");
-                builder.AppendLine(string.Join("\n", node.GetHelp()));
+                env.AppendLine("----------------");
+                env.AppendLine(string.Join("\n", node.GetHelp()));
             }
-            return builder.ToString();
         }
 
-        public static string PrintHelp(string head) {
+        public static void PrintHelp(DMEnv env, string head) {
             CommandNode<DMEnv> node = null;
             if ((node = Global.Dispatcher[head]) != null) {
-                return string.Join("\n", node.GetHelp());
+                env.Next = string.Join("\n", node.GetHelp());
             }
-            return $"未找到指令：{head}";
+            env.Next = $"未找到指令：{head}";
         }
 
         public static Dictionary<string, string> Temepletes = new Dictionary<string, string> {

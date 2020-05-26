@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
 
@@ -29,9 +30,8 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("r", "投掷");
         }
 
-        public static string Roll(DMEnv env, Dice dice) {
+        public static int Roll(DMEnv env, Dice dice) {
             string invName = "你";
-            string diceStr = dice.ToString();
             int result;
             if (env.TryGetInv(out Scenario sce, out Investigator inv)) {
                 result = dice.RollWith(inv.DamageBonus);
@@ -39,10 +39,13 @@ namespace top.riverelder.arkham.Code.Commands {
             } else {
                 result = dice.Roll();
             }
-            return 
-                Global.TranslatorTone ?
-                WithTranslatorTone(diceStr, Convert.ToString(result), invName) :
-                $"{dice.ToString()} => {dice.Roll()}";
+            if (!Global.TranslatorTone) {
+                env.Append($"{dice.ToString()} => {result}");
+                return result;
+            }
+            string diceStr = dice.ToString();
+            env.Append(WithTranslatorTone(diceStr, Convert.ToString(result), invName));
+            return result;
         }
 
         public static string WithTranslatorTone(string dice, string result, string name) {

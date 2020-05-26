@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     public class Command_Custom : DiceCmdEntry {

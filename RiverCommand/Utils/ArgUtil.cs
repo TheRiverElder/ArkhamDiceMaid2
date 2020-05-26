@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using top.riverelder.RiverCommand.ParamParsers;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.RiverCommand.Utils {
     public static class ArgUtil {
@@ -43,9 +44,10 @@ namespace top.riverelder.RiverCommand.Utils {
             return ch == '_' || char.IsLetter(ch) || char.IsDigit(ch);
         }
         
-        public static CmdExecutor<TEnv> Rep2Exe<TEnv>(CmdReplyer<TEnv> replyer) {
-            return (TEnv env, Args args, Args dict, out string reply) => {
-                return reply = replyer(env, args, dict);
+        public static CmdExecutor<TEnv> Void2Null<TEnv>(VoidCmdExecutor<TEnv> vce) {
+            return (TEnv env, Args args, Args dict) => {
+                vce(env, args, dict);
+                return null;
             };
         }
     }

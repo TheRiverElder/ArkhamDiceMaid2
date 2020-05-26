@@ -4,6 +4,7 @@ using System.Text;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     public class Command_Inv : DiceCmdEntry {
@@ -51,7 +52,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("检查")
-                .Executes((env, args, dict) => Check(env.Inv))
+                .Executes((env, args, dict) => Check(env, env.Inv))
             ).Then(
                 PresetNodes.Literal<DMEnv>("伤害加值")
                 .Then(
@@ -110,11 +111,12 @@ namespace top.riverelder.arkham.Code.Commands {
             return flag;
         }
 
-        public static string Rename(DMEnv env, string name) {
+        public static bool Rename(DMEnv env, string name) {
             Investigator inv = env.Inv;
             string oldName = inv.Name;
             if (oldName == name) {
-                return "新旧名字相同，无需更改";
+                env.Next = "新旧名字相同，无需更改";
+                return false;
             }
             inv.Name = name;
             
@@ -122,10 +124,11 @@ namespace top.riverelder.arkham.Code.Commands {
             env.Sce.PutInvestigator(inv);
             env.Sce.Control(env.SelfId, inv.Name);
             env.Save();
-            return $"{oldName}被重命名为：{name}" + (CheckNameInputHardness(name, out string hint) ? "\n" + hint : "");
+            env.Next = $"{oldName}被重命名为：{name}" + (CheckNameInputHardness(name, out string hint) ? "\n" + hint : "");
+            return true;
         }
 
-        public static string CreateInv(DMEnv env, string name, string desc, Args dict) {
+        public static bool CreateInv(DMEnv env, string name, string desc, Args dict) {
             Scenario sce = env.Sce;
             Investigator inv = new Investigator(name, desc);
 
@@ -138,60 +141,61 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             inv.Calc(out string err);
 
-            StringBuilder builder = new StringBuilder();
-            builder.AppendFormat("名字：{0}", name).AppendLine();
+            env.Append("名字：", name).Line();
             if (!string.IsNullOrEmpty(desc)) {
-                builder.AppendFormat("描述：{0}", desc).AppendLine();
+                env.Append("描述：", desc).Line();
             }
             if (CheckNameInputHardness(name, out string hint)) {
-                builder.AppendLine(hint).AppendLine();
+                env.AppendLine(hint).Line();
             }
-            builder
+            env
                 .Append("体格：").Append(inv.Build)
                 .Append("伤害加值：").AppendLine(inv.DamageBonus);
 
             foreach (string key in inv.Values.Names) {
                 if (inv.Values.TryWidelyGet(key, out Value value)) {
-                    builder.AppendFormat("{0}:{1} ", key, value);
+                    env.Append($"{key}:{value} ");
                 }
             }
             sce.PutInvestigator(inv);
             sce.Control(env.SelfId, inv.Name);
             env.Save();
-            return builder.ToString();
+            return true;
         }
 
-        public static string DestoryInv(DMEnv env, string name) {
+        public static bool DestoryInv(DMEnv env, string name) {
             Scenario sce = env.Sce;
 
             if (env.IsAdmin) {
-                return "你不是管理员！";
+                env.Next = "你不是管理员！";
+                return false;
             } else if (!sce.ExistInvestigator(name)) {
-                return "不存在调查员：" + name;
+                env.Next = "不存在调查员：" + name;
+                return false;
             }
             sce.PlayerNames.Remove(env.SelfId);
             sce.Investigators.Remove(name);
             
             env.Save();
-            return "成功销毁：" + name + "，TA永远地消失了……";
+            env.Next = "成功销毁：" + name + "，TA永远地消失了……";
+            return true;
         }
 
-        public static string ReCalc(DMEnv env, Investigator inv) {
+        public static void ReCalc(DMEnv env, Investigator inv) {
             inv.Calc(out string err);
             env.Save();
 
-            return new StringBuilder()
+            env
                 .Append(inv.Name).AppendLine("的数据：")
                 .Append("体格：").Append(inv.Build).Append('，')
-                .Append("伤害加值：").Append(inv.DamageBonus)
-                .ToString();
+                .Append("伤害加值：").Append(inv.DamageBonus);
         }
 
         private static string[] BasicNine = new string[] {
             "力量", "体型", "体质", "智力", "教育", "敏捷", "意志", "外貌", "幸运",
         };
 
-        public static string Check(Investigator inv) {
+        public static bool Check(DMEnv env, Investigator inv) {
             HashSet<string> missingValueNames = new HashSet<string>();
             ValueSet values = inv.Values;
             foreach (string name in BasicNine) {
@@ -240,50 +244,48 @@ namespace top.riverelder.arkham.Code.Commands {
             }
 
             if (missingValueNames.Count == 0 && warnings.Count == 0) {
-                return "未发现数据错误（不包括体格、伤害加值）";
+                env.Next = "未发现数据错误（不包括体格、伤害加值）";
+                return true;
             }
-
-            StringBuilder builder = new StringBuilder();
+            
             if (missingValueNames.Count > 0) {
-                builder.Append("缺失数据：" + string.Join("、", missingValueNames));
+                env.Append("缺失数据：" + string.Join("、", missingValueNames));
                 if (warnings.Count > 0) {
-                    builder.AppendLine();
+                    env.Line();
                 }
             }
             if (warnings.Count > 0) {
-                builder.Append(string.Join("\n", warnings));
+                env.Append(string.Join("\n", warnings));
             }
 
-            return builder.ToString();
+            return false;
         }
 
-        public static string AddTags(DMEnv env, Investigator inv, string[] tags) {
+        public static void AddTags(DMEnv env, Investigator inv, string[] tags) {
             foreach (string tag in tags) {
                 inv.Tags.Add(tag.ToUpper());
             }
             env.Save();
 
-            return inv.Name + "添加了标签：" + string.Join("、", tags);
+            env.Next = inv.Name + "添加了标签：" + string.Join("、", tags);
         }
 
-        public static string RemoveTags(DMEnv env, Investigator inv, string[] tags) {
+        public static void RemoveTags(DMEnv env, Investigator inv, string[] tags) {
             foreach (string tag in tags) {
                 inv.Tags.Remove(tag.ToUpper());
             }
             env.Save();
 
-            return inv.Name + "移除了标签：" + string.Join("、", tags);
+            env.Next = inv.Name + "移除了标签：" + string.Join("、", tags);
         }
 
-        public static string SetDB(DMEnv env, Dice db) {
+        public static void SetDB(DMEnv env, Dice db) {
             env.Inv.DamageBonus = db.ToString();
             env.Save();
 
-            return new StringBuilder()
-                .Append(env.Inv.Name).AppendLine("的数据：")
+            env.Append(env.Inv.Name).AppendLine("的数据：")
                 .Append("体格：").Append(env.Inv.Build).Append('，')
-                .Append("伤害加值：").Append(env.Inv.DamageBonus)
-                .ToString();
+                .Append("伤害加值：").Append(env.Inv.DamageBonus);
         }
     }
 }

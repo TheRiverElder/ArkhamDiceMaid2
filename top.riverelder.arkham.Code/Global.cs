@@ -10,6 +10,7 @@ using top.riverelder.arkham.Code.Exceptions;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code {
     public static class Global {
@@ -133,20 +134,25 @@ namespace top.riverelder.arkham.Code {
         /// </summary>
         /// <param name="msg">接受的信息</param>
         /// <param name="env">环境</param>
-        /// <param name="sb">输出字符流</param>
         /// <returns>是否有信息输出</returns>
-        public static bool Reply(string msg, DMEnv env, StringBuilder sb) {
+        public static bool Reply(string msg, DMEnv env) {
             string raw = msg.Substring(Prefix.Length);
             string[] cmds = Regex.Split(raw, @"[ \t\n\r；;]+" + Prefix);
             bool flag = false;
             foreach (string c in cmds) {
                 try {
-                    if (Dispatcher.Execute(c, env, out object ret, out string reply) || Debug) {
-                        sb.AppendLine().Append(reply);
-                        flag = true;
+                    if (Dispatcher.Dispatch(c, env, out ICmdResult result)) {
+                        if (!result.IsError) {
+                            env.Line();
+                            result.Execute();
+                            flag = true;
+                        } else if (Debug) {
+                            env.LineAppend(result.ToString());
+                            flag = true;
+                        }
                     }
                 } catch (DiceException ex) {
-                    sb.AppendLine().Append(ex.Message);
+                    env.Line().Append(ex.Message);
                 }
             }
             return flag;

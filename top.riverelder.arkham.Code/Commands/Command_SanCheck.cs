@@ -5,6 +5,7 @@ using System.Text;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     public class Command_SanCheck : DiceCmdEntry {
@@ -27,35 +28,34 @@ namespace top.riverelder.arkham.Code.Commands {
             .Then(
                 Extensions.Dice("成功骰子").Then(
                     Extensions.Dice("失败骰子")
-                    .Executes((env, args, dict) => SanCheck(env.Sce, env.Inv, args.GetDice("成功骰子"), args.GetDice("失败骰子")))
+                    .Executes((env, args, dict) => SanCheck(env, env.Sce, env.Inv, args.GetDice("成功骰子"), args.GetDice("失败骰子")))
                 )
             );
             dispatcher.SetAlias("sc", "SC");
         }
 
-        public static string SanCheck(Scenario sce, Investigator inv, Dice success, Dice failure) {
+        public static bool SanCheck(DMEnv env, Scenario sce, Investigator inv, Dice success, Dice failure) {
             if (!inv.Values.TryWidelyGet("理智", out Value value)) {
-                return inv.Name + "没有理智！";
+                env.Append(inv.Name + "没有理智！");
+                return false;
             }
-
-            StringBuilder builder = new StringBuilder();
-            CheckResult result = value.Check();
-            string typeStr = result.succeed ? "成功" : "失败";
-            builder.Append($"{inv.Name}的SC({value.Val}) => {result.points}：{typeStr}");
+            if (!inv.Check("理智", out CheckResult result, out string str)) {
+                env.Append(str);
+                return false;
+            }
+            env.Append(str);
 
             int v = result.succeed ? success.Roll() : failure.Roll();
-            if (v > 0) {
-                builder.AppendLine().Append(Desc[new Random().Next(Desc.Length)]);
+            if (v != 0) {
+                env.LineAppend(Desc[new Random().Next(Desc.Length)]);
+                env.LineAppend(inv.Change("理智", -v));
                 if (v >= 5) {
-                    builder.AppendLine().Append(Command_Status.DrawMadness(inv));
+                    env.LineAppend(Command_Status.DrawMadness(inv));
                 }
             }
-            int prev = value.Val;
-            value.Sub(v);
-            builder.AppendLine().Append($"{inv.Name}的理智：{prev} - {v} => {value.Val}");
             SaveUtil.Save(sce);
 
-            return builder.ToString();
+            return result.succeed;
         }
     }
 }

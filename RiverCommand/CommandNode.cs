@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using top.riverelder.RiverCommand.ParamParsers;
+using top.riverelder.RiverCommand.Parsing;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand {
@@ -50,14 +51,14 @@ namespace top.riverelder.RiverCommand {
             TEnv env,
             Args args,
             int level,
-            List<CompiledCommand<TEnv>> res
+            List<ICmdResult> res
         ) {
             reader.Skip(Config.ListSeps);
             int start = reader.Cursor;
             // 匹配参数
             if (!MatchSelfListArg(dispatcher, reader, env, args, out string err)) {
                 reader.Cursor = start;
-                res.Add(MakeErr(err, level, reader.Cursor));
+                res.Add(new ErrorResult(reader.Cursor, level, err));
                 return false;
             }
 
@@ -69,21 +70,21 @@ namespace top.riverelder.RiverCommand {
                     return false;
                 } else if (ArgUtil.IsCommandEnd(reader)) {
                     if (Executor != null) {
-                        res.Add(CompileWith(env, args, dict, level, reader.Cursor));
+                        res.Add(new CommandResult<TEnv>(reader.Cursor, level, Executor, env, args, dict));
                         return true;
                     } else {
-                        res.Add(MakeErr(
-                            "该节点不应该是终结节点",
+                        res.Add(new ErrorResult(
+                            reader.Cursor,
                             level,
-                            reader.Cursor));
+                            "该节点不应该是终结节点"));
                         return false;
                     }
                 } else {
-                    res.Add(MakeErr(
-                        "命令本应结束，却读取到未知字符：" +
-                        reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip),
+                    res.Add(new ErrorResult(
+                        reader.Cursor,
                         level,
-                        reader.Cursor)
+                        "命令本应结束，却读取到未知字符：" +
+                        reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip))
                     );
                     return false;
                 }
@@ -93,7 +94,13 @@ namespace top.riverelder.RiverCommand {
             return MatchChildren(dispatcher, reader, env, args, level + 1, res);
         }
 
-        protected bool MatchSelfListArg(CmdDispatcher<TEnv> dispatcher, StringReader reader, TEnv env, Args args, out string err) {
+        protected bool MatchSelfListArg(
+            CmdDispatcher<TEnv> dispatcher, 
+            StringReader reader, 
+            TEnv env,
+            Args args, 
+            out string err
+        ) {
             // 匹配参数
             object ori = null;
             if (Spread) { // 收集所有剩下的参数
@@ -128,9 +135,20 @@ namespace top.riverelder.RiverCommand {
             return true;
         }
 
-        protected bool MatchChildren(CmdDispatcher<TEnv> dispatcher, StringReader reader, TEnv env, Args args, int childLevel, List<CompiledCommand<TEnv>> res) {
+        protected bool MatchChildren(
+            CmdDispatcher<TEnv> dispatcher, 
+            StringReader reader, 
+            TEnv env, 
+            Args args, 
+            int childLevel, 
+            List<ICmdResult> res
+        ) {
             if (certainChildren.Count == 0 && children.Count == 0 && !ArgUtil.IsListArgEnd(reader)) {
-                res.Add(MakeErr("多余的参数：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip), childLevel, reader.Cursor));
+                res.Add(new ErrorResult(
+                    reader.Cursor,
+                    childLevel,
+                    "多余的参数：" + 
+                    reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip)));
                 return false;
             }
             
@@ -143,10 +161,13 @@ namespace top.riverelder.RiverCommand {
                 reader.Cursor = start;
             }
             if (!hasChildMatched) {
-                res.Add(MakeErr(new StringBuilder()
+                res.Add(new ErrorResult(
+                    reader.Cursor,
+                    childLevel,
+                    new StringBuilder()
                     .AppendLine("期待：" + string.Join("，", GetTips()))
                     .Append("得到：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip))
-                    .ToString(), childLevel, reader.Cursor));
+                    .ToString()));
             }
             return hasChildMatched;
         }
@@ -166,14 +187,6 @@ namespace top.riverelder.RiverCommand {
             HashSet<CommandNode<TEnv>> ac = new HashSet<CommandNode<TEnv>>(certainChildren.Values);
             ac.UnionWith(children);
             return ac;
-        }
-
-        protected CompiledCommand<TEnv> CompileWith(TEnv env, Args args, Args dict, int len, int readerCursor) {
-            return new CompiledCommand<TEnv>(readerCursor, len, Executor, env, args, dict);
-        }
-
-        protected CompiledCommand<TEnv> MakeErr(string err, int len, int readerCursor) {
-            return new CompiledCommand<TEnv>(readerCursor, len, err);
         }
 
         #endregion
@@ -212,8 +225,8 @@ namespace top.riverelder.RiverCommand {
             return this;
         }
 
-        public CommandNode<TEnv> Executes(CmdReplyer<TEnv> replyer) {
-            Executor = ArgUtil.Rep2Exe<TEnv>(replyer);
+        public CommandNode<TEnv> Executes(VoidCmdExecutor<TEnv> vce) {
+            Executor = ArgUtil.Void2Null(vce);
             return this;
         }
 

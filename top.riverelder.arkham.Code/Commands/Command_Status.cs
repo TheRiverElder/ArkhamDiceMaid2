@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     public class Command_Status : DiceCmdEntry {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("状态")
-            .Executes((env, args, dict) => DrawMadness(env.Inv));
+            .Executes((env, args, dict) => env.Next = DrawMadness(env.Inv));
         }
 
         public static List<string> Madnesses = new List<string> {

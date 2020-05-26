@@ -7,7 +7,7 @@ using top.riverelder.arkham.Code.Exceptions;
 using top.riverelder.arkham.Code.Utils;
 
 namespace top.riverelder.arkham.Code.Model {
-    public class DMEnv {
+    public class DMEnv : AdvancedStringBuilder {
 
         // 自己的ID
         public long SelfId;
@@ -114,5 +114,6 @@ namespace top.riverelder.arkham.Code.Model {
                 return InvCache = inv;
             }
         }
+        
     }
 }

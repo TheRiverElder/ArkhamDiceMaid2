@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Exceptions;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Utils {
     public static class Extensions {
@@ -110,8 +111,8 @@ namespace top.riverelder.arkham.Code.Utils {
             return args.Get<string>(name);
         }
 
-        public static CompiledCommand<DMEnv> GetCmd(this Args args, string name) {
-            return args.Get<CompiledCommand<DMEnv>>(name);
+        public static CommandResult<DMEnv> GetCmd(this Args args, string name) {
+            return args.Get<CommandResult<DMEnv>>(name);
         }
 
         public static Dice GetDice(this Args args, string name) {

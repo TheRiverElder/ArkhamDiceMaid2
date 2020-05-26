@@ -4,6 +4,7 @@ using System.Text;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 using static top.riverelder.RiverCommand.PresetNodes;
 
 namespace top.riverelder.arkham.Code.Commands {
@@ -12,18 +13,17 @@ namespace top.riverelder.arkham.Code.Commands {
         public string Usage => "显示 <属性|信息|物品|战斗>";
         
 
-        public static string DisplayInfo(Investigator inv) {
-            return $"姓名：{inv.Name}，描述：{inv.Desc}，体格：{inv.Build}，DB：{inv.DamageBonus}";
+        public static void DisplayInfo(DMEnv env, Investigator inv) {
+            env.Next = $"姓名：{inv.Name}，描述：{inv.Desc}，体格：{inv.Build}，DB：{inv.DamageBonus}";
         }
 
-        public static string DisplayInventory(Investigator inv, string itemName) {
+        public static void DisplayInventory(DMEnv env, Investigator inv, string itemName) {
             if (inv.Inventory.Count == 0) {
-                return $"{inv.Name}没有物品";
+                env.Next = $"{inv.Name}没有物品";
             }
             if (!string.IsNullOrEmpty(itemName)) {
                 if (inv.Inventory.TryGetValue(itemName, out Item it)) {
-                    StringBuilder b = new StringBuilder().AppendLine($"{inv.Name}的 {itemName}：");
-                    b
+                    env.AppendLine($"{inv.Name}的 {itemName}：")
                         .Append("技能名：").AppendLine(it.SkillName)
                         .Append("类型：").AppendLine(it.Type)
                         .Append("伤害：").AppendLine(it.Damage)
@@ -33,19 +33,17 @@ namespace top.riverelder.arkham.Code.Commands {
                         .Append("故障值：").AppendLine(it.Mulfunction.ToString())
                         .Append("弹药：").AppendLine(it.CurrentLoad.ToString())
                         .Append("消耗：").Append(it.Cost.ToString());
-                    return b.ToString();
                 } else {
-                    return $"{inv.Name}没有{itemName}";
+                    env.Next = $"{inv.Name}没有{itemName}";
                 }
             }
             StringBuilder sb = new StringBuilder().Append($"{inv.Name}的物品：");
             foreach (Item item in inv.Inventory.Values) {
                 sb.AppendLine().Append(item.Name);
             }
-            return sb.ToString();
         }
 
-        public static string DisplayValue(Investigator inv, string valueName) {
+        public static void DisplayValue(DMEnv env, Investigator inv, string valueName) {
             if (!string.IsNullOrEmpty(valueName)) {
                 if (inv.Values.TryWidelyGet(valueName, out Value value)) {
                     StringBuilder b = new StringBuilder()
@@ -56,85 +54,80 @@ namespace top.riverelder.arkham.Code.Commands {
                     if (value.Max > 0) {
                         b.Append('(').Append(value.Max).Append(')');
                     }
-                    return b.ToString();
                 } else {
-                    return $"未找到{inv.Name}的{valueName}";
+                    env.Next = $"未找到{inv.Name}的{valueName}";
                 }
             } else {
-                StringBuilder b = new StringBuilder().AppendLine($"{inv.Name}的数值：");
+                env.AppendLine($"{inv.Name}的数值：");
                 foreach (string name in inv.Values.Names) {
-                    b.Append(name).Append(':').Append(inv.Values[name]).Append(' ');
+                    env.Append(name).Append(':').Append(inv.Values[name]).Append(' ');
                 }
-                return b.ToString();
             }
         }
 
-        public static string DisplayFightEvents(Investigator inv) {
+        public static void DisplayFightEvents(DMEnv env, Investigator inv) {
             if (inv.Fights.Count == 0) {
-                return $"{inv.Name}没有战斗事件";
+                env.Next = $"{inv.Name}没有战斗事件";
             }
-            StringBuilder sb = new StringBuilder().Append($"{inv.Name}的战斗事件：");
+            env.Append($"{inv.Name}的战斗事件：");
             foreach (FightEvent fight in inv.Fights) {
-                sb.AppendLine().Append($"来自{fight.SourceName}使用{fight.WeaponName ?? "身体"}的攻击");
+                env.Line().Append($"来自{fight.SourceName}使用{fight.WeaponName ?? "身体"}的攻击");
             }
-            return sb.ToString();
         }
 
-        public static string DisplaySpells(Investigator inv) {
+        public static void DisplaySpells(DMEnv env, Investigator inv) {
             if (inv.Spells.Count == 0) {
-                return inv.Name + "不会任何法术";
+                env.Next = inv.Name + "不会任何法术";
             }
-            StringBuilder sb = new StringBuilder().Append($"{inv.Name}的法术：");
+            env.Append($"{inv.Name}的法术：");
             foreach (string sn in inv.Spells) {
-                sb.AppendLine().Append(sn);
+                env.Line().Append(sn);
             }
-            return sb.ToString();
         }
 
-        public static string DisplaySpell(Scenario sce, Investigator inv, string spellName) {
+        public static void DisplaySpell(DMEnv env, Scenario sce, Investigator inv, string spellName) {
             if (!sce.Spells.TryGetValue(spellName, out Spell spell)) {
-                return "不存在法术：" + spellName;
+                env.Next = "不存在法术：" + spellName;
             } else if (!inv.Spells.Contains(spellName)) {
-                return inv.Name + "还未学会" + spellName;
+                env.Next = inv.Name + "还未学会" + spellName;
             }
-            StringBuilder sb = new StringBuilder().Append($"{spellName}消耗：");
+            env.Append($"{spellName}消耗：");
             foreach (var e in spell.Cost) {
-                sb.AppendLine().Append(e.Key).Append('：').Append(e.Value);
+                env.Line().Append(e.Key).Append('：').Append(e.Value);
             }
-            return sb.ToString();
         }
 
-        public static string DisplayTags(Investigator inv) {
-            return inv.Name + (inv.Tags.Count == 0 ? "没有标签" : "的标签：" + string.Join("、", inv.Tags));
+        public static void DisplayTags(DMEnv env, Investigator inv) {
+            env.Next = inv.Name + (inv.Tags.Count == 0 ? "没有标签" : "的标签：" + string.Join("、", inv.Tags));
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("显示")
             .Then(
-                Literal<DMEnv>("信息").Executes((env, args, dict) => DisplayInfo(env.Inv))
+                Literal<DMEnv>("信息").Executes((env, args, dict) => DisplayInfo(env, env.Inv))
             ).Then(
                 Literal<DMEnv>("物品")
-                .Executes((env, args, dict) => DisplayInventory(env.Inv, null))
+                .Executes((env, args, dict) => DisplayInventory(env, env.Inv, null))
                 .Then(
-                    String<DMEnv>("物品名").Executes((env, args, dict) => DisplayInventory(env.Inv, args.GetStr("物品名")))
+                    String<DMEnv>("物品名").Executes((env, args, dict) => DisplayInventory(env, env.Inv, args.GetStr("物品名")))
                 )
             ).Then(
                 Literal<DMEnv>("数值")
-                .Executes((env, args, dict) => DisplayValue(env.Inv, null))
+                .Executes((env, args, dict) => DisplayValue(env, env.Inv, null))
                 .Then(
-                    String<DMEnv>("数值名").Executes((env, args, dict) => DisplayValue(env.Inv, args.GetStr("数值名")))
+                    String<DMEnv>("数值名").Executes((env, args, dict) => DisplayValue(env, env.Inv, args.GetStr("数值名")))
                 )
             ).Then(
-                Literal<DMEnv>("战斗").Executes((env, args, dict) => DisplayFightEvents(env.Inv))
+                Literal<DMEnv>("战斗").Executes((env, args, dict) => DisplayFightEvents(env, env.Inv))
             ).Then(
                 Literal<DMEnv>("法术")
-                .Executes((env, args, dict) => DisplaySpells(env.Inv))
+                .Executes((env, args, dict) => DisplaySpells(env, env.Inv))
                 .Then(
-                    String<DMEnv>("法术名").Executes((env, args, dict) => DisplaySpell(env.Sce, env.Inv, args.GetStr("法术名")))
+                    String<DMEnv>("法术名").Executes((env, args, dict) => DisplaySpell(env, env.Sce, env.Inv, args.GetStr("法术名")))
                 )
             ).Then(
                 Literal<DMEnv>("标签")
-                .Executes((env, args, dict) => DisplayTags(env.Inv))
+                .Executes((env, args, dict) => DisplayTags(env, env.Inv))
             );
 
             dispatcher.SetAlias("ds", "显示");

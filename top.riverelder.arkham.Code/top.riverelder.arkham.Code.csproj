@@ -81,10 +81,8 @@
     <Compile Include="Commands\Command_Scenario.cs" />
     <Compile Include="Commands\Command_Roll.cs" />
     <Compile Include="Commands\Command_SanCheck.cs" />
-    <Compile Include="Commands\Command_SetPrefix.cs" />
     <Compile Include="Commands\Command_Spell.cs" />
     <Compile Include="Commands\Command_Status.cs" />
-    <Compile Include="Commands\Command_Sudo.cs" />
     <Compile Include="Commands\Command_Value.cs" />
     <Compile Include="Commands\Command_Control.cs" />
     <Compile Include="Event_CqAppEnable.cs" />
@@ -97,6 +95,7 @@
     <Compile Include="Model\Horse.cs" />
     <Compile Include="Model\Scenario.cs" />
     <Compile Include="Model\Spell.cs" />
+    <Compile Include="Utils\AdvancedStringBuilder.cs" />
     <Compile Include="Utils\CheckResult.cs" />
     <Compile Include="Utils\Dice.cs" />
     <Compile Include="Event_GroupMessage.cs" />
@@ -104,7 +103,6 @@
     <Compile Include="Model\Item.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\FightTask.cs" />
-    <Compile Include="Util.cs" />
     <Compile Include="Model\Value.cs" />
     <Compile Include="Model\ValueSet.cs" />
     <Compile Include="Utils\DiceCmdEntry.cs" />

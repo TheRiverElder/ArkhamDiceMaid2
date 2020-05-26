@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     public class Command_Grow : DiceCmdEntry {
@@ -24,14 +25,12 @@ namespace top.riverelder.arkham.Code.Commands {
             );
         }
 
-        public static string Grow(DMEnv env, Investigator inv, string[] skillNames, Dice dice) {
-            StringBuilder builder = new StringBuilder();
-            builder.Append(inv.Name + "的成长：");
+        public static void Grow(DMEnv env, Investigator inv, string[] skillNames, Dice dice) {
+            env.Append(inv.Name + "的成长：");
             foreach (string skillName in skillNames) {
-                builder.AppendLine().Append(Grow(inv, skillName, dice));
+                env.LineAppend(Grow(inv, skillName, dice));
             }
             env.Save();
-            return builder.ToString();
         }
 
         public static string Grow(Investigator inv, string skillName, Dice dice) {

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 using static top.riverelder.RiverCommand.PresetNodes;
 
 namespace top.riverelder.arkham.Code.Commands {
@@ -68,13 +69,15 @@ namespace top.riverelder.arkham.Code.Commands {
         }
         
 
-        string Start(DMEnv env, int amount) {
+        public static void Start(DMEnv env, int amount) {
             var horses = env.Sce.Horses;
             if (horses.Count > 0) {
-                return "🏇已经开始！";
+                env.Next = "🏇已经开始！";
+                return;
             }
             if (amount < 2 || amount > 10) {
-                return "🐎匹不得少于2只且不得大于10只！";
+                env.Next = "🐎匹不得少于2只且不得大于10只！";
+                return;
             }
 
             for (int i = 0; i < amount; i++) {
@@ -82,14 +85,15 @@ namespace top.riverelder.arkham.Code.Commands {
                 horses.Add(horse);
             }
             env.Save();
-            return DisplayHorses(horses);
+            env.Next = DisplayHorses(horses);
         }
 
-        string Step(DMEnv env) {
+        public static void Step(DMEnv env) {
             var horses = env.Sce.Horses;
             var scenario = env.Sce;
             if (horses.Count == 0) {
-                return "🏇还未开始！";
+                env.Next = "🏇还未开始！";
+                return;
             }
             HashSet<int> winners = new HashSet<int>();
             for (int i = 0; i < horses.Count; i++) {
@@ -97,52 +101,54 @@ namespace top.riverelder.arkham.Code.Commands {
                     winners.Add(i);
                 }
             }
-            string scene = DisplayHorses(horses);
+            env.Append(DisplayHorses(horses));
             if (winners.Count > 0) {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine(scene).Append("赢家：");
+                env.LineAppend("赢家：");
                 Dictionary<string, int> profits = new Dictionary<string, int>();
                 foreach (int index in winners) {
-                    sb.Append(Indices.ElementAt(index));
+                    env.Append(Indices.ElementAt(index));
                     double bonus = BonusMin + Horse.Rand.NextDouble() * (BonusMax - BonusMin);
                     foreach (var e in horses[index].Bets) {
                         profits[e.Key] = (int)(e.Value * bonus) + (profits.ContainsKey(e.Key) ? profits[e.Key] : 0);
                     }
                 }
-                sb.AppendLine("号🐎。");
+                env.AppendLine("号🐎。");
                 foreach (var e in profits) {
                     if (scenario.TryGetInvestigator(e.Key, out Investigator inv)) {
                         if (!inv.Values.TryWidelyGet("账户", out Value account)) {
                             account = new Value(0);
                             inv.Values.Put("账户", account);
                         }
-                        sb.AppendLine(inv.Change("账户", e.Value));
+                        env.AppendLine(inv.Change("账户", e.Value));
                     } else {
-                        sb.AppendLine($"未找到【{e.Key}】，很遗憾，他的奖金全没了");
+                        env.AppendLine($"未找到【{e.Key}】，很遗憾，他的奖金全没了");
                     }
                 }
                 horses.Clear();
-                env.Save();
-                return sb.Append("🏇已结束！").ToString();
+                env.Append("🏇已结束！");
             }
             env.Save();
-            return scene;
         }
 
-        string Bet(DMEnv env, Investigator inv, int index, int amount) {
+        public static void Bet(DMEnv env, Investigator inv, int index, int amount) {
             var horses = env.Sce.Horses;
             if (horses.Count == 0) {
-                return "🏇还未开始！";
+                env.Next = "🏇还未开始！";
+                return;
             }
             if (amount < 0) {
-                return "必须输入账户且必须大于零！";
+                env.Next = "必须输入账户且必须大于零！";
+                return;
             } else if (index <= 0 || index > horses.Count) {
-                return $"找不到{index}号🐎";
+                env.Next = $"找不到{index}号🐎";
+                return;
             }
             if (!inv.Values.TryGet("账户", out Value account)) {
-                return $"{inv.Name}没有账户";
+                env.Next = $"{inv.Name}没有账户";
+                return;
             } else if (account.Val < amount) {
-                return $"{inv.Name}的账户只有{account.Val}不足{amount}";
+                env.Next = $"{inv.Name}的账户只有{account.Val}不足{amount}";
+                return;
             }
             account.Add(-amount);
             Horse horse = horses[index - 1];
@@ -152,87 +158,73 @@ namespace top.riverelder.arkham.Code.Commands {
                 horse.Bets[inv.Name] = amount;
             }
             env.Save();
-            return $"{inv.Name}下注成功，对象：{index}号🐎，金额：{amount}，总金额：{horse.Bets[inv.Name]}";
+            env.Next = $"{inv.Name}下注成功，对象：{index}号🐎，金额：{amount}，总金额：{horse.Bets[inv.Name]}";
         }
 
-        string Kill(DMEnv env, Investigator source, int index, string weaponName) {
+        public static void Kill(DMEnv env, Investigator source, int index, string weaponName) {
             List<Horse> horses = env.Sce.Horses;
             if (horses.Count == 0) {
-                return "🏇已经结束！";
+                env.Next = "🏇已经结束！";
+                return;
             }
             if (index <= 0 || index > horses.Count) {
-                return $"找不到{index}号🐎";
+                env.Next = $"找不到{index}号🐎";
+                return;
             }
 
             Horse horse = horses[index - 1];
             string horseName = Indices[index - 1] + "号🐎";
 
             if (horse.Sources.Contains(source.Name)) {
-                return $"{source.Name}本轮已经杀过此🐎了！";
+                env.Next = $"{source.Name}本轮已经杀过此🐎了！";
+                return;
             }
 
-            Item w;
-            if (weaponName != null) {
-                if (!source.Inventory.TryGetValue(weaponName, out w)) {
-                    return $"未找到{source.Name}武器：{weaponName}";
-                }
-            } else {
-                w = new Item("肉体") {
-                    SkillName = "斗殴",
-                    Type = "肉搏",
-                    Damage = "1D3+DB",
-                    Impale = false,
-                    MaxCount = 1,
-                    Capacity = 1,
-                    Mulfunction = 100,
-                    CurrentLoad = 1,
-                    Cost = 0,
-                };
-            }
+            Item w = source.GetItem(weaponName);
 
             horse.Sources.Add(source.Name);
 
-            StringBuilder sb = new StringBuilder();
-
             if (!source.Check(w.SkillName, out CheckResult sr, out string str)) {
                 env.Save();
-                return str;
+                env.Append(str);
+                return;
             }
-            sb.AppendLine(str);
+            env.AppendLine(str);
             if (!sr.succeed) {
                 env.Save();
-                return sb.Append("杀🐎失败，该回合不能再杀此🐎").ToString();
+                env.Append("杀🐎失败，该回合不能再杀此🐎");
+                return;
             }
             // 检定🐎的闪避
             CheckResult hr = new Value(horse.Ponential).Check();
-            sb.AppendLine($"{horseName}飞奔(???) => {hr.points}，{hr.ActualTypeString}");
+            env.AppendLine($"{horseName} => {hr.points}，逃离{hr.TypeString}");
             if (hr.succeed && hr.type <= sr.type) {
                 env.Save();
-                return $"{source.Name}没有打中飞速移动中的{horseName}";
+                env.Next = $"{source.Name}没有打中飞速移动中的{horseName}";
+                return;
             }
             // 计算伤害
             int r = Dice.RollWith(w.Damage, source.DamageBonus);
-            sb.Append($"造成伤害：{r}");
+            env.Append($"造成伤害：{r}");
             if (r > 0) {
                 int prev = horse.Health;
                 horse.Health = Math.Min(Math.Max(0, prev - r), Horse.MaxHealth);
-                sb.AppendLine().Append($"{horseName}的体力：{prev} - {r} => {horse.Health}");
+                env.LineAppend($"{horseName}的体力：{prev} - {r} => {horse.Health}");
                 if (horse.Health <= 0) {
                     int totalBets = 0;
                     foreach (int bet in horse.Bets.Values) {
                         totalBets += bet;
                     }
                     horse.Bets.Clear();
-                    sb.AppendLine($"{source.Name}获得{horseName}身上的所有筹码({totalBets})");
-                    sb.Append(source.Change("账户", totalBets));
+                    env.AppendLine($"{source.Name}获得{horseName}身上的所有筹码({totalBets})");
+                    env.Append(source.Change("账户", totalBets));
                 }
             }
             env.Save();
-            return sb.ToString();
         }
 
         public static string Indices = "①②③④⑤⑥⑦⑧⑨⑩";
-        string DisplayHorses(List<Horse> horses) {
+        public static string DisplayHorses(List<Horse> horses) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < horses.Count; i++) {
                 sb.Append(Indices.ElementAt(i)).Append("号：").Append(horses[i].Display());

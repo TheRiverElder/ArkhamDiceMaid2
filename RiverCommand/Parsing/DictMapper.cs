@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using top.riverelder.RiverCommand.ParamParsers;
 using top.riverelder.RiverCommand.Utils;
 
-namespace top.riverelder.RiverCommand {
+namespace top.riverelder.RiverCommand.Parsing {
     public class DictMapper<TEnv> {
 
         private ParamParser<TEnv> RestParser = null;

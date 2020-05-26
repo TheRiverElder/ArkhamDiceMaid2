@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     class Command_Control : DiceCmdEntry {
@@ -35,7 +36,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("关联到此", "控制 关联");
         }
 
-        public static string ControlAndAct(DMEnv env, Investigator inv, CompiledCommand<DMEnv> action) {
+        public static object ControlAndAct(DMEnv env, Investigator inv, CommandResult<DMEnv> action) {
             Scenario sce = env.Sce;
             if (!sce.PlayerNames.TryGetValue(env.SelfId, out string selfName)) {
                 selfName = null;
@@ -43,21 +44,23 @@ namespace top.riverelder.arkham.Code.Commands {
             sce.Control(env.SelfId, inv.Name);
             env.ClearCache();
             action.Env = env;
-            action.Execute(out string reply);
+            object res = action.Execute();
             if (selfName != null) {
                 sce.Control(env.SelfId, selfName);
             }
             env.Save();
-            return /*$"以{inv.Name}的身份：\n" +*/ reply;
+            return res;
         }
 
-        public static string Relate(DMEnv env) {
+        public static bool Relate(DMEnv env) {
             if (env.GroupId <= 10000) {
-                return "泥确定是在群里执行这条指令的？";
+                env.Next = "泥确定是在群里执行这条指令的？";
+                return false;
             }
             Global.Users[env.SelfId] = env.GroupId;
             SaveUtil.SaveGlobal();
-            return "已将泥关联到该羣！现在可以在小窗操作我了哦~";
+            env.Next = "已将泥关联到该羣！现在可以在小窗操作我了哦~";
+            return true;
         }
     }
 }

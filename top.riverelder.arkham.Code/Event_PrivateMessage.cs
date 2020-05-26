@@ -20,12 +20,11 @@ namespace top.riverelder.arkham.Code {
                     Global.Users.TryGetValue(e.FromQQ.Id, out long groupId) ? groupId : 0,
                     false
                 );
-                StringBuilder sb = new StringBuilder();
                 if (Global.DoAt) {
-                    sb.Append(CQApi.CQCode_At(e.FromQQ));
+                    env.Append(CQApi.CQCode_At(e.FromQQ));
                 }
-                if (Global.Reply(msg, env, sb)) {
-                    e.CQApi.SendPrivateMessage(e.FromQQ, sb.ToString().Trim());
+                if (Global.Reply(msg, env)) {
+                    e.CQApi.SendPrivateMessage(e.FromQQ, env.ToString().Trim());
                 }
             }
         }

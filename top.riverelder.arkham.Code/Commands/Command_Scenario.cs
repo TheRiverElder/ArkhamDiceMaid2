@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     public class Command_Scenario : DiceCmdEntry {
@@ -14,23 +15,23 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.Register("存档").Then(
                 PresetNodes.Literal<DMEnv>("保存")
                 
-                .Executes((env, args, dict) => SaveScenario(env.Sce))
+                .Executes((env, args, dict) => SaveScenario(env, env.Sce))
                 .Then(
                     PresetNodes.String<DMEnv>("团名")
-                    .Executes((env, args, dict) => SaveScenario(args.GetStr("团名")))
+                    .Executes((env, args, dict) => SaveScenario(env, args.GetStr("团名")))
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("读取")
-                .Executes((env, args, dict) => LoadScenario(env.GroupId))
+                .Executes((env, args, dict) => LoadScenario(env, env.GroupId))
                 .Then(
                     PresetNodes.String<DMEnv>("团名")
-                    .Executes((env, args, dict) => LoadScenario(env.GroupId, args.GetStr("团名")))
+                    .Executes((env, args, dict) => LoadScenario(env, env.GroupId, args.GetStr("团名")))
                 )
             ).Then(
                 PresetNodes.Literal<DMEnv>("开始")
                 .Then(
                     PresetNodes.String<DMEnv>("团名")
-                    .Executes((env, args, dict) => StartScenario(env.GroupId, env.SelfId, args.GetStr("团名")))
+                    .Executes((env, args, dict) => StartScenario(env, env.GroupId, env.SelfId, args.GetStr("团名")))
                     //.Then(
                     //    PresetNodes.Literal<DMEnv>("强制")
                     //    .Executes((env, args, dict) => StartScenario(env.GroupId, args.GetStr("团名")))
@@ -43,45 +44,53 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("开团", "存档 开始");
         }
 
-        public static string LoadScenario(long groupId) {
+        public static bool LoadScenario(DMEnv env, long groupId) {
             if (!Global.Groups.TryGetValue(groupId, out string sceName)) {
-                return "该群还未有存档存在";
+                env.Append("该群还未有存档存在");
+                return false;
             }
-            return LoadScenario(groupId, sceName);
+            return LoadScenario(env, groupId, sceName);
         }
 
-        public static string LoadScenario(long groupId, string sceName) {
+        public static bool LoadScenario(DMEnv env, long groupId, string sceName) {
             try {
                 if (SaveUtil.TryLoad(sceName, out Scenario scenario)) {
                     Global.Scenarios[sceName] = scenario;
                     Global.Groups[groupId] = scenario.Name;
-                    return $"读团完毕：{sceName}";
+                    env.Append($"读团完毕：{sceName}");
+                    return true;
                 }
             } catch (Exception e) {
-                return "读团失败，原因：" + e.Message;
+                env.Append("读团失败，原因：" + e.Message);
+                return false;
             }
-            return $"读团失败：{sceName}";
+            env.Append($"读团失败：{sceName}");
+            return false;
         }
 
-        public static string SaveScenario(Scenario sce) {
+        public static bool SaveScenario(DMEnv env, Scenario sce) {
             SaveUtil.Save(sce);
-            return "保存完毕：" + sce.Name;
+            env.Append("保存完毕：" + sce.Name);
+            return false;
         }
 
-        public static string SaveScenario(string sceName) {
+        public static bool SaveScenario(DMEnv env, string sceName) {
             if (Global.Scenarios.TryGetValue(sceName, out Scenario scenario)) {
                 SaveUtil.Save(scenario);
-                return "保存完毕：" + sceName;
+                env.Append("保存完毕：" + sceName);
+                return true;
             }
-            return $"未找到团：{sceName}";
+            env.Append($"未找到团：{sceName}");
+            return false;
         }
 
-        public static string StartScenario(long groupId, long selfId, string sceName) {
+        public static bool StartScenario(DMEnv env, long groupId, long selfId, string sceName) {
             Scenario s = new Scenario(sceName);
             Global.Scenarios[sceName] = s;
             Global.Groups[groupId] = s.Name;
             SaveUtil.Save(s);
-            return $"【{sceName}】开团啦！";
+            env.Append($"【{sceName}】开团啦！");
+            return true;
         }
     }
 }

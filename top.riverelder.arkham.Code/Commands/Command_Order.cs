@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     class Command_Order : DiceCmdEntry {
 
         public string Usage => "排序 <数值名> {调查员名}";
 
-        public static string OrderByValue(Scenario scenario, string[] invNames, string valueName) {
+        public static void OrderByValue(DMEnv env, Scenario scenario, string[] invNames, string valueName) {
             IList<string> notFoundNames = new List<string>();
             IList<string> notFoundValues = new List<string>();
             IDictionary<Investigator, int> map = new Dictionary<Investigator, int>();
@@ -38,26 +39,23 @@ namespace top.riverelder.arkham.Code.Commands {
                 }
             }
 
-            StringBuilder sb = new StringBuilder();
-
             if (map.Count > 0) {
                 List<Investigator> list = new List<Investigator>(map.Keys);
                 list.Sort((a, b) => map[b] - map[a]);
                 for (int i = 0; i < list.Count; i++) {
                     if (i > 0) {
-                        sb.Append(" > ");
+                        env.Append(" > ");
                     }
                     Investigator inv = list[i];
-                    sb.Append(inv.Name).Append('(').Append(inv.Is("HIDE_VALUE") ? "???" : Convert.ToString(map[inv])).Append(')');
+                    env.Append(inv.Name).Append('(').Append(inv.Is("HIDE_VALUE") ? "???" : Convert.ToString(map[inv])).Append(')');
                 }
             }
             if (notFoundNames.Count > 0) {
-                sb.AppendLine().Append("未找到调查员：").Append(string.Join("、", notFoundNames));
+                env.LineAppend("未找到调查员：").Append(string.Join("、", notFoundNames));
             }
             if (notFoundValues.Count > 0) {
-                sb.AppendLine().Append($"未找到带{valueName}调查员：").Append(string.Join("、", notFoundValues));
+                env.LineAppend($"未找到带{valueName}调查员：").Append(string.Join("、", notFoundValues));
             }
-            return sb.ToString();
         }
         
 
@@ -67,7 +65,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 PresetNodes.String<DMEnv>("数值名").Rest(
                     PresetNodes.String<DMEnv>("调查员名")
                     .Handles(PreProcesses.ConvertObjectArrayToStringArray)
-                    .Executes((env, args, dict) => OrderByValue(env.Sce, args.Get<string[]>("调查员名"), args.GetStr("数值名")))
+                    .Executes((env, args, dict) => OrderByValue(env, env.Sce, args.Get<string[]>("调查员名"), args.GetStr("数值名")))
                 )
             );
 

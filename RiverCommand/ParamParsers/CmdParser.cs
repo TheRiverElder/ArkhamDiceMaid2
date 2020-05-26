@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using top.riverelder.RiverCommand.Parsing;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand.ParamParsers {
@@ -19,7 +20,7 @@ namespace top.riverelder.RiverCommand.ParamParsers {
                 reader.Skip();
                 hasParen = true;
             }
-            dispatcher.Dispatch(reader, env, out CompiledCommand<TEnv> res);
+            dispatcher.Dispatch(reader, env, out ICmdResult res);
             if (hasParen && !(reader.HasNext && Config.CloseParen.Contains(reader.Read()))) {
                 result = null;
                 return false;

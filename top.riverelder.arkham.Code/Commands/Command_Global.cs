@@ -2,6 +2,7 @@
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
 
@@ -28,7 +29,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     PresetNodes.Bool<DMEnv>("开关", "开", "关")
                     .Executes((env, args, dict) => {
                         Global.Debug = args.GetBool("开关");
-                        return "调试模式：" + (Global.Debug ? "开" : "关");
+                        env.Next = "调试模式：" + (Global.Debug ? "开" : "关");
                     })
                 )
             ).Then(
@@ -37,7 +38,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     .Executes((env, args, dict) => {
                         Global.DoAt = args.GetBool("开关");
                         SaveUtil.SaveGlobal();
-                        return "回复：" + (Global.DoAt ? "开" : "关");
+                        env.Next = "回复：" + (Global.DoAt ? "开" : "关");
                     })
                 )
             ).Then(
@@ -46,7 +47,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     .Executes((env, args, dict) => {
                         Global.AutoLoad = args.GetBool("开关");
                         SaveUtil.SaveGlobal();
-                        return "自动载入：" + (Global.AutoLoad ? "开" : "关");
+                        env.Next = "自动载入：" + (Global.AutoLoad ? "开" : "关");
                     })
                 )
             ).Then(
@@ -55,7 +56,7 @@ namespace top.riverelder.arkham.Code.Commands {
                     .Executes((env, args, dict) => {
                         Global.TranslatorTone = args.GetBool("开关");
                         //SaveUtil.SaveGlobal();
-                        return "翻译腔：" + (Global.TranslatorTone ? "开" : "关");
+                        env.Next = "翻译腔：" + (Global.TranslatorTone ? "开" : "关");
                     })
                 )
             );

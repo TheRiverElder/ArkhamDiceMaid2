@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace top.riverelder.RiverCommand {
+namespace top.riverelder.RiverCommand.Parsing {
     public class Args {
 
         public Args Parent { get; private set; } = null;

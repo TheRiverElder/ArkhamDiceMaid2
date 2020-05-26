@@ -11,13 +11,14 @@ using static top.riverelder.arkham.Code.Utils.Extensions;
 using static top.riverelder.RiverCommand.PresetNodes;
 using top.riverelder.RiverCommand.ParamParsers;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     class Command_Item : DiceCmdEntry {
 
-        public string Usage => "物品 <创造|丢弃|拾取|销毁|编辑|装弹> <物品名> [重命名|弹药数]";
+        public static string Usage => "物品 <创造|丢弃|拾取|销毁|编辑|装弹> <物品名> [重命名|弹药数]";
 
-        static string FillWeaponInfo(Item item, Args dict) {
+        public static string FillWeaponInfo(Item item, Args dict) {
             StringBuilder sb = new StringBuilder();
             if (dict.TryGet("技能名", out string sn)) sb.AppendLine().Append("技能名：").Append(item.SkillName = sn);
             if (dict.TryGet("类型", out string t)) sb.AppendLine().Append("类型：").Append(item.Type = t);
@@ -31,91 +32,104 @@ namespace top.riverelder.arkham.Code.Commands {
             return sb.ToString();
         }
 
-        string CreateItem(DMEnv env, string name, Args dict) {
+        public static bool CreateItem(DMEnv env, string name, Args dict) {
             Investigator inv = env.Inv;
             if (inv.Inventory.ContainsKey(name)) {
-                return $"{inv.Name}的物品栏中已经存在{name}，请重命名";
+                env.Next = $"{inv.Name}的物品栏中已经存在{name}，请重命名";
+                return false;
             }
             Item item = new Item(name);
-            string ret = $"{inv.Name}创造了物品：{name}" + FillWeaponInfo(item, dict);
+            env.Append($"{inv.Name}创造了物品：{name}" + FillWeaponInfo(item, dict));
 
             inv.Inventory[name] = item;
             env.Save();
-            return ret;
+            return true;
         }
 
-        string DestoryItem(DMEnv env, string name) {
+        public static bool DestoryItem(DMEnv env, string name) {
             Investigator inv = env.Inv;
             if (!inv.Inventory.ContainsKey(name)) {
-                return $"未找到{inv.Name}的{name}";
+                env.Append($"未找到{inv.Name}的{name}");
+                return false;
             }
             inv.Inventory.Remove(name);
             env.Save();
-            return $"{inv.Name}销毁了了物品：{name}";
+            env.Append($"{inv.Name}销毁了了物品：{name}");
+            return true;
         }
 
-        string ThrowItem(DMEnv env, string name, string newName) {
+        public static bool ThrowItem(DMEnv env, string name, string newName) {
             if (newName == null) {
                 newName = name;
             }
             Scenario sce = env.Sce;
             Investigator inv = env.Inv;
             if (sce.Desk.ContainsKey(newName)) {
-                return $"桌子上已有物品：{newName}，请重命名";
+                env.Append($"桌子上已有物品：{newName}，请重命名");
+                return false;
             }
             if (!inv.Inventory.TryGetValue(name, out Item item)) {
-                return $"{inv.Name}的物品栏中不存在{name}";
+                env.Append($"{inv.Name}的物品栏中不存在{name}");
+                return false;
             }
             inv.Inventory.Remove(name);
             item.Name = newName;
             sce.Desk[item.Name] = item;
             env.Save();
-            return $"{inv.Name}丢弃了{name}" + (name == newName ? "" : "，并重命名为：" + newName);
+            env.Append($"{inv.Name}丢弃了{name}" + (name == newName ? "" : "，并重命名为：" + newName));
+            return true;
         }
 
-        string PickItem(DMEnv env, string name, string newName) {
+        public static bool PickItem(DMEnv env, string name, string newName) {
             if (newName == null) {
                 newName = name;
             }
             Scenario sce = env.Sce;
             Investigator inv = env.Inv;
             if (!sce.Desk.TryGetValue(name, out Item item)) {
-                return $"桌子上没有物品：{name}";
+                env.Append($"桌子上没有物品：{name}");
+                return false;
             }
             if (inv.Inventory.ContainsKey(newName)) {
-                return $"{inv.Name}的物品栏中已经存在{newName}，请重命名";
+                env.Append($"{inv.Name}的物品栏中已经存在{newName}，请重命名");
+                return false;
             }
             item.Name = newName;
             inv.Inventory[item.Name] = item;
             sce.Desk.Remove(name);
             env.Save();
-            return $"{inv.Name}拾取了：{name}";
+            env.Append($"{inv.Name}拾取了：{name}");
+            return true;
         }
 
-        string PassItem(DMEnv env, string name, Investigator targetInv, string newName) {
+        public static bool PassItem(DMEnv env, string name, Investigator targetInv, string newName) {
             if (newName == null) {
                 newName = name;
             }
             if (!env.Inv.Inventory.TryGetValue(name, out Item item)) {
-                return $"{env.Inv.Name}的物品栏中不存在{name}";
+                env.Append($"{env.Inv.Name}的物品栏中不存在{name}");
+                return false;
             }
             if (targetInv.Inventory.ContainsKey(newName)) {
-                return $"{targetInv.Name}的物品栏中已经存在{newName}";
+                env.Append($"{targetInv.Name}的物品栏中已经存在{newName}");
+                return false;
             }
             env.Inv.Inventory.Remove(name);
             item.Name = newName;
             targetInv.Inventory[item.Name] = item;
             env.Save();
-            return $"{env.Inv.Name}把{item.Name}给了：{targetInv.Name}";
+            env.Append($"{env.Inv.Name}把{item.Name}给了：{targetInv.Name}");
+            return true;
         }
 
-        string EditItem(DMEnv env, string name, string newName, Args dict) {
+        public static bool EditItem(DMEnv env, string name, string newName, Args dict) {
             if (newName == null) {
                 newName = name;
             }
             Investigator inv = env.Inv;
             if (!inv.Inventory.TryGetValue(name, out Item item)) {
-                return $"{inv.Name}的物品栏中不存在{name}";
+                env.Append($"{inv.Name}的物品栏中不存在{name}");
+                return false;
             }
             string wiChanges = FillWeaponInfo(item, dict);
             if (!string.Equals(name, newName)) {
@@ -123,27 +137,32 @@ namespace top.riverelder.arkham.Code.Commands {
                 item.Name = newName;
                 inv.Inventory[item.Name] = (item);
                 env.Save();
-                return $"{inv.Name}重命名了物品：{name} => {newName}";
+                env.Append($"{inv.Name}重命名了物品：{name} => {newName}");
+                return true;
             } else {
                 env.Save();
-                return $"{inv.Name}编辑了物品：{name}" + wiChanges;
+                env.Append($"{inv.Name}编辑了物品：{name}" + wiChanges);
+                return true;
             }
         }
 
-        string LoadBullets(DMEnv env, string name, Dice amount) {
+        public static bool LoadBullets(DMEnv env, string name, Dice amount) {
             Investigator inv = env.Inv;
             if (!inv.Inventory.TryGetValue(name, out Item item)) {
-                return $"{inv.Name}的物品栏中不存在{name}";
+                env.Append($"{inv.Name}的物品栏中不存在{name}");
+                return false;
             }
             int left = item.Capacity - item.CurrentLoad;
             if (left <= 0) {
-                return "弹匣已经装满，无需装弹";
+                env.Append("弹匣已经装满，无需装弹");
+                return false;
             }
             int loaded = Math.Min(left, amount.Roll());
             item.CurrentLoad += loaded;
             env.Save();
-            return new StringBuilder().AppendLine($"{inv.Name}为{name}装弹{loaded}")
-                .Append($"弹药：{item.CurrentLoad}/{item.Capacity}").ToString();
+            env.AppendLine($"{inv.Name}为{name}装弹{loaded}")
+                .Append($"弹药：{item.CurrentLoad}/{item.Capacity}");
+            return false;
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {

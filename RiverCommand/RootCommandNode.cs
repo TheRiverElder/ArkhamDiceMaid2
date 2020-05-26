@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using top.riverelder.RiverCommand;
 using top.riverelder.RiverCommand.ParamParsers;
+using top.riverelder.RiverCommand.Parsing;
 using top.riverelder.RiverCommand.Utils;
 
 namespace top.riverelder.RiverCommand {
@@ -30,7 +31,7 @@ namespace top.riverelder.RiverCommand {
             TEnv env,
             Args args,
             int level,
-            List<CompiledCommand<TEnv>> res
+            List<ICmdResult> res
         ) {
             // 直接匹配子节点
             return MatchChildren(dispatcher, reader, env, args, level + 1, res);

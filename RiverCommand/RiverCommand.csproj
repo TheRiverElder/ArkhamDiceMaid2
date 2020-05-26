@@ -41,14 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Args.cs" />
-    <Compile Include="CmdDispatcher.cs" />
+    <Compile Include="ParamParsers\CompiledCommand.cs" />
+    <Compile Include="Parsing\Args.cs" />
+    <Compile Include="Parsing\CmdDispatcher.cs" />
     <Compile Include="CommandNode.cs" />
-    <Compile Include="CompiledCommand.cs" />
+    <Compile Include="Parsing\CommandResult.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="DictMapper.cs" />
+    <Compile Include="Parsing\DictMapper.cs" />
     <Compile Include="Handler.cs" />
-    <Compile Include="ICmdEntry.cs" />
+    <Compile Include="Parsing\ErrorResult.cs" />
+    <Compile Include="Parsing\ICmdEntry.cs" />
     <Compile Include="ParamParsers\BoolParser.cs" />
     <Compile Include="ParamParsers\CmdParser.cs" />
     <Compile Include="ParamParsers\IntParser.cs" />
@@ -57,6 +59,7 @@
     <Compile Include="ParamParsers\ParamParser.cs" />
     <Compile Include="ParamParsers\RestParser.cs" />
     <Compile Include="ParamParsers\StringParser.cs" />
+    <Compile Include="Parsing\ICmdResult.cs" />
     <Compile Include="PreProcesses.cs" />
     <Compile Include="PresetNodes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 using static top.riverelder.RiverCommand.PresetNodes;
 
 namespace top.riverelder.arkham.Code.Commands {
@@ -52,10 +53,11 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("施法", "法术 使用");
         }
 
-        public static string CreateSpell(DMEnv env, string name, Args cost) {
+        public static bool CreateSpell(DMEnv env, string name, Args cost) {
             Scenario sce = env.Sce;
             if (sce.Spells.ContainsKey(name)) {
-                return "已经存在法术：" + name;
+                env.Append("已经存在法术：" + name);
+                return false;
             }
 
             Dictionary<string, string> costStr = new Dictionary<string, string>();
@@ -67,52 +69,64 @@ namespace top.riverelder.arkham.Code.Commands {
             Spell spell = new Spell(name, costStr);
             sce.Spells[name] = spell;
             env.Save();
-            return "成功创造法术：" + name;
+            env.Append("成功创造法术：" + name);
+            return false;
         }
 
-        public static string DestorySpell(DMEnv env, string name) {
+        public static bool DestorySpell(DMEnv env, string name) {
             Scenario sce = env.Sce;
             if (!sce.Spells.ContainsKey(name)) {
-                return "不存在法术：" + name;
+                env.Append("不存在法术：" + name);
+                return false;
             }
             sce.Spells.Remove(name);
             env.Save();
-            return "成功销毁法术：" + name;
+            env.Append("成功销毁法术：" + name);
+            return true;
         }
 
-        public static string LearnSpell(DMEnv env, Investigator inv, string name) {
+        public static bool LearnSpell(DMEnv env, Investigator inv, string name) {
             Scenario sce = env.Sce;
             if (!sce.Spells.ContainsKey(name)) {
-                return "不存在法术：" + name;
+                env.Append("不存在法术：" + name);
+                return false;
             } else if (inv.Spells.Contains(name)) {
-                return inv.Name + "已经学会了" + name;
+                env.Append(inv.Name + "已经学会了" + name);
+                return false;
             }
             inv.Spells.Add(name);
             env.Save();
-            return inv.Name + "学习了法术：" + name;
+            env.Append(inv.Name + "学习了法术：" + name);
+            return true;
         }
 
-        public static string ForgetSpell(DMEnv env, Investigator inv, string name) {
+        public static bool ForgetSpell(DMEnv env, Investigator inv, string name) {
             Scenario sce = env.Sce;
             if (!inv.Spells.Contains(name)) {
-                return inv.Name + "还没学会" + name;
+                env.Append(inv.Name + "还没学会" + name);
+                return false;
             }
             inv.Spells.Remove(name);
             env.Save();
-            return inv.Name + "忘记了法术：" + name;
+            env.Append(inv.Name + "忘记了法术：" + name);
+            return true;
         }
 
-        public static string UseSpell(DMEnv env, Investigator inv, string name) {
+        public static bool UseSpell(DMEnv env, Investigator inv, string name) {
             Scenario sce = env.Sce;
             if (!inv.Spells.Contains(name)) {
-                return inv.Name + "还没学会" + name;
+                env.Append(inv.Name + "还没学会" + name);
+                return false;
             } else if (!sce.Spells.TryGetValue(name, out Spell spell)) {
-                return "不存在法术：" + name;
+                env.Append("不存在法术：" + name);
+                return false;
             } else if (!spell.Use(inv, out string reply)) {
-                return "施法失败\n" + reply;
+                env.Append("施法失败\n" + reply);
+                return false;
             } else { 
                 env.Save();
-                return inv.Name + "使用了" + name + (inv.Is("HIDE_VALUE") ? "" : reply);
+                env.Append(inv.Name + "使用了" + name + (inv.Is("HIDE_VALUE") ? "" : reply));
+                return true;
             }
         }
 

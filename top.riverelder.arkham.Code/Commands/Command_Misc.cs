@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 using static top.riverelder.RiverCommand.PresetNodes;
 
 namespace top.riverelder.arkham.Code.Commands {
@@ -27,7 +28,7 @@ namespace top.riverelder.arkham.Code.Commands {
             .Append("让我们再次把热烈的掌声送给他")
             .ToString();
 
-        public static string ListLuck(Scenario sce) {
+        public static string ListLuck(DMEnv env, Scenario sce) {
             Dictionary<string, int> lucks = new Dictionary<string, int>();
 
             long seed = DateTime.Today.Ticks;
@@ -40,23 +41,22 @@ namespace top.riverelder.arkham.Code.Commands {
             }
             List<string> list = new List<string>(lucks.Keys);
             list.Sort((a, b) => lucks[b] - lucks[a]);
-            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < list.Count; i++) {
                 if (i > 0) {
-                    sb.AppendLine();
+                    env.Line();
                 }
-                string indexStr = Convert.ToString(i + 1) + ".  ";
+                string indexStr = Convert.ToString(i + 1) + ". ";
                 switch (i + 1) {
                     case 1: indexStr = "🥇"; break;
                     case 2: indexStr = "🥈"; break;
                     case 3: indexStr = "🥉"; break;
                 }
-                sb.Append(indexStr).Append(list[i]).Append('(').Append(lucks[list[i]]).Append(')');
+                env.Append(indexStr).Append(list[i]).Append('(').Append(lucks[list[i]]).Append(')');
             }
-            return sb.ToString();
+            return list.FirstOrDefault();
         }
 
-        public static string LuckyOneOfDay(Scenario sce) {
+        public static string LuckyOneOfDay(DMEnv env, Scenario sce) {
             Investigator luckOne = null;
             int luckMax = 0;
 
@@ -74,9 +74,11 @@ namespace top.riverelder.arkham.Code.Commands {
                 }
             }
             if (luckOne == null) {
-                return "今天没有幸运儿";
+                env.Append("今天没有幸运儿");
+                return null;
             } else {
-                return string.Format(Templete, luckMax, luckOne.Name, luckOne.Desc);
+                env.Append(string.Format(Templete, luckMax, luckOne.Name, luckOne.Desc));
+                return luckOne.Name;
             }
         }
 
@@ -113,11 +115,11 @@ namespace top.riverelder.arkham.Code.Commands {
             return sb.ToString();
         }
 
-        public static string SendClaps(Dice times) {
+        public static string SendClaps(DMEnv env, Dice times) {
             if (times == null) {
                 times = Dice.Of("1d5");
             }
-            return Repeat(Clap, times.Roll());
+            return env.Next = Repeat(Clap, times.Roll());
         }
 
         private static int Seed = (int)DateTime.Now.Ticks;
@@ -146,53 +148,55 @@ namespace top.riverelder.arkham.Code.Commands {
             "藏琼杭芒农朗旺匡仓翁蓬东栋通贡孔丰宗松雄洪蒙隆龙荣聪邓滕",
         };
         
-        public static string MakeName(string dict, int len) {
+        public static string MakeName(DMEnv env, string dict, int len) {
             dict = dict ?? "武侠";
             if (len <= 0) {
-                return "名字长度必须是正整数！";
+                env.Append("名字长度必须是正整数！");
+                return null;
             }
             if (!NameLetterSet.TryGetValue(dict, out string set)) {
-                return "未找到字集：" + dict;
+                env.Append("未找到字集：" + dict);
+                return null;
             }
             List<char> list = new List<char>();
             Random random = new Random(Seed++);
             for (int i = 0; i < len; i++) {
                 list.Add(set[random.Next(set.Length)]);
             }
-            return string.Join("", list);
+            return env.Next = string.Join("", list);
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("杂项").Then(
                 Literal<DMEnv>("今日幸运儿")
-                .Executes((env, args, dict) => LuckyOneOfDay(env.Sce))
+                .Executes((env, args, dict) => LuckyOneOfDay(env, env.Sce))
             ).Then(
                 Literal<DMEnv>("幸运儿")
-                .Executes((env, args, dict) => ListLuck(env.Sce))
+                .Executes((env, args, dict) => ListLuck(env, env.Sce))
             ).Then(
                 Literal<DMEnv>("鼓掌")
-                .Executes((env, args, dict) => SendClaps(null))
+                .Executes((env, args, dict) => SendClaps(env, null))
                 .Then(
-                    Extensions.Dice("次数").Executes((env, args, dict) => SendClaps(args.GetDice("次数")))
+                    Extensions.Dice("次数").Executes((env, args, dict) => SendClaps(env, args.GetDice("次数")))
                 )
             ).Then(
                 Literal<DMEnv>("取名")
-                .Executes((env, args, dict) => MakeName("武侠", 3))
+                .Executes((env, args, dict) => MakeName(env, "武侠", 3))
                 .Then(
                     Int<DMEnv>("长度")
-                    .Executes((env, args, dict) => MakeName("武侠", args.GetInt("长度")))
+                    .Executes((env, args, dict) => MakeName(env, "武侠", args.GetInt("长度")))
                     .Then(
                         String<DMEnv>("字集")
-                        .Executes((env, args, dict) => MakeName(args.GetStr("字集"), args.GetInt("长度")))
+                        .Executes((env, args, dict) => MakeName(env, args.GetStr("字集"), args.GetInt("长度")))
                     )
                 ).Then(
-                    Literal<DMEnv>("字集").Executes((env, args, dict) => string.Join("，", NameLetterSet.Keys))
+                    Literal<DMEnv>("字集").Executes((env, args, dict) => env.Next = string.Join("，", NameLetterSet.Keys))
                 )
             ).Then(
                 Literal<DMEnv>("说")
                 .Then(
                     String<DMEnv>("内容")
-                    .Executes((env, args, dict) => env.Inv.Name + "：" + args.GetStr("内容"))
+                    .Executes((env, args, dict) => env.Next = env.Inv.Name + "：" + args.GetStr("内容"))
                 )
             );
 

@@ -24,12 +24,11 @@ namespace top.riverelder.arkham.Code {
                     e.FromGroup.Id,
                     e.FromGroup.GetGroupMemberInfo(e.FromQQ).MemberType == QQGroupMemberType.Manage
                     );
-                StringBuilder sb = new StringBuilder();
                 if (Global.DoAt) {
-                    sb.Append(CQApi.CQCode_At(e.FromQQ));
+                    env.Append(CQApi.CQCode_At(e.FromQQ));
                 }
-                if (Global.Reply(msg, env, sb)) {
-                    e.CQApi.SendGroupMessage(e.FromGroup, sb.ToString().Trim());
+                if (Global.Reply(msg, env)) {
+                    e.CQApi.SendGroupMessage(e.FromGroup, env.ToString().Trim());
                 }
             }
         }

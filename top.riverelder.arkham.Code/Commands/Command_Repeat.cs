@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     /// <summary>
@@ -16,22 +17,18 @@ namespace top.riverelder.arkham.Code.Commands {
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("重复").Then(
                 PresetNodes.Int<DMEnv>("次数").Then(
-                    PresetNodes.Rest<DMEnv>("命令").Executes((env, args, dict) => Repeat(env, args.GetStr("命令"), args.GetInt("次数")))
+                    PresetNodes.Cmd<DMEnv>("命令").Executes((env, args, dict) => Repeat(env, args.GetCmd("命令"), args.GetInt("次数")))
                 )
             );
         }
 
-        public static string Repeat(DMEnv env, string rawCmd, int times) {
-            StringBuilder sb = new StringBuilder();
-            string reply;
+        public static void Repeat(DMEnv env, CommandResult<DMEnv> cmd, int times) {
             for (int i = 0; i < times; i++) {
                 if (i != 0) {
-                    sb.AppendLine();
+                    env.Line();
                 }
-                Global.Dispatcher.Execute(rawCmd, env, out object ret, out reply);
-                sb.Append(reply);
+                cmd.Execute();
             }
-            return sb.ToString();
         }
     }
 }

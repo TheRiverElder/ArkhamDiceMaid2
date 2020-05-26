@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using top.riverelder.RiverCommand.Utils;
 
-namespace top.riverelder.RiverCommand {
+namespace top.riverelder.RiverCommand.Parsing {
 
     public class CmdDispatcher<TEnv> {
         
@@ -65,13 +65,17 @@ namespace top.riverelder.RiverCommand {
         /// <param name="env">环境</param>
         /// <param name="result">结果，可能是编译成功的指令或错误信息</param>
         /// <returns>是否调度成功</returns>
-        public bool Dispatch(string raw, TEnv env, out CompiledCommand<TEnv> result) {
+        public bool Dispatch(string raw, TEnv env, out ICmdResult result) {
             raw = raw.TrimStart();
             StringReader reader = new StringReader(raw);
             if (!Dispatch(reader, env, out result)) {
                 return false;
             } else if (reader.SkipWhiteSpace()) {
-                result = new CompiledCommand<TEnv>(result.ReaderCursor, 0, "未能识别的部分：" + reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip));
+                result = new ErrorResult(
+                    result.MatchedLength, 
+                    0, 
+                    "未能识别的部分：" + 
+                    reader.ReadToEndOrMaxOrEmpty(Config.MaxCut, Config.EmptyStrTip));
                 return false;
             }
             return true;
@@ -84,7 +88,7 @@ namespace top.riverelder.RiverCommand {
         /// <param name="env">环境</param>
         /// <param name="result">调度结果</param>
         /// <returns>是否调度成功</returns>
-        public bool Dispatch(StringReader stringReader, TEnv env, out CompiledCommand<TEnv> result) {
+        public bool Dispatch(StringReader stringReader, TEnv env, out ICmdResult result) {
             StringReader reader = stringReader;
             // 跳过空白
             reader.Skip(Config.ListSeps);
@@ -104,14 +108,14 @@ namespace top.riverelder.RiverCommand {
             }
             // 恢复原始字符流
             stringReader.Cursor = start;
-            List<CompiledCommand<TEnv>> res = new List<CompiledCommand<TEnv>>();
+            List<ICmdResult> res = new List<ICmdResult>();
             // 开始调度
             bool ret = Root.Dispatch(this, reader, env, new Args(), 0, res);
             // 查找匹配成功的最长命令
-            List<CompiledCommand<TEnv>> matched = new List<CompiledCommand<TEnv>>();
-            List<CompiledCommand<TEnv>> errors = new List<CompiledCommand<TEnv>>();
+            List<ICmdResult> matched = new List<ICmdResult>();
+            List<ICmdResult> errors = new List<ICmdResult>();
             foreach (var cc in res) {
-                (cc.IsErr ? errors : matched).Add(cc);
+                (cc.IsError ? errors : matched).Add(cc);
             }
             if (ret && matched.Count > 0) {
                 result = GetLongestCmd(matched);
@@ -124,7 +128,7 @@ namespace top.riverelder.RiverCommand {
                 reader.Cursor = start;
                 return false;
             }
-            reader.Skip(result.ReaderCursor);
+            reader.Skip(result.MatchedLength);
             // 此时reader已经不是原来的reader了，这样一来就要重新计算原始字符流的读取长度
             stringReader.Skip(reader.Cursor + offset);
             return ret;
@@ -137,20 +141,19 @@ namespace top.riverelder.RiverCommand {
         /// <param name="env">环境</param>
         /// <param name="reply">回复</param>
         /// <returns>是否解析成功</returns>
-        public bool Execute(string raw, TEnv env, out object ret, out string reply) {
+        public bool Execute(string raw, TEnv env, out object ret) {
             if (Dispatch(raw, env, out var ccmd)) {
-                ret = ccmd.Execute(out reply);
+                ret = ccmd.Execute();
                 return true;
             }
-            ret = null;
-            reply = ccmd.ErrorStr;
+            ret = ccmd.Errors;
             return false;
         }
 
-        private CompiledCommand<TEnv> GetLongestCmd(List<CompiledCommand<TEnv>> list) {
-            CompiledCommand<TEnv> result = list[0];
+        private ICmdResult GetLongestCmd(List<ICmdResult> list) {
+            ICmdResult result = list[0];
             foreach (var cc in list) {
-                if (cc != result && cc.Length > result.Length) {
+                if (cc != result && cc.ArgLength > result.ArgLength) {
                     result = cc;
                 }
             }

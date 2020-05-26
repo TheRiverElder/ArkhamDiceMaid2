@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 using static top.riverelder.RiverCommand.PresetNodes;
 
 namespace top.riverelder.arkham.Code.Commands {
@@ -19,24 +20,24 @@ namespace top.riverelder.arkham.Code.Commands {
                 Literal<DMEnv>("增加").Then(
                     String<DMEnv>("数值名").Then(
                         Extensions.Dice("增量")
-                        .Executes((env, args, dict) => ChangeVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetDice("增量"), true))
+                        .Executes((env, args, dict) => ChangeVal(env, env.Sce, env.Inv, args.GetStr("数值名"), args.GetDice("增量"), true))
                    )
                 )
             ).Then(
                 Literal<DMEnv>("减少").Then(
                     String<DMEnv>("数值名").Then(
                         Extensions.Dice("减量")
-                        .Executes((env, args, dict) => ChangeVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetDice("减量"), false))
+                        .Executes((env, args, dict) => ChangeVal(env, env.Sce, env.Inv, args.GetStr("数值名"), args.GetDice("减量"), false))
                     )
                 )
             ).Then(
                 Literal<DMEnv>("设置").Then(
                     String<DMEnv>("数值名").Then(
                         Int<DMEnv>("新值")
-                        .Executes((env, args, dict) => SetVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("新值"), -1))
+                        .Executes((env, args, dict) => SetVal(env, env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("新值"), -1))
                         .Then(
                             Int<DMEnv>("上限")
-                            .Executes((env, args, dict) => SetVal(env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("新值"), args.GetInt("上限")))
+                            .Executes((env, args, dict) => SetVal(env, env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("新值"), args.GetInt("上限")))
                         )
                     )
                 )
@@ -44,14 +45,14 @@ namespace top.riverelder.arkham.Code.Commands {
                 Literal<DMEnv>("删除").Then(
                     String<DMEnv>("数值名")
                     .Handles(Extensions.ExistSelfValue)
-                    .Executes((env, args, dict) => RemoveVal(env.Sce, env.Inv, args.GetStr("数值名")))
+                    .Executes((env, args, dict) => RemoveVal(env, env.Sce, env.Inv, args.GetStr("数值名")))
                 )
             ).Then(
                 Literal<DMEnv>("上限").Then(
                     String<DMEnv>("数值名")
                     .Then(
                         Int<DMEnv>("上限值")
-                        .Executes((env, args, dict) => SetMax(env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("上限值")))
+                        .Executes((env, args, dict) => SetMax(env, env.Sce, env.Inv, args.GetStr("数值名"), args.GetInt("上限值")))
                     )
                 )
             ).Then(
@@ -60,25 +61,25 @@ namespace top.riverelder.arkham.Code.Commands {
                     .Handles(Extensions.ExistSelfValue)
                     .Then(
                         String<DMEnv>("新名")
-                        .Executes((env, args, dict) => NewName(env.Sce, env.Inv, args.GetStr("数值名"), args.GetStr("新名")))
+                        .Executes((env, args, dict) => NewName(env, env.Sce, env.Inv, args.GetStr("数值名"), args.GetStr("新名")))
                     )
                 )
             ).Then(
                 Literal<DMEnv>("st")
-                .Executes((env, args, dict) => StHelp())
+                .Executes((env, args, dict) => env.Next = "使用st子指令时，请保证除了“st”与剩下内容之间的空格外，再没有其它空白！")
                 .Then(
                     Rest<DMEnv>("数值串")
                     .Executes((env, args, dict) => St(env, env.Inv, args.GetStr("数值串")))
                 )
             ).Then(
                 Literal<DMEnv>("补全")
-                .Executes((env, args, dict) => CompleteWithDefaultValues(env.Sce, env.Inv))
+                .Executes((env, args, dict) => CompleteWithDefaultValues(env, env.Sce, env.Inv))
             ).Then(
                 Literal<DMEnv>("覆盖")
-                .Executes((env, args, dict) => FillWithDefaultValues(env.Sce, env.Inv, false))
+                .Executes((env, args, dict) => FillWithDefaultValues(env, env.Sce, env.Inv, false))
                 .Then(
                     Literal<DMEnv>("强制")
-                    .Executes((env, args, dict) => FillWithDefaultValues(env.Sce, env.Inv, true))
+                    .Executes((env, args, dict) => FillWithDefaultValues(env, env.Sce, env.Inv, true))
                 )
             );
 
@@ -97,27 +98,24 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("dh", "数值 减少 体力");
         }
 
-        public static string RemoveVal(Scenario scenario, Investigator inv, string valueName) {
+        public static bool RemoveVal(DMEnv env, Scenario scenario, Investigator inv, string valueName) {
             if (inv.Values.Remove(valueName, out bool isAlias)) {
                 SaveUtil.Save(scenario);
-                return $"移除了{inv.Name}的{(isAlias ? "别名" : "数值")}：{valueName}";
+                env.Append($"移除了{inv.Name}的{(isAlias ? "别名" : "数值")}：{valueName}");
+                return true;
             }
-            return $"未找到{inv.Name}的{valueName}";
+            env.Append($"未找到{inv.Name}的{valueName}");
+            return false;
         }
 
-        public static string ChangeVal(Scenario scenario, Investigator inv, string valueName, Dice increment, bool posotive) {
-            if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
-                value = new Value(1);
-                inv.Values.Put(valueName, value);
-            }
-            int prev = value.Val;
+        public static bool ChangeVal(DMEnv env, Scenario scenario, Investigator inv, string valueName, Dice increment, bool posotive) {
             int inc = increment.Roll() * (posotive ? 1 : -1);
-            value.Add(inc);
+            env.Append(inv.Change(valueName, inc));
             SaveUtil.Save(scenario);
-            return $"{inv.Name}的{valueName}: {prev} + {inc} => {value.Val}";
+            return true;
         }
 
-        public static string SetVal(Scenario scenario, Investigator inv, string valueName, int val, int max) {
+        public static bool SetVal(DMEnv env, Scenario scenario, Investigator inv, string valueName, int val, int max) {
             if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
                 value = new Value(1);
                 inv.Values.Put(valueName, value);
@@ -127,52 +125,52 @@ namespace top.riverelder.arkham.Code.Commands {
                 value.Max = max;
             }
             value.Set(val);
+            env.Append($"{inv.Name}的{valueName}: {prev} => {value.ToString()}");
             SaveUtil.Save(scenario);
-            return $"{inv.Name}的{valueName}: {prev} => {value.ToString()}";
+            return true;
         }
 
-        public static string SetMax(Scenario scenario, Investigator inv, string valueName, int max) {
+        public static bool SetMax(DMEnv env, Scenario scenario, Investigator inv, string valueName, int max) {
             if (!inv.Values.TryWidelyGet(valueName, out Value value)) {
                 value = new Value(1);
                 inv.Values.Put(valueName, value);
             }
             string prev = value.ToString();
             value.Max = max;
+            env.Append($"{inv.Name}的{valueName}: {prev} => {value.ToString()}");
             SaveUtil.Save(scenario);
-            return $"{inv.Name}的{valueName}: {prev} => {value.ToString()}";
+            return true;
         }
 
-        public static string NewName(Scenario scenario, Investigator inv, string valueName, string newName) {
+        public static bool NewName(DMEnv env, Scenario scenario, Investigator inv, string valueName, string newName) {
             if (inv.Values.SetAlias(newName, valueName)) {
                 SaveUtil.Save(scenario);
-                return $"{inv.Name}的{valueName}的新别名：{newName}";
+                env.Append($"{inv.Name}的{valueName}的新别名：{newName}");
+                return true;
             } else {
-                return $"{inv.Name}不存在原本名为{valueName}的数值";
+                env.Append($"{inv.Name}不存在原本名为{valueName}的数值");
+                return false;
             }
         }
 
-        public static string FillWithDefaultValues(Scenario scenario, Investigator inv, bool force) {
+        public static void FillWithDefaultValues(DMEnv env, Scenario scenario, Investigator inv, bool force) {
             if (!force) {
-                return "覆盖操作有极大可能会对你已经设定的数值进行更改！若确定你在做什么，请在指令后面加上“强制”";
+                env.Append("覆盖操作有极大可能会对你已经设定的数值进行更改！若确定你在做什么，请在指令后面加上“强制”");
             }
             inv.Values.FillWith(Global.DefaultValues);
             SaveUtil.Save(scenario);
-            return $"{inv.Name}的数值与别名已被默认值覆盖！已有的数值可能被覆盖！";
+            env.Append($"{inv.Name}的数值与别名已被默认值覆盖！已有的数值可能被覆盖！");
         }
 
-        public static string CompleteWithDefaultValues(Scenario scenario, Investigator inv) {
+        public static void CompleteWithDefaultValues(DMEnv env, Scenario scenario, Investigator inv) {
             inv.Values.CompleteWith(Global.DefaultValues);
             SaveUtil.Save(scenario);
-            return $"{inv.Name}的数值与别名已被默认值补全！已有的数值未被修改！";
+            env.Append($"{inv.Name}的数值与别名已被默认值补全！已有的数值未被修改！");
         }
-
-        public static string StHelp() {
-            return $"使用st子指令时，请保证除了“st”与剩下内容之间的空格外，再没有其它空白了！";
-        }
-
-        public static string St(DMEnv env, Investigator inv, string str) {
+        
+        public static void St(DMEnv env, Investigator inv, string str) {
             ValueSet values = inv.Values;
-            StringBuilder sb = new StringBuilder().Append(inv.Name).Append("的数值：");
+            env.Append(inv.Name).Append("的数值：");
             Regex reg = new Regex(@"(\D+)(\d+)");
             Match m = reg.Match(str);
             int i = 0;
@@ -186,13 +184,12 @@ namespace top.riverelder.arkham.Code.Commands {
                     values.Put(name, value);
                 }
                 if (i++ % 3 == 0) {
-                    sb.AppendLine();
+                    env.Line();
                 }
-                sb.Append(name).Append('：').Append(value).Append(' ');
+                env.Append(name).Append('：').Append(value).Append(' ');
                 m = m.NextMatch();
             }
             env.Save();
-            return sb.ToString();
         }
     }
 }

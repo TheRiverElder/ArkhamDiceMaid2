@@ -7,28 +7,26 @@ using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Model;
 using top.riverelder.arkham.Code.Utils;
 using top.riverelder.RiverCommand;
+using top.riverelder.RiverCommand.Parsing;
 
 namespace top.riverelder.arkham.Code.Commands {
     public class Command_Heal : DiceCmdEntry {
 
         public string Usage => "治疗 <技能名> <目标> <回血量>";
         
-        public static string Heal(DMEnv env, Investigator inv, Investigator target, string valueName, Dice dice) {
+        public static bool Heal(DMEnv env, Investigator inv, Investigator target, string valueName, string healValueName, Dice dice) {
             Scenario scenario = env.Sce;
-            if (!target.Values.TryWidelyGet("体力", out Value health)) {
-                return $"未找到{target.Name}的体力";
+            if (!inv.Check(valueName, out CheckResult cr, out string str)) {
+                env.Next = str;
+                return false;
             }
-            Value skill = inv.Values[valueName];
-            StringBuilder sb = new StringBuilder();
-            int prev = health.Val;
-            CheckResult cr = skill.Check();
-            sb.Append($"{inv.Name}的{valueName}({skill.Val}) => {cr.points}，{cr.ActualTypeString}");
+            env.Append(str);
             if (cr.succeed) {
                 int r = dice.Roll();
-                sb.AppendLine().Append($"{target.Name}的体力：{prev} + {r}({dice.ToString()}) => {health.Add(r)}");
+                env.LineAppend(target.Change(healValueName, r));
                 SaveUtil.Save(scenario);
             }
-            return sb.ToString();
+            return cr.succeed;
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
@@ -39,10 +37,14 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Then(
                     PresetNodes.String<DMEnv>("目标")
                     .Handles(Extensions.ExistInv)
-                    .Executes((env, args, dict) => Heal(env, env.Inv, args.GetInv("目标"), args.GetStr("技能名"), Dice.Of("1d3")))
+                    //.Executes((env, args, dict) => Heal(env, env.Inv, args.GetInv("目标"), args.GetStr("技能名"), "体力", Dice.Of("1d3")))
                     .Then(
                         Extensions.Dice("增量")
-                        .Executes((env, args, dict) => Heal(env, env.Inv, args.GetInv("目标"), args.GetStr("技能名"), args.GetDice("增量")))
+                        .Executes((env, args, dict) => Heal(env, env.Inv, args.GetInv("目标"), args.GetStr("技能名"), "体力", args.GetDice("增量")))
+                        .Then(
+                            PresetNodes.String<DMEnv>("回复数值名")
+                            .Executes((env, args, dict) => Heal(env, env.Inv, args.GetInv("目标"), args.GetStr("技能名"), args.GetStr("回复数值名"), args.GetDice("增量")))
+                        )
                     )
                 )
             );
