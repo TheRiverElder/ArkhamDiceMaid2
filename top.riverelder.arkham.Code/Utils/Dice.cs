@@ -180,15 +180,15 @@ namespace top.riverelder.arkham.Code.Utils {
             if (!Global.AllowedLead || Global.Lead == 50) {
                 return original;
             }
-            int half= max / 2;
+            int half = max / 2;
             double percent = Global.Lead / 100.0;
             int anchor = (int)(max * percent);
-            if (original <= half) {
-                double leftScale = percent;
+            if (original < half) {
+                double leftScale = anchor / (double)half;
                 double left = original / (double)half;
                 return (int)(left * leftScale * anchor);
             } else {
-                double rightScale = 1 - percent;
+                double rightScale = (max - anchor) / (double)half;
                 double right = (original - half) / (double)half;
                 return anchor + (int)(right * rightScale * (max - anchor));
             }
