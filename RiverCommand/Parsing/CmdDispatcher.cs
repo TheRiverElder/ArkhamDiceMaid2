@@ -124,7 +124,7 @@ namespace top.riverelder.RiverCommand.Parsing {
                 result = GetLongestCmd(errors);
             } else {
                 // 否则出错
-                result = null;
+                result = new ErrorResult(0, 0, "未知错误");
                 reader.Cursor = start;
                 return false;
             }

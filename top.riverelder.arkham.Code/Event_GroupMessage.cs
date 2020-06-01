@@ -29,6 +29,9 @@ namespace top.riverelder.arkham.Code {
                 }
                 if (Global.Reply(msg, env)) {
                     e.CQApi.SendGroupMessage(e.FromGroup, env.ToString().Trim());
+                    e.CQLog.Info("ArkhamDiceMaid", "响应成功");
+                } else {
+                    e.CQLog.Info("ArkhamDiceMaid", "响应失败");
                 }
             }
         }

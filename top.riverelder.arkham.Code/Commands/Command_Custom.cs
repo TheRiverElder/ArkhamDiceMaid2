@@ -12,17 +12,7 @@ namespace top.riverelder.arkham.Code.Commands {
     public class Command_Custom : DiceCmdEntry {
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
-            dispatcher.RegisterCustom(
-                Extensions.Dice("骰子")
-                .Executes((env, args, dict) => {
-                    Dice dice = args.GetDice("骰子");
-                    if (env.TryGetInv(out Scenario sce, out Investigator inv)) {
-                        return $"{dice.ToString()} => {dice.RollWith(inv.DamageBonus)}";
-                    } else {
-                        return $"{dice.ToString()} => {dice.Roll()}";
-                    }
-                })
-            );
+            dispatcher.RegisterCustom(Command_Roll.MainAction);
             dispatcher.RegisterCustom(Command_Check.MainAction);
             dispatcher.RegisterCustom(
                 PresetNodes.String<DMEnv>("卡名")

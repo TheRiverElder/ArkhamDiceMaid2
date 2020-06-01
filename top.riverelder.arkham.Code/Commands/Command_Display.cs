@@ -37,9 +37,8 @@ namespace top.riverelder.arkham.Code.Commands {
                     env.Next = $"{inv.Name}没有{itemName}";
                 }
             }
-            StringBuilder sb = new StringBuilder().Append($"{inv.Name}的物品：");
             foreach (Item item in inv.Inventory.Values) {
-                sb.AppendLine().Append(item.Name);
+                env.LineAppend(item.Name);
             }
         }
 

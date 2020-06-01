@@ -11,10 +11,10 @@ namespace top.riverelder.arkham.Code.Commands {
 
         public string Usage => "控制 <卡名>";
 
-        public static string Control(long selfId, Scenario sce, Investigator inv) {
+        public static string Control(DMEnv env, long selfId, Scenario sce, Investigator inv) {
             sce.Control(selfId, inv.Name);
             SaveUtil.Save(sce);
-            return $"早啊，{inv.Name}！";
+            return env.Next = $"早啊，{inv.Name}！";
         }
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
@@ -26,7 +26,7 @@ namespace top.riverelder.arkham.Code.Commands {
             .Then(
                 PresetNodes.String<DMEnv>("卡名")
                 .Handles(Extensions.ExistInv)
-                .Executes((env, args, dict) => Control(env.SelfId, env.Sce, args.GetInv("卡名")))
+                .Executes((env, args, dict) => Control(env, env.SelfId, env.Sce, args.GetInv("卡名")))
                 .Then(
                     PresetNodes.Cmd<DMEnv>("行动").Executes((env, args, dict) => ControlAndAct(env, args.GetInv("卡名"), args.GetCmd("行动")))
                 )

@@ -14,17 +14,19 @@ namespace top.riverelder.arkham.Code.Commands {
     /// </summary>
     public class Command_Roll : DiceCmdEntry {
 
+        public static CommandNode<DMEnv> MainAction;
+
         public string Usage => "投掷 <骰子>";
 
         public override void OnRegister(CmdDispatcher<DMEnv> dispatcher) {
             dispatcher.Register("投掷")
             .Executes((env, args, dict) => Roll(env, Dice.Of("1d100")))
             .Then(
-                Extensions.Dice("骰子").Executes((env, args, dict) => Roll(env, args.GetDice("骰子")))
+                MainAction = Extensions.Dice("骰子").Executes((env, args, dict) => Roll(env, args.GetDice("骰子")))
             ).Rest(
                 PresetNodes.String<DMEnv>("选项组")
                 .Handles(PreProcesses.ConvertObjectArrayToStringArray)
-                .Executes((env, args, dict) => Choose(args.Get<string[]>("选项组")))
+                .Executes((env, args, dict) => Choose(env, args.Get<string[]>("选项组")))
             );
 
             dispatcher.SetAlias("r", "投掷");
@@ -159,16 +161,16 @@ namespace top.riverelder.arkham.Code.Commands {
         };
 
 
-        public static string Choose(string[] results) {
+        public static string Choose(DMEnv env, string[] results) {
             if (results.Length > 0) {
                 int index = Dice.Roll(results.Length);
                 if (index >= 0 && index < results.Length) {
-                    return results[index];
+                    return env.Next = results[index];
                 } else {
-                    return "骰娘出错了๐·°(৹˃̵﹏˂̵৹)°·๐";
+                    return env.Next = "骰娘出错了๐·°(৹˃̵﹏˂̵৹)°·๐";
                 }
             }
-            return "没有选项哦";
+            return env.Next = "没有选项哦";
         }
     }
 }

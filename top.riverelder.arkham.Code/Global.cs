@@ -141,18 +141,18 @@ namespace top.riverelder.arkham.Code {
             bool flag = false;
             foreach (string c in cmds) {
                 try {
-                    if (Dispatcher.Dispatch(c, env, out ICmdResult result)) {
-                        if (!result.IsError) {
-                            env.Line();
-                            result.Execute();
-                            flag = true;
-                        } else if (Debug) {
-                            env.LineAppend(result.ToString());
-                            flag = true;
-                        }
+                    Dispatcher.Dispatch(c, env, out ICmdResult result);
+                    if (!result.IsError) {
+                        env.Line();
+                        result.Execute();
+                        flag = true;
+                    } else if (Debug) {
+                        env.LineAppend(result.ToString());
+                        flag = true;
                     }
                 } catch (DiceException ex) {
-                    env.Line().Append(ex.Message);
+                    env.LineAppend(ex.Message);
+                    flag = true;
                 }
             }
             return flag;
