@@ -11,7 +11,7 @@ namespace top.riverelder.arkham.Code.Utils {
         private IList<DiceItem> items = new List<DiceItem>();
 
         public static int Roll(int max) {
-            return DiceItem.random.Next(Math.Max(1, max));
+            return DiceItem.NextInt(Math.Max(1, max));
         }
 
         public static T Roll<T>(T[] array) {
@@ -170,9 +170,28 @@ namespace top.riverelder.arkham.Code.Utils {
             //Random random = new Random(seed++);
             int sum = 0;
             for (int i = 0; i < times; i++) {
-                sum += random.Next(value) + 1;
+                sum += NextInt(value) + 1;
             }
             return sign * sum;
+        }
+
+        public static int NextInt(int max) {
+            int original = random.Next(max);
+            if (!Global.AllowedLead || Global.Lead == 50) {
+                return original;
+            }
+            int half= max / 2;
+            double percent = Global.Lead / 100.0;
+            int anchor = (int)(max * percent);
+            if (original <= half) {
+                double leftScale = percent;
+                double left = original / (double)half;
+                return (int)(left * leftScale * anchor);
+            } else {
+                double rightScale = 1 - percent;
+                double right = (original - half) / (double)half;
+                return anchor + (int)(right * rightScale * (max - anchor));
+            }
         }
     }
 }

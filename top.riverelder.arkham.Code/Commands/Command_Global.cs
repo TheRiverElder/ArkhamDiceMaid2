@@ -59,6 +59,22 @@ namespace top.riverelder.arkham.Code.Commands {
                         env.Next = "翻译腔：" + (Global.TranslatorTone ? "开" : "关");
                     })
                 )
+            ).Then(
+                PresetNodes.Literal<DMEnv>("灌铅")
+                .Then(
+                    PresetNodes.Int<DMEnv>("数值")
+                    .Executes((env, args, dict) => {
+                        //SaveUtil.SaveGlobal();
+                        env.Next = Global.AllowedLead ? "禁止给老娘灌铅！喵~o( =▼ω▼= )m！" : "当前铅量：" + (Global.SetLead(args.GetInt("数值")));
+                    })
+                ).Then(
+                    PresetNodes.Literal<DMEnv>("重置")
+                    .Executes((env, args, dict) => {
+                        //SaveUtil.SaveGlobal();
+                        Global.SetLead(50);
+                        env.Next = "铅量已重置为" + Global.Lead;
+                    })
+                )
             );
 
             dispatcher.SetAlias("配置", "全局 配置");
@@ -66,6 +82,7 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("回复", "全局 回复");
             dispatcher.SetAlias("自动载入", "全局 自动载入");
             dispatcher.SetAlias("翻译腔", "全局 翻译腔");
+            dispatcher.SetAlias("灌铅", "全局 灌铅");
         }
 
     }

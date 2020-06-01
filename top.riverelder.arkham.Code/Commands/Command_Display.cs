@@ -36,6 +36,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 } else {
                     env.Next = $"{inv.Name}没有{itemName}";
                 }
+                return;
             }
             foreach (Item item in inv.Inventory.Values) {
                 env.LineAppend(item.Name);
@@ -56,6 +57,7 @@ namespace top.riverelder.arkham.Code.Commands {
                 } else {
                     env.Next = $"未找到{inv.Name}的{valueName}";
                 }
+                return;
             } else {
                 env.AppendLine($"{inv.Name}的数值：");
                 foreach (string name in inv.Values.Names) {
@@ -67,6 +69,7 @@ namespace top.riverelder.arkham.Code.Commands {
         public static void DisplayFightEvents(DMEnv env, Investigator inv) {
             if (inv.Fights.Count == 0) {
                 env.Next = $"{inv.Name}没有战斗事件";
+                return;
             }
             env.Append($"{inv.Name}的战斗事件：");
             foreach (FightEvent fight in inv.Fights) {

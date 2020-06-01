@@ -48,6 +48,17 @@ namespace top.riverelder.arkham.Code {
 
 
         /// <summary>
+        /// 是否允许灌铅
+        /// </summary>
+        public static bool AllowedLead = false;
+
+        /// <summary>
+        /// 骰子灌铅，50为正常值，最小为1，最大为100
+        /// </summary>
+        public static int Lead = 50;
+        public static int SetLead(int lead) => Lead = AllowedLead ? Math.Max(1, Math.Min(lead, 100)) : 50;
+
+        /// <summary>
         /// 自动读团
         /// </summary>
         public static bool AutoLoad = true;
