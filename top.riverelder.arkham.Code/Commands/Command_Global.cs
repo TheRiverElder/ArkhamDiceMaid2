@@ -64,15 +64,15 @@ namespace top.riverelder.arkham.Code.Commands {
                 .Then(
                     PresetNodes.Int<DMEnv>("数值")
                     .Executes((env, args, dict) => {
-                        //SaveUtil.SaveGlobal();
                         env.Next = !Global.AllowedLead ? "禁止给老娘灌铅！喵~o( =▼ω▼= )m！" : "当前铅量：" + (Global.SetLead(args.GetInt("数值")));
+                        SaveUtil.SaveGlobal();
                     })
                 ).Then(
                     PresetNodes.Literal<DMEnv>("重置")
                     .Executes((env, args, dict) => {
-                        //SaveUtil.SaveGlobal();
                         Global.SetLead(50);
                         env.Next = "铅量已重置为" + Global.Lead;
+                        SaveUtil.SaveGlobal();
                     })
                 )
             );

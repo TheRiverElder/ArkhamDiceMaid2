@@ -56,8 +56,8 @@ namespace top.riverelder.arkham.Code.Utils {
                 if (conf.TryGetValue(nameof(Global.AutoLoad), out IniValue autoLoad)) Global.DoAt = doAt.ToBoolean();
                 if (conf.TryGetValue(nameof(Global.GreatSuccess), out IniValue gs)) Global.GreatSuccess = gs.ToInt32();
                 if (conf.TryGetValue(nameof(Global.GreatFailure), out IniValue gf)) Global.GreatFailure = gf.ToInt32();
-                if (conf.TryGetValue(nameof(Global.AllowedLead), out IniValue al)) Global.AllowedLead = gf.ToBoolean();
-                if (conf.TryGetValue(nameof(Global.Lead), out IniValue lead)) Global.Lead = gf.ToInt32();
+                if (conf.TryGetValue(nameof(Global.AllowedLead), out IniValue al)) Global.AllowedLead = al.ToBoolean();
+                if (conf.TryGetValue(nameof(Global.Lead), out IniValue lead)) Global.Lead = lead.ToInt32();
 
                 IniSection defaultValues = global["DefaultValues"];
                 Global.DefaultValues.Clear();
