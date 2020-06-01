@@ -35,7 +35,16 @@ namespace top.riverelder.RiverCommand.Parsing {
 
 
         public override string ToString() {
-            return string.Join("\n", Errors); ;
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"第{ArgLength}个参数:")
+                .Append(Error);
+            ErrorResult err = this;
+            while (err.SubError != null) {
+                err = err.SubError;
+                sb.AppendLine($"第{err.ArgLength}个参数:")
+                    .Append(err.Error);
+            }
+            return sb.ToString();
         }
     }
 }
