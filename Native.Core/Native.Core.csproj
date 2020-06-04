@@ -135,6 +135,10 @@
       <Project>{8386f876-96ba-4fdc-9067-27cbe008582d}</Project>
       <Name>top.riverelder.arkham.Code</Name>
     </ProjectReference>
+    <ProjectReference Include="..\top.riverelder.arkham.UI\top.riverelder.arkham.UI.csproj">
+      <Project>{f4a7c741-bf38-4ef9-ae55-e0311b51978c}</Project>
+      <Name>top.riverelder.arkham.UI</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ImportGroup Label=".NET DllExport">

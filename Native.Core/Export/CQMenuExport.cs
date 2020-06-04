@@ -35,10 +35,35 @@ namespace Native.App.Export
 		/// </summary>	
 		private static void ResolveBackcall ()	
 		{	
+			/*	
+			 * Name: 打开聊天窗口	
+			 * Function: menuChat	
+			 */	
+			if (AppData.UnityContainer.IsRegistered<IMenuCall> ("打开聊天窗口"))	
+			{	
+				MenumenuChatHandler += AppData.UnityContainer.Resolve<IMenuCall> ("打开聊天窗口").MenuCall;	
+			}	
+			
 		}	
 		#endregion	
 		
 		#region --导出方法--	
+		/*	
+		 * Name: 打开聊天窗口	
+		 * Function: menuChat	
+		 */	
+		public static event EventHandler<CQMenuCallEventArgs> MenumenuChatHandler;	
+		[DllExport (ExportName = "menuChat", CallingConvention = CallingConvention.StdCall)]	
+		public static int MenumenuChat ()	
+		{	
+			if (MenumenuChatHandler != null)	
+			{	
+				CQMenuCallEventArgs args = new CQMenuCallEventArgs (AppData.CQApi, AppData.CQLog, "打开聊天窗口", "menuChat");	
+				MenumenuChatHandler (typeof (CQMenuExport), args);	
+			}	
+			return 0;	
+		}	
+		
 		#endregion	
 	}	
 }

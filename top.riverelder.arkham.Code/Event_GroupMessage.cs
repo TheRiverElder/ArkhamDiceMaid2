@@ -11,12 +11,20 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using top.riverelder.arkham.Code.Exceptions;
 using top.riverelder.arkham.Code.Model;
+using top.riverelder.arkham.Model.Code;
 
 namespace top.riverelder.arkham.Code {
 
     public class Event_GroupMessage : IGroupMessage {
 
         public void GroupMessage(object sender, CQGroupMessageEventArgs e) {
+            Chat.Of(e.FromGroup.Id, e.CQApi).AddMessage(new Chat.Message(
+                e.FromGroup.GetGroupMemberInfo(e.FromQQ).Nick, 
+                e.FromQQ.Id, 
+                e.FromGroup.Id, 
+                e.Message.Text, 
+                DateTime.Now.Millisecond
+            ));
             string msg = e.Message.Text;
             if (msg.StartsWith(Global.Prefix)) {
                 DMEnv env = new DMEnv(
