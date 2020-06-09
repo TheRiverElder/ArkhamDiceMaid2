@@ -166,7 +166,7 @@ namespace top.riverelder.arkham.Code.Commands {
         public static bool DestoryInv(DMEnv env, string name) {
             Scenario sce = env.Sce;
 
-            if (env.IsAdmin) {
+            if (!env.IsAdmin) {
                 env.Next = "你不是管理员！";
                 return false;
             } else if (!sce.ExistInvestigator(name)) {

@@ -18,12 +18,12 @@ namespace top.riverelder.arkham.Code {
     public class Event_GroupMessage : IGroupMessage {
 
         public void GroupMessage(object sender, CQGroupMessageEventArgs e) {
-            Chat.Of(e.FromGroup.Id, e.CQApi).AddMessage(new Chat.Message(
+            Chat.Of(e.FromGroup.Id).AddMessage(new Chat.Message(
                 e.FromGroup.GetGroupMemberInfo(e.FromQQ).Nick, 
                 e.FromQQ.Id, 
                 e.FromGroup.Id, 
                 e.Message.Text, 
-                DateTime.Now.Millisecond
+                DateTime.Now.ToBinary()
             ));
             string msg = e.Message.Text;
             if (msg.StartsWith(Global.Prefix)) {

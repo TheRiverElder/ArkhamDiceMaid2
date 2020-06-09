@@ -12,6 +12,9 @@ namespace top.riverelder.arkham.Model.Code {
 
     public class Chat {
 
+        public static CQApi Api { get; set; }
+        public static long SelfId { get; set; }
+
         public class Message {
             public string Nick { get; }
             public long QQ { get; }
@@ -32,11 +35,11 @@ namespace top.riverelder.arkham.Model.Code {
 
         private static Dictionary<long, Chat> chats = new Dictionary<long, Chat>();
 
-        public static Chat Of(long groupId, CQApi api) {
+        public static Chat Of(long groupId) {
             if (chats.TryGetValue(groupId, out Chat chat)) {
                 return chat;
             }
-            chat = new Chat(groupId, api);
+            chat = new Chat(groupId);
             chats[groupId] = chat;
             return chat;
         }
@@ -47,13 +50,11 @@ namespace top.riverelder.arkham.Model.Code {
 
 
         public long GroupId { get; }
-        public CQApi Api { get; }
         public List<Message> Messages = new List<Message>();
         public event OnAddMessageHandler OnAddMessage;
 
-        public Chat(long groupId, CQApi api) {
+        public Chat(long groupId) {
             GroupId = groupId;
-            Api = api;
         }
 
         public void AddMessage(Message msg) {

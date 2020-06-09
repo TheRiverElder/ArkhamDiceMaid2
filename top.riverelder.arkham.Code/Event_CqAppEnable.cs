@@ -6,6 +6,7 @@ using top.riverelder.arkham.Code;
 
 using top.riverelder.arkham.Code.Commands;
 using top.riverelder.arkham.Code.Utils;
+using top.riverelder.arkham.Model.Code;
 
 namespace top.riverelder.arkham.Code
 {
@@ -16,6 +17,8 @@ namespace top.riverelder.arkham.Code
     {
         public void AppEnable(object sender, CQAppEnableEventArgs e) {
             Global.Initialize(e.CQApi.AppDirectory);
+            Chat.Api = e.CQApi;
+            Chat.SelfId = e.CQApi.GetLoginQQId();
         }
     }
 }
