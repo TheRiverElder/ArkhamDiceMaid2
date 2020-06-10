@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <TextBox x:Name="iptMessage" HorizontalAlignment="Left" Height="23" Margin="10,387,0,0" TextWrapping="Wrap" Text="待发送消息" VerticalAlignment="Top" Width="450"/>
+        <TextBox x:Name="iptMessage" HorizontalAlignment="Left" Height="23" Margin="10,387,0,0" TextWrapping="Wrap" Text="待发送消息" VerticalAlignment="Top" Width="450" />
         <Button x:Name="btnSendMessage" Content="发送" HorizontalAlignment="Left" Margin="465,387,0,0" VerticalAlignment="Top" Width="111" Height="23" Click="BtnSendMessage_Click"/>
         <TextBox x:Name="iptGroup" HorizontalAlignment="Left" Height="23" Margin="465,10,0,0" TextWrapping="Wrap" Text="在此输入QQ群号" VerticalAlignment="Top" Width="203"/>
         <Button x:Name="btnGroup" Content="关联" HorizontalAlignment="Left" Margin="673,10,0,0" VerticalAlignment="Top" Width="111" Height="23" Click="BtnGroup_Click"/>
@@ -15,8 +15,8 @@
             <StackPanel x:Name="pnlMessageList" VerticalAlignment="Top" HorizontalAlignment="Left">
             </StackPanel>
         </ScrollViewer>
-        <CheckBox x:Name="cbxKeepText" Content="保留文字" HorizontalAlignment="Left" Margin="581,391,0,11" Height="18" Width="103"/>
-        <CheckBox x:Name="cbxAutoScroll" Content="自动滚动" HorizontalAlignment="Left" Margin="684,391,0,0" VerticalAlignment="Top" Height="19" Width="100" IsChecked="True"/>
+        <CheckBox x:Name="cbxKeepText" Content="保留文字" HorizontalAlignment="Left" Margin="581,391,0,9" Height="20" Width="100"/>
+        <CheckBox x:Name="cbxAutoScroll" Content="自动滚动" HorizontalAlignment="Left" Margin="684,391,0,0" VerticalAlignment="Top" Height="20" Width="100" IsChecked="True"/>
         <Label Content="羣名：" Margin="10,4,733.6,0" VerticalAlignment="Top" Height="25" Width="50"/>
         <TextBlock x:Name="txtGroupName" Text="未关联" HorizontalAlignment="Left" Margin="65,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="19" Width="395"/>
 

@@ -78,6 +78,7 @@ namespace top.riverelder.arkham.UI {
                 groupChat = chat;
                 groupChat.OnAddMessage += this.AddMessage;
                 Clear();
+                txtGroupName.Text = $"{groupInfo.Name} ({groupInfo.CurrentMemberCount}人)";
                 AppendText($"当前群：{groupInfo.Name} ({groupId})", NoticeBursh);
                 foreach (var msg in chat.Messages) {
                     AddMessage(msg);
