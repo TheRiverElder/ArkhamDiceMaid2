@@ -8,15 +8,15 @@
         Closed="Window_Closed"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <TextBox x:Name="iptMessage" HorizontalAlignment="Left" Height="23" Margin="10,387,0,0" TextWrapping="Wrap" Text="待发送消息" VerticalAlignment="Top" Width="450" />
-        <Button x:Name="btnSendMessage" Content="发送" HorizontalAlignment="Left" Margin="465,387,0,0" VerticalAlignment="Top" Width="111" Height="23" Click="BtnSendMessage_Click"/>
+        <TextBox x:Name="iptMessage" Height="23" Margin="10,0,333.6,10" TextWrapping="Wrap" Text="待发送消息" VerticalAlignment="Bottom" />
+        <Button x:Name="btnSendMessage" Content="发送" Margin="465,0,217.6,10" Click="BtnSendMessage_Click" Height="23" VerticalAlignment="Bottom"/>
         <Button x:Name="btnGroup" Content="关联" HorizontalAlignment="Left" Margin="673,10,0,0" VerticalAlignment="Top" Width="111" Height="23" Click="BtnGroup_Click"/>
-        <ScrollViewer x:Name="lstMessage" HorizontalAlignment="Left" Height="344" Margin="10,38,0,0" VerticalAlignment="Top" Width="774" BorderThickness="2,2,2,2" BorderBrush="AliceBlue">
+        <ScrollViewer x:Name="lstMessage" Margin="10,38,9.6,38" BorderThickness="2,2,2,2" BorderBrush="AliceBlue">
             <StackPanel x:Name="pnlMessageList" VerticalAlignment="Top" HorizontalAlignment="Left">
             </StackPanel>
         </ScrollViewer>
-        <CheckBox x:Name="cbxKeepText" Content="保留文字" HorizontalAlignment="Left" Margin="581,391,0,0" Height="20" Width="100" VerticalAlignment="Top"/>
-        <CheckBox x:Name="cbxAutoScroll" Content="自动滚动" HorizontalAlignment="Left" Margin="684,391,0,0" Width="100" IsChecked="True" Height="20" VerticalAlignment="Top"/>
+        <CheckBox x:Name="cbxKeepText" Content="保留文字" Margin="581,0,112.6,9" Height="20" VerticalAlignment="Bottom"/>
+        <CheckBox x:Name="cbxAutoScroll" Content="自动滚动" Margin="684,0,9.6,9" IsChecked="True" Height="20" VerticalAlignment="Bottom"/>
         <Label Content="羣名：" Margin="10,4,733.6,0" VerticalAlignment="Top" Height="25" Width="50"/>
         <TextBlock x:Name="txtGroupName" Text="未关联" HorizontalAlignment="Left" Margin="65,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="19" Width="200"/>
         <ListBox x:Name="lstGroup" Height="100" MaxHeight="150" Visibility="Collapsed" Margin="270,32,125.6,0" VerticalAlignment="Top" LostFocus="LstGroup_LostFocus" SelectionChanged="LstGroup_SelectionChanged"/>

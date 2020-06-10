@@ -38,9 +38,9 @@ namespace top.riverelder.arkham.Code {
                     e.CQLog.Info("ArkhamDiceMaid", "响应失败");
                 }
             } else {
-                List<CQCode> codes = null;
+                List<CQCode> codes = e.Message.CQCodes;
                 
-                if (!e.Message.IsRegexMessage && (codes = e.Message.CQCodes) != null) {
+                if (codes != null) {
                     long qq = e.FromQQ.Id;
                     foreach (CQCode code in codes) {
                         switch (code.Function) {

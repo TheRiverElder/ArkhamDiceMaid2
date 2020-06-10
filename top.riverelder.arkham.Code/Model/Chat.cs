@@ -68,8 +68,10 @@ namespace top.riverelder.arkham.Model.Code {
             GroupId = groupId;
         }
 
-        public void AddMessage(string text, long qq, int type = Message.Normal) {
-            AddMessage(new Message(Api.GetGroupMemberInfo(GroupId, qq).Nick, qq, text,DateTime.Now.ToBinary(), type));
+        public void AddMessage(string text, long qq, int type = Message.Normal, string anonymousName = null) {
+            AddMessage(new Message(
+                anonymousName ?? Api.GetGroupMemberInfo(GroupId, qq).Nick, 
+                qq, text,DateTime.Now.ToBinary(), type));
         }
 
         public void AddMessage(Message msg) {
