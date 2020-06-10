@@ -1,20 +1,11 @@
-﻿using Native.Sdk.Cqp.EventArgs;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using top.riverelder.arkham.Code;
 using top.riverelder.arkham.Model.Code;
@@ -47,22 +38,47 @@ namespace top.riverelder.arkham.UI {
         }
 
         public void AppendText(string text, Brush foreground, int indent = 0) {
-            try {
-                Dispatcher.BeginInvoke(
-                    DispatcherPriority.Normal,
-                    new Action(() => {
-                        pnlMessageList.Children.Add(new TextBlock {
-                            Text = text,
-                            Margin = new Thickness(indent, 0, 0, 0),
-                            Foreground = foreground,
-                        });
-                        if (cbxAutoScroll.IsChecked.Value) {
-                            lstMessage.ScrollToBottom();
-                        }
-                    }));
-            } catch (Exception e) {
-                MessageBox.Show(e.StackTrace);
-            }
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => {
+                pnlMessageList.Children.Add(new TextBlock {
+                    Text = text,
+                    Margin = new Thickness(indent, 0, 0, 0),
+                    Foreground = foreground,
+                });
+                if (cbxAutoScroll.IsChecked.Value) {
+                    lstMessage.ScrollToBottom();
+                }
+            }));
+        }
+
+        private WrapPanel panel = null;
+
+        public void AppendSub(int indent = 0) {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => {
+                if (panel != null) {
+                    panel.Margin = new Thickness(indent, 0, 0, 0);
+                    pnlMessageList.Children.Add(panel);
+                    panel = null;
+                    if (cbxAutoScroll.IsChecked.Value) {
+                        lstMessage.ScrollToBottom();
+                    }
+                }
+            }));
+        }
+
+        public void AppendSubImage(string link) {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => {
+                if (panel == null) {
+                    panel = new WrapPanel();
+                }
+                BitmapImage bi = new BitmapImage();
+                bi.BeginInit();
+                bi.UriSource = new Uri(link);
+                bi.EndInit();
+                panel.Children.Add(new Image() {
+                    MaxHeight = 150,
+                    Source = bi,
+                });
+            }));
         }
 
         public void Clear() {
@@ -97,13 +113,12 @@ namespace top.riverelder.arkham.UI {
 
         private void AddMessage(Chat.Message msg) {
             AppendText($"{msg.Nick} ({msg.QQ}) {DateTime.FromBinary(msg.Time).ToShortTimeString()}", MemberInfoBursh);
-            Brush brush = NormalTextBursh;
             switch (msg.Type) {
-                case Chat.Message.Normal: brush = NormalTextBursh; break;
-                case Chat.Message.Command: brush = CommandTextBursh; break;
-                case Chat.Message.Reply: brush = ReplyTextBursh; break;
+                case Chat.Message.Normal: AppendText(msg.Text, NormalTextBursh, 20); break;
+                case Chat.Message.Command: AppendText(msg.Text, CommandTextBursh, 20); break;
+                case Chat.Message.Reply: AppendText(msg.Text, ReplyTextBursh, 20); break;
+                case Chat.Message.Image: AppendSubImage(msg.Text); AppendSub(20) ; break;
             }
-            AppendText(msg.Text, brush, 20);
         }
 
         private void BtnSendMessage_Click(object sender, RoutedEventArgs e) {
@@ -114,7 +129,7 @@ namespace top.riverelder.arkham.UI {
                 }
             }
         }
-        
+
         private void Window_Closed(object sender, EventArgs e) {
             if (groupChat != null) {
                 groupChat.OnAddMessage -= this.AddMessage;

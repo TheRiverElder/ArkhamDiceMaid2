@@ -23,7 +23,9 @@ namespace top.riverelder.arkham.Model.Code {
                 Warning = 2,
                 Normal = 3,
                 Command = 4,
-                Reply = 5;
+                Reply = 5,
+                Image = 6,
+                Record = 7;
 
             public string Nick { get; }
             public long QQ { get; }

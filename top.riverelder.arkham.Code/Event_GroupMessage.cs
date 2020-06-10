@@ -38,7 +38,18 @@ namespace top.riverelder.arkham.Code {
                     e.CQLog.Info("ArkhamDiceMaid", "响应失败");
                 }
             } else {
-                chat.AddMessage(e.Message.Text, e.FromQQ.Id);
+                List<CQCode> codes = null;
+                
+                if (!e.Message.IsRegexMessage && (codes = e.Message.CQCodes) != null) {
+                    long qq = e.FromQQ.Id;
+                    foreach (CQCode code in codes) {
+                        switch (code.Function) {
+                            case CQFunction.Image: chat.AddMessage(e.CQApi.ReceiveImage(code), qq, Chat.Message.Image); break;
+                        }
+                    }
+                } else {
+                    chat.AddMessage(e.Message.Text, e.FromQQ.Id);
+                }
             }
 
         }
