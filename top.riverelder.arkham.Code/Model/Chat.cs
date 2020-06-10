@@ -14,20 +14,29 @@ namespace top.riverelder.arkham.Model.Code {
 
         public static CQApi Api { get; set; }
         public static long SelfId { get; set; }
+        
 
         public class Message {
+
+            public const int
+                Notice = 1,
+                Warning = 2,
+                Normal = 3,
+                Command = 4,
+                Reply = 5;
+
             public string Nick { get; }
             public long QQ { get; }
-            public long GroupId { get; }
             public string Text { get; }
             public long Time { get; }
+            public int Type { get; }
 
-            public Message(string nick, long qQ, long groupId, string text, long time) {
+            public Message(string nick, long qQ, string text, long time, int type) {
                 Nick = nick;
                 QQ = qQ;
-                GroupId = groupId;
                 Text = text;
                 Time = time;
+                Type = type;
             }
         }
 
@@ -57,6 +66,10 @@ namespace top.riverelder.arkham.Model.Code {
             GroupId = groupId;
         }
 
+        public void AddMessage(string text, long qq, int type = Message.Normal) {
+            AddMessage(new Message(Api.GetGroupMemberInfo(GroupId, qq).Nick, qq, text,DateTime.Now.ToBinary(), type));
+        }
+
         public void AddMessage(Message msg) {
             if (Messages.Count > 0 && Messages.Count >= MaxChatCacheCount) {
                 Messages.RemoveAt(0);
@@ -65,14 +78,14 @@ namespace top.riverelder.arkham.Model.Code {
             OnAddMessage?.Invoke(msg);
         }
 
-        public void SendMessage(string text) {
+        public void SendMessage(string text, int type = Message.Normal) {
             Api.SendGroupMessage(GroupId, text);
             AddMessage(new Message(
                 Api.GetGroupMemberInfo(GroupId, Api.GetLoginQQId()).Nick,
                 Api.GetLoginQQId(),
-                GroupId,
                 text,
-                DateTime.Now.ToBinary()
+                DateTime.Now.ToBinary(),
+                type
             ));
         }
     }

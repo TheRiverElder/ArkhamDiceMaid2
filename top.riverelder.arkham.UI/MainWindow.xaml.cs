@@ -30,7 +30,9 @@ namespace top.riverelder.arkham.UI {
         public static readonly Brush WarningBursh = new SolidColorBrush(Colors.Red);
         public static readonly Brush NoticeBursh = new SolidColorBrush(Colors.Green);
         public static readonly Brush MemberInfoBursh = new SolidColorBrush(Colors.Blue);
-        public static readonly Brush MessageTextBursh = new SolidColorBrush(Colors.Black);
+        public static readonly Brush NormalTextBursh = new SolidColorBrush(Colors.Black);
+        public static readonly Brush CommandTextBursh = new SolidColorBrush(Colors.DarkCyan);
+        public static readonly Brush ReplyTextBursh = new SolidColorBrush(Colors.DarkBlue);
 
 
         public MainWindow() {
@@ -41,7 +43,7 @@ namespace top.riverelder.arkham.UI {
         private Chat groupChat;
 
         public void AppendText(string text, int indent = 0) {
-            AppendText(text, MessageTextBursh, indent);
+            AppendText(text, NormalTextBursh, indent);
         }
 
         public void AppendText(string text, Brush foreground, int indent = 0) {
@@ -80,7 +82,7 @@ namespace top.riverelder.arkham.UI {
                 groupChat = chat;
                 groupChat.OnAddMessage += this.AddMessage;
                 Clear();
-                txtGroupName.Text = $"{groupInfo.Name} ({groupInfo.CurrentMemberCount}人)";
+                txtGroupName.Text = $"{groupInfo.Name} ({groupInfo.CurrentMemberCount}人 - {groupId})";
                 AppendText($"当前群：{groupInfo.Name} ({groupId})", NoticeBursh);
                 foreach (var msg in chat.Messages) {
                     AddMessage(msg);
@@ -95,7 +97,13 @@ namespace top.riverelder.arkham.UI {
 
         private void AddMessage(Chat.Message msg) {
             AppendText($"{msg.Nick} ({msg.QQ}) {DateTime.FromBinary(msg.Time).ToShortTimeString()}", MemberInfoBursh);
-            AppendText(msg.Text, MessageTextBursh, 20);
+            Brush brush = NormalTextBursh;
+            switch (msg.Type) {
+                case Chat.Message.Normal: brush = NormalTextBursh; break;
+                case Chat.Message.Command: brush = CommandTextBursh; break;
+                case Chat.Message.Reply: brush = ReplyTextBursh; break;
+            }
+            AppendText(msg.Text, brush, 20);
         }
 
         private void BtnSendMessage_Click(object sender, RoutedEventArgs e) {
