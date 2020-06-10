@@ -88,8 +88,8 @@ namespace top.riverelder.arkham.UI {
         }
 
         private void AddMessage(Chat.Message msg) {
-            AppendText($"{msg.Nick} ({msg.QQ}) {msg.Time}", MemberInfoBursh);
-            AppendText(msg.Text, 20);
+            AppendText($"{msg.Nick} ({msg.QQ}) {DateTime.FromBinary(msg.Time).ToShortTimeString()}", MemberInfoBursh);
+            AppendText(msg.Text, MessageTextBursh, 20);
         }
 
         private void BtnSendMessage_Click(object sender, RoutedEventArgs e) {
