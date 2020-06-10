@@ -24,6 +24,13 @@ namespace top.riverelder.arkham.UI {
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
     public partial class MainWindow : Window {
+
+        public static readonly Brush WarningBursh = new SolidColorBrush(Colors.Red);
+        public static readonly Brush NoticeBursh = new SolidColorBrush(Colors.Green);
+        public static readonly Brush MemberInfoBursh = new SolidColorBrush(Colors.Black);
+        public static readonly Brush MessageTextBursh = new SolidColorBrush(Colors.Blue);
+
+
         public MainWindow() {
             InitializeComponent();
             this.iptGroup.Text = Convert.ToString(Global.Groups.Keys.FirstOrDefault());
@@ -32,17 +39,25 @@ namespace top.riverelder.arkham.UI {
         private Chat groupChat;
 
         public void AppendText(string text, int indent = 0) {
-            AppendText(new TextBlock() {
-                Text = text,
-                Margin = new Thickness(indent, 0, 0, 0),
-            });
+            AppendText(text, MessageTextBursh, indent);
         }
 
-        public void AppendText(TextBlock txt) {
+        public void AppendText(string text, Brush foreground, int indent = 0) {
             try {
-                Dispatcher.Invoke(new Action(() => pnlMessageList.Children.Add(txt)));
+                Dispatcher.BeginInvoke(
+                    DispatcherPriority.Normal,
+                    new Action(() => {
+                        pnlMessageList.Children.Add(new TextBlock {
+                            Text = text,
+                            Margin = new Thickness(indent, 0, 0, 0),
+                            Foreground = foreground,
+                        });
+                        if (cbxAutoScroll.IsChecked.Value) {
+                            lstMessage.ScrollToBottom();
+                        }
+                    }));
             } catch (Exception e) {
-                MessageBox.Show(e.Message);
+                MessageBox.Show(e.StackTrace);
             }
         }
 
@@ -63,25 +78,17 @@ namespace top.riverelder.arkham.UI {
                 groupChat = chat;
                 groupChat.OnAddMessage += this.AddMessage;
                 Clear();
-                AppendText(new TextBlock {
-                    Text = $"当前群：{groupInfo.Name} ({groupId})",
-                    TextAlignment = TextAlignment.Center,
-                    Foreground = new SolidColorBrush(Colors.Green),
-                });
+                AppendText($"当前群：{groupInfo.Name} ({groupId})", NoticeBursh);
                 foreach (var msg in chat.Messages) {
                     AddMessage(msg);
                 }
             } else {
-                AppendText(new TextBlock {
-                    Text = "关联失败!",
-                    TextAlignment = TextAlignment.Center,
-                    Foreground = new SolidColorBrush(Colors.Red),
-                });
+                AppendText("关联失败!", WarningBursh);
             }
         }
 
         private void AddMessage(Chat.Message msg) {
-            AppendText($"{msg.Nick} ({msg.QQ}) {msg.Time}");
+            AppendText($"{msg.Nick} ({msg.QQ}) {msg.Time}", MemberInfoBursh);
             AppendText(msg.Text, 20);
         }
 
