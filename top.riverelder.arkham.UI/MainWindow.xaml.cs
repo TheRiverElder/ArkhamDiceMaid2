@@ -1,6 +1,7 @@
 ﻿using Native.Sdk.Cqp.EventArgs;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,6 +18,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using top.riverelder.arkham.Code;
 using top.riverelder.arkham.Model.Code;
+using top.riverelder.arkham.UI.Model;
 
 namespace top.riverelder.arkham.UI {
 
@@ -33,7 +35,7 @@ namespace top.riverelder.arkham.UI {
 
         public MainWindow() {
             InitializeComponent();
-            this.iptGroup.Text = Convert.ToString(Global.Groups.Keys.FirstOrDefault());
+            this.txtGroup.Text = Convert.ToString(Global.Groups.Keys.FirstOrDefault());
         }
 
         private Chat groupChat;
@@ -66,7 +68,7 @@ namespace top.riverelder.arkham.UI {
         }
 
         private void BtnGroup_Click(object sender, RoutedEventArgs e) {
-            if (!long.TryParse(this.iptGroup.Text, out long groupId)) {
+            if (!long.TryParse(this.txtGroup.Text, out long groupId)) {
                 return;
             }
             if (groupChat != null) {
@@ -82,6 +84,9 @@ namespace top.riverelder.arkham.UI {
                 AppendText($"当前群：{groupInfo.Name} ({groupId})", NoticeBursh);
                 foreach (var msg in chat.Messages) {
                     AddMessage(msg);
+                }
+                if (lstGroup.Visibility == Visibility.Visible) {
+                    HideGroupSelections();
                 }
             } else {
                 AppendText("关联失败!", WarningBursh);
@@ -100,6 +105,45 @@ namespace top.riverelder.arkham.UI {
                     iptMessage.Clear();
                 }
             }
+        }
+        
+        private void Window_Closed(object sender, EventArgs e) {
+            if (groupChat != null) {
+                groupChat.OnAddMessage -= this.AddMessage;
+            }
+        }
+
+        private void ShowGroupSelections() {
+            List<Group> data = new List<Group>();
+            foreach (var g in Global.Groups) {
+                data.Add(new Group(g.Key, Chat.Api.GetGroupInfo(g.Key).Name, g.Value ?? "<无团>"));
+            }
+            Binding binding = new Binding {
+                Source = data
+            };
+            lstGroup.SetBinding(ItemsControl.ItemsSourceProperty, binding);
+            lstGroup.Visibility = Visibility.Visible;
+        }
+
+        private void HideGroupSelections() {
+            lstGroup.Visibility = Visibility.Collapsed;
+        }
+
+        private void LstGroup_LostFocus(object sender, RoutedEventArgs e) {
+            HideGroupSelections();
+        }
+
+        private void TxtGroup_GotFocus(object sender, RoutedEventArgs e) {
+            ShowGroupSelections();
+        }
+
+        private void LstGroup_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            Group group = lstGroup.SelectedItem as Group;
+            if (group is null) {
+                return;
+            }
+            txtGroup.Text = Convert.ToString(group.Id);
+            HideGroupSelections();
         }
     }
 }
