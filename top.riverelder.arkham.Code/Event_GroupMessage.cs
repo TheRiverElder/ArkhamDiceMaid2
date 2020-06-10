@@ -40,7 +40,7 @@ namespace top.riverelder.arkham.Code {
             } else {
                 List<CQCode> codes = e.Message.CQCodes;
                 
-                if (codes != null) {
+                if (codes?.Count > 0) {
                     long qq = e.FromQQ.Id;
                     foreach (CQCode code in codes) {
                         switch (code.Function) {
