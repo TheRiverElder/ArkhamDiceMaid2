@@ -28,7 +28,7 @@ namespace top.riverelder.arkham.UI {
         public static readonly Brush WarningBursh = new SolidColorBrush(Colors.Red);
         public static readonly Brush NoticeBursh = new SolidColorBrush(Colors.Green);
         public static readonly Brush MemberInfoBursh = new SolidColorBrush(Colors.Blue);
-        public static readonly Brush MessageTextBursh = new SolidColorBrush(Colors.Blue);
+        public static readonly Brush MessageTextBursh = new SolidColorBrush(Colors.Black);
 
 
         public MainWindow() {
