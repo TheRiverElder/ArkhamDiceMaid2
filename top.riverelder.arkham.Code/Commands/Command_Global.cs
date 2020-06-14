@@ -60,6 +60,15 @@ namespace top.riverelder.arkham.Code.Commands {
                     })
                 )
             ).Then(
+                PresetNodes.Literal<DMEnv>("睡眠").Then(
+                    PresetNodes.Bool<DMEnv>("开关", "开", "关")
+                    .Executes((env, args, dict) => {
+                        Global.Sleep = args.GetBool("开关");
+                        SaveUtil.SaveGlobal();
+                        env.Next = (Global.Sleep ? "那我去睡觉觉咯~w" : "爷来啦！");
+                    })
+                )
+            ).Then(
                 PresetNodes.Literal<DMEnv>("灌铅")
                 .Then(
                     PresetNodes.Int<DMEnv>("数值")
@@ -81,6 +90,8 @@ namespace top.riverelder.arkham.Code.Commands {
             dispatcher.SetAlias("调试", "全局 调试");
             dispatcher.SetAlias("回复", "全局 回复");
             dispatcher.SetAlias("自动载入", "全局 自动载入");
+            dispatcher.SetAlias("闭嘴", "全局 睡眠 开");
+            dispatcher.SetAlias("说话", "全局 睡眠 关");
             dispatcher.SetAlias("翻译腔", "全局 翻译腔");
             dispatcher.SetAlias("灌铅", "全局 灌铅");
         }
