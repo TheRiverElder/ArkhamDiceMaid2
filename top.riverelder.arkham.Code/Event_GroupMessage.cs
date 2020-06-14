@@ -18,9 +18,6 @@ namespace top.riverelder.arkham.Code {
     public class Event_GroupMessage : IGroupMessage {
 
         public void GroupMessage(object sender, CQGroupMessageEventArgs e) {
-            if (Global.Sleep) {
-                return;
-            }
             Chat chat = Chat.Of(e.FromGroup.Id);
             string msg = e.Message.Text;
             if (msg.StartsWith(Global.Prefix)) {

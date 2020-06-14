@@ -160,6 +160,9 @@ namespace top.riverelder.arkham.Code {
             bool flag = false;
             foreach (string c in cmds) {
                 try {
+                    if (Sleep && !Regex.IsMatch(c, @"$全局\s+")) {
+                        break;
+                    }
                     Dispatcher.Dispatch(c, env, out ICmdResult result);
                     if (!result.IsError) {
                         env.Line();
