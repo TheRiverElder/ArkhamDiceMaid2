@@ -51,6 +51,7 @@ namespace top.riverelder.arkham.Code.Utils {
                 IniObject global = IniObject.Load(Global.ConfFile, Encoding.UTF8);
 
                 IniSection conf = global["Config"];
+                if (conf.TryGetValue(nameof(Global.Sleep), out IniValue sleep)) Global.Sleep = sleep.ToBoolean();
                 if (conf.TryGetValue(nameof(Global.Prefix), out IniValue prefix)) Global.Prefix = prefix.ToString();
                 if (conf.TryGetValue(nameof(Global.DoAt), out IniValue doAt)) Global.DoAt = doAt.ToBoolean();
                 if (conf.TryGetValue(nameof(Global.AutoLoad), out IniValue autoLoad)) Global.DoAt = doAt.ToBoolean();
@@ -98,6 +99,7 @@ namespace top.riverelder.arkham.Code.Utils {
 
         public static bool SaveGlobal() {
             IniSection conf = new IniSection("Config") {
+                [nameof(Global.Sleep)] = new IniValue(Global.Sleep),
                 [nameof(Global.Prefix)] = new IniValue(Global.Prefix),
                 [nameof(Global.AutoLoad)] = new IniValue(Global.AutoLoad),
                 [nameof(Global.DoAt)] = new IniValue(Global.DoAt),

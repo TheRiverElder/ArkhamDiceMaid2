@@ -36,6 +36,14 @@ namespace top.riverelder.arkham.Code {
             } catch { }
         }
 
+
+
+
+        /// <summary>
+        /// 睡眠，相当于在群里关闭骰娘，但是小窗消息还是会有响应
+        /// </summary>
+        public static bool Sleep = false;
+
         /// <summary>
         /// 翻译腔，这并不会被保存
         /// </summary>

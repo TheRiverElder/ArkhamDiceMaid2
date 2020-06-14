@@ -18,14 +18,18 @@ namespace top.riverelder.arkham.Code {
     public class Event_GroupMessage : IGroupMessage {
 
         public void GroupMessage(object sender, CQGroupMessageEventArgs e) {
+            if (Global.Sleep) {
+                return;
+            }
             Chat chat = Chat.Of(e.FromGroup.Id);
             string msg = e.Message.Text;
             if (msg.StartsWith(Global.Prefix)) {
                 chat.AddMessage(e.Message.Text, e.FromQQ.Id, Chat.Message.Command);
+                QQGroupMemberType memberType = e.FromGroup.GetGroupMemberInfo(e.FromQQ).MemberType;
                 DMEnv env = new DMEnv(
                     e.FromQQ.Id,
                     e.FromGroup.Id,
-                    e.FromGroup.GetGroupMemberInfo(e.FromQQ).MemberType == QQGroupMemberType.Manage
+                    memberType == QQGroupMemberType.Manage || memberType == QQGroupMemberType.Creator
                     );
                 if (Global.DoAt) {
                     env.Append(CQApi.CQCode_At(e.FromQQ));
